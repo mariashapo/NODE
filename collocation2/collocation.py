@@ -8,6 +8,12 @@ from interpolation import BarycentricInterpolation
 from jax.scipy.linalg import solve
 import time
 
+def lagrange_basis_node(xi):
+    n = len(xi)
+    # The basis evaluated at the nodes xi is simply an identity matrix
+    L = jnp.eye(n)
+    return L
+
 # @jit
 def lagrange_basis(xi, x):
     n = len(xi)
