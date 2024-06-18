@@ -89,7 +89,7 @@ def collocate_data(data, tpoints, kernel="TriangularKernel", bandwidth=None):
 
     # the exprected shape is (dimensions, no of datapoints)
     # hence, the number of datapoints should be larger than the number of dimensions
-    if data.shape[0] > data.shape[1]:
+    if len(data.shape)>1 and data.shape[0] > data.shape[1]:
         data = data.T
 #-----------------------------------BANDWIDTH----------------------------------#
     if bandwidth is None:

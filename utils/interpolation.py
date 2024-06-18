@@ -2,12 +2,14 @@ import jax
 import jax.numpy as jnp
 
 class BarycentricInterpolation:
-    def __init__(self, n, start=-5, stop=5):
+    def __init__(self, n, start=-5, stop=5, spacing = "Chebyshev"):
         self.n = n
         self.start = start
         self.stop = stop
+        # if spacing == "Chebyshev":
         self.nodes = self.chebyshev_nodes_second_kind()
         self.weights = self.compute_barycentric_weights()
+    
         self.coefficients = None
 
     def chebyshev_nodes_second_kind(self):
