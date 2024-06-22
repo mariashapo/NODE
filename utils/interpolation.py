@@ -51,13 +51,3 @@ class BarycentricInterpolation:
         result = jnp.where(jnp.any(exact_matches, axis=1), self.coefficients[jnp.argmax(exact_matches, axis=1)], result)
 
         return result
-
-"""# Example usage:
-n = 5
-interp = BarycentricInterpolation(n)
-y = jnp.array([1.0, 2.0, 0.0, 4.0, 3.0])
-interp.fit(y)
-x_interp = jnp.array([0.5, 1.5, 2.5])
-y_interp = interp.evaluate(x_interp)
-print(y_interp)
-"""
