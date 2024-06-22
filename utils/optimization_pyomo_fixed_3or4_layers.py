@@ -91,10 +91,10 @@ class ODEOptimizationModel:
             inputs = new_inputs
         return inputs
 
-    def solve_model(self):
+    def solve_model(self, verbose=False):
         solver = pyo.SolverFactory('ipopt')
         solver.options['max_iter'] = self.max_iter
-        solver.solve(self.model, tee=True)
+        solver.solve(self.model, tee=verbose)
 
     def extract_solution(self):
         u = np.array([pyo.value(self.model.u[i]) for i in self.model.t_idx])
