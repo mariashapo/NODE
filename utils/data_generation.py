@@ -37,8 +37,8 @@ def generate_ode_data(n_points, noise_level, ode_type, params, start_time=0, end
             initial_state = 1.0
 
     #-----------------------------------------SPACING-------------------------------------#
-    if spacing_type == "equally_spaced":
-        t = jnp.linspace(start_time, end_time, n_points)
+    if spacing_type == "equally_spaced" or spacing_type == "uniform":
+        t = jnp.linspace(start_time, end_time, n_points, dtype=jnp.float64)
     elif spacing_type == "chebyshev":
         t = generate_chebyshev_nodes(n_points, start_time, end_time)
     else:
