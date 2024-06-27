@@ -6,17 +6,36 @@ import jax
 import jax.numpy as jnp
 
 class ODEOptimizationModel:
-    def __init__(self, y_observed, t, first_derivative_matrix, layer_sizes, penalty_lambda=100, max_iter=500, act_func="tanh", w_init_method="random", y_init = None):
+    def __init__(self, y_observed, t, first_derivative_matrix, layer_sizes, penalty_lambda=100, act_func="tanh", w_init_method="random", objective = "mse", y_init = None, 
+                 penalty = True, max_iter=None, max_cpu = None, tol = None, acceptable_tol = None, acceptable_iter = None, params = None, verbose=False, print_level = 4):
         self.y_observed = y_observed
         self.t = t
         self.first_derivative_matrix = first_derivative_matrix
-        self.penalty_lambda = penalty_lambda
-        self.max_iter = max_iter
-        self.act_func = act_func
-        self.w_init_method = w_init_method
-        self.layer_sizes = layer_sizes
+
         self.model = ConcreteModel()
+        
+        # model parameters
+        self.penalty_lambda = penalty_lambda
+        self.act_func = act_func
+        self.layer_sizes = layer_sizes
+        self.objective = objective
+        self.penalty = penalty
+        
+        # initialization parameters
+        self.w_init_method = w_init_method
         self.y_init = y_init
+        
+        # solver parameters
+        self.max_iter = max_iter
+        self.verbose = verbose
+        self.max_cpu = max_cpu
+        self.tol = tol
+        self.acceptable_tol = acceptable_tol
+        self.acceptable_iter = acceptable_iter
+        self.params = params
+        
+        # output parameters
+        self.print_level = print_level
 
     def initialize_weights(self, shape):
         if self.w_init_method == 'random':
@@ -72,7 +91,7 @@ class ODEOptimizationModel:
             du_dt = sum(self.first_derivative_matrix[i, j] * model.u[j] for j in range(N))
             dv_dt = sum(self.first_derivative_matrix[i, j] * model.v[j] for j in range(N))
 
-            nn_u, nn_v = self.nn_output(self.t[i], model.u[i], model.v[i], model)
+            nn_u, nn_v = self.nn_output( model.u[i], model.v[i], model)
 
             collocation_constraint_u = nn_u - du_dt
             collocation_constraint_v = nn_v - dv_dt
@@ -83,15 +102,21 @@ class ODEOptimizationModel:
             penalty_terms.append((collocation_constraint_u)**2 + (collocation_constraint_v)**2)
 
         def _objective(m):
-            data_fit = sum((m.u[i] - self.y_observed[i, 0])**2 + (m.v[i] - self.y_observed[i, 1])**2 for i in m.t_idx)
+            if self.objective == "mae":
+                data_fit = sum(self.mae(self.y_observed[i], m.u[i], m.v[i]) for i in m.t_idx)
+            elif self.objective == "mse":
+                data_fit = sum((m.u[i] - self.y_observed[i, 0])**2 + (m.v[i] - self.y_observed[i, 1])**2 for i in m.t_idx)
             penalty = self.penalty_lambda * sum(penalty_terms)
-            return penalty + data_fit
+            if self.penalty:
+                return penalty + data_fit
+            else:
+                return data_fit
 
         model.obj = Objective(rule=_objective, sense=pyo.minimize)
         self.model = model
 
-    def nn_output(self, t, u, v, m):
-        inputs = [t, u, v]
+    def nn_output(self, u, v, m):
+        inputs = [u, v]
         if len(self.layer_sizes) == 3:
             W1, b1, W2, b2 = m.W1, m.b1, m.W2, m.b2
             hidden = [sum(W1[j, k] * inputs[k] for k in range(self.layer_sizes[0])) + b1[j] for j in range(self.layer_sizes[1])]
@@ -122,10 +147,40 @@ class ODEOptimizationModel:
         return outputs
 
     def solve_model(self):
-        solver = pyo.SolverFactory('ipopt')
-        solver.options['max_iter'] = self.max_iter
-        solver.solve(self.model)
-
+        solver = pyo.SolverFactory('ipopt', tee=self.verbose)
+        solver.options['print_level'] = self.print_level
+        
+        if self.max_iter is not None:
+            solver.options['max_iter'] = self.max_iter
+        if self.max_cpu is not None:
+            solver.options['max_cpu_time'] = self.max_cpu
+        if self.tol is not None:
+            solver.options['tol'] = self.tol
+        if self.acceptable_tol is not None:
+            solver.options['acceptable_tol'] = self.acceptable_tol
+        if self.acceptable_iter is not None:
+            solver.options['acceptable_iter'] = self.acceptable_iter
+        
+        if self.params is not None:
+            for key, value in self.params.items():
+                solver.options[key] = value
+        
+        result = solver.solve(self.model, tee=self.verbose)
+        
+        # ------------------- Extract solver information -------------------
+        solver_time = result.solver.time
+        termination_condition = result.solver.termination_condition
+        message = result.solver.message
+        
+        # ----------------- Extracted information in a dictionary ----------
+        solver_info = {
+            'solver_time': solver_time,
+            'termination_condition': termination_condition,
+            'message': message
+        }
+        
+        return solver_info
+        
     def extract_solution(self):
         u = np.array([pyo.value(self.model.u[i]) for i in self.model.t_idx])
         v = np.array([pyo.value(self.model.v[i]) for i in self.model.t_idx])
@@ -149,9 +204,9 @@ class ODEOptimizationModel:
             weights['W1'], weights['b1'], weights['W2'], weights['b2'], weights['W3'], weights['b3'] = W1, b1, W2, b2, W3, b3
         return weights
 
-    def predict(self, t, u, v):
+    def predict(self, u, v):
         weights = self.extract_weights()
-        inputs = jnp.array([t, u, v])
+        inputs = jnp.array([u, v])
 
         if len(self.layer_sizes) == 3:
             W1, b1, W2, b2 = weights['W1'], weights['b1'], weights['W2'], weights['b2']
@@ -168,7 +223,6 @@ class ODEOptimizationModel:
         combined = np.vstack((u, v)).T
         mae_result = np.mean(np.abs(y_true - combined))
         return mae_result
-
 
 
 

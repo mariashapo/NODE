@@ -6,7 +6,7 @@ import jax
 import jax.numpy as jnp
 
 class ODEOptimizationModel:
-    def __init__(self, y_observed, t, first_derivative_matrix, layer_sizes, penalty_lambda=100, max_iter=500, act_func="tanh", w_init_method="random"):
+    def __init__(self, y_observed, t, first_derivative_matrix, layer_sizes, penalty_lambda=100, max_iter=500, act_func="tanh", w_init_method="random", y_init = None):
         self.y_observed = y_observed
         self.t = t
         self.first_derivative_matrix = first_derivative_matrix
@@ -16,6 +16,7 @@ class ODEOptimizationModel:
         self.w_init_method = w_init_method
         self.layer_sizes = layer_sizes
         self.model = ConcreteModel()
+        self.y_init = y_init
 
     def initialize_weights(self, shape):
         if self.w_init_method == 'random':
@@ -35,10 +36,14 @@ class ODEOptimizationModel:
         model = self.model
         model.t_idx = RangeSet(0, N - 1)
 
-        model.u = pyo.Var(model.t_idx, domain=pyo.Reals, initialize=0.1)
-        model.v = pyo.Var(model.t_idx, domain=pyo.Reals, initialize=0.1)
+        if self.y_init == None:
+            model.u = pyo.Var(model.t_idx, domain=pyo.Reals, initialize=0.1)
+            model.v = pyo.Var(model.t_idx, domain=pyo.Reals, initialize=0.1)
+        else:
+            model.u = pyo.Var(model.t_idx, domain=pyo.Reals, initialize=np.array(self.y_init[0]))
+            model.v = pyo.Var(model.t_idx, domain=pyo.Reals, initialize=np.array(self.y_init[1]))
 
-        # Create a Block to hold neural network parameters
+        # a Block to hold neural network parameters
         model.nn_block = Block()
         model.nn_block.layers = Block(range(len(self.layer_sizes) - 1))
 
@@ -55,7 +60,7 @@ class ODEOptimizationModel:
             du_dt = sum(self.first_derivative_matrix[i, j] * model.u[j] for j in range(N))
             dv_dt = sum(self.first_derivative_matrix[i, j] * model.v[j] for j in range(N))
 
-            nn_u, nn_v = self.nn_output(self.t[i], model.u[i], model.v[i], model)
+            nn_u, nn_v = self.nn_output(model.u[i], model.v[i], model)
 
             collocation_constraint_u = nn_u - du_dt
             collocation_constraint_v = nn_v - dv_dt
@@ -73,8 +78,8 @@ class ODEOptimizationModel:
         model.obj = Objective(rule=_objective, sense=pyo.minimize)
         self.model = model
 
-    def nn_output(self, t, u, v, m):
-        inputs = [t, u, v]
+    def nn_output(self, u, v, m):
+        inputs = [u, v]
         for i in range(len(self.layer_sizes) - 1):
             layer = m.nn_block.layers[i]
             new_inputs = []
@@ -110,9 +115,9 @@ class ODEOptimizationModel:
             weights[f'layer_{i}'] = (W, b)
         return weights
 
-    def predict(self, t, u, v):
+    def predict(self, u, v):
         weights = self.extract_weights()
-        inputs = jnp.array([t, u, v])
+        inputs = jnp.array([u, v])
 
         for i in range(len(self.layer_sizes) - 1):
             W, b = weights[f'layer_{i}']

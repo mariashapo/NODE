@@ -13,8 +13,22 @@ def damped_oscillation(y, t, damping_factor, omega_squared):
     return jnp.array([y[1], -damping_factor * y[1] - omega_squared * y[0]])
 
 @jit
-def van_der_pol(y, t, mu):
-    return jnp.array([y[1], mu * (1 - y[0]**2) * y[1] - y[0]])
+def van_der_pol(y, t, mu, omega, A = 1):
+    """
+    Van der Pol oscillator with a periodic forcing term.
+    
+    Args:
+    - y: State vector [y0, y1] where y0 is the displacement and y1 is the velocity.
+    - t: Time variable.
+    - mu: The damping parameter.
+    - A: Amplitude of the forcing term.
+    - omega: Angular frequency of the forcing term.
+    
+    Returns:
+    - dydt: Derivatives [dy0/dt, dy1/dt]
+    """
+    dydt = jnp.array([y[1], mu * (1 - y[0]**2) * y[1] - y[0] + A * jnp.cos(omega * t)])
+    return dydt
 
 @jit
 def decay(y, t, c):
@@ -53,8 +67,9 @@ def generate_ode_data(n_points, noise_level, ode_type, params, start_time=0, end
         omega_squared = params.get("omega_squared", 1)  # Default omega_squared if not specified
         ode_func = lambda y, t: damped_oscillation(y, t, damping_factor, omega_squared)
     elif ode_type == "van_der_pol":
-        mu = params.get("mu", 1)  # Default mu if not specified
-        ode_func = lambda y, t: van_der_pol(y, t, mu)
+        mu = params.get("mu", 1) 
+        omega = params.get("omega", 1) 
+        ode_func = lambda y, t: van_der_pol(y, t, mu, omega)
     elif ode_type == "decay":
         c = params.get("c", 1) 
         ode_func = lambda y, t: decay(y, t, c)   
