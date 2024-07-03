@@ -2,3 +2,6 @@ material/*
 material
 *.pkl
 */*.pkl
+data
+*.csv
+*/*.csv

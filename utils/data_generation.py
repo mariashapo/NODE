@@ -31,6 +31,10 @@ def van_der_pol(y, t, mu, omega, A = 1):
     return dydt
 
 @jit
+def sinusoidal_oscillator(y, t, A, omega):
+    return A * jnp.cos(omega * t)
+
+@jit
 def decay(y, t, c):
     return -c * y
 
@@ -72,7 +76,11 @@ def generate_ode_data(n_points, noise_level, ode_type, params, start_time=0, end
         ode_func = lambda y, t: van_der_pol(y, t, mu, omega)
     elif ode_type == "decay":
         c = params.get("c", 1) 
-        ode_func = lambda y, t: decay(y, t, c)   
+        ode_func = lambda y, t: decay(y, t, c)
+    elif ode_type == "sinusoidal_oscillator":
+        A = params.get("A", 1) 
+        omega = params.get("omega", 1) 
+        ode_func = lambda y, t: sinusoidal_oscillator(y, t, A, omega)   
     else:
         raise ValueError("Unsupported ODE type provided.")
         

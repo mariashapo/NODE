@@ -13,18 +13,19 @@ import flax.linen.initializers as initializers
 class NeuralODE(nn.Module):
     layer_widths: list
     time_invariant: bool = True
+    loss: int = 0
+    max_iter: int = np.inf
+    regularizer: float = 1e-5
 
     @nn.compact
     def __call__(self, x):
         for width in self.layer_widths[:-1]:
             x = nn.Dense(width, kernel_init=initializers.lecun_normal())(x)
-            # batch normalization
-            # x = nn.BatchNorm(use_running_average=False)(x)
             x = nn.tanh(x)
         x = nn.Dense(self.layer_widths[-1], kernel_init=initializers.lecun_normal())(x)
         return x
 
-    def create_train_state(self, rng, learning_rate):
+    def create_train_state(self, rng, learning_rate, regularizer = 1e-5):
         """
         Create and initialize the training state for the NeuralODE model.
         
@@ -35,11 +36,13 @@ class NeuralODE(nn.Module):
         Returns:
             train_state.TrainState: Initialized training state.
         """
+        self.regularizer = regularizer
+        
         params = self.init(rng, jnp.ones((self.layer_widths[0],)))['params']
         tx = optax.adam(learning_rate)
         return train_state.TrainState.create(apply_fn=self.apply, params=params, tx=tx)
 
-    def loss_fn(self, params, apply_fn, t, observed_data, y0):
+    def loss_fn(self, params, apply_fn, t, observed_data, y0, args):
         """
         Compute the loss as the mean absolute error between predicted and observed data.
         
@@ -53,23 +56,34 @@ class NeuralODE(nn.Module):
         Returns:
             float: The mean absolute error loss.
         """
-        def func(y, t):
-            y = jnp.atleast_1d(y)
-            if self.time_invariant:
-                return apply_fn({'params': params}, y)
-            else:
+        def func(y, t, args_):
+            input = jnp.atleast_1d(y)
+            if not self.time_invariant:
                 # time-dependent ODE
-                input = jnp.append(y, t)
-                return apply_fn({'params': params}, input)
+                # print(f't shape: {t.shape}')
+                input = jnp.append(input, t)
+            
+            # print(f'Input shape: {input.shape}') 
+            if args is not None:
+                # print(f'Args shape: {args.shape}')
+                for arg in args[t.astype(int)]: # need to select the correct index
+                    # print(f'Arg shape: {arg.shape}')
+                    input = jnp.append(input, arg)
+            
+            # print(f'Input shape: {input.shape}')
+            return apply_fn({'params': params}, input)
         
-        pred_solution = odeint(func, y0, t)
+        # >>>>>>>>>>>>>>>>>>>>>>>>>>>> ODEINT <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< # 
+        pred_solution = odeint(func, y0, t, args)
+        
         # >>>>>>>>>>>>>>>>>>>>>>>>>> MSE vs MAE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< #
         loss_mse = jnp.mean(jnp.square(pred_solution - observed_data))
-        loss_mae = jnp.mean(jnp.abs(pred_solution - observed_data))
+        # loss_mae = jnp.mean(jnp.abs(pred_solution - observed_data))
         l2_regularization = sum(jnp.sum(param ** 2) for param in jax.tree_util.tree_leaves(params))  # L2 regularization
-        return loss_mse + 1e-4 * l2_regularization 
+        
+        return loss_mse + 1e-5 * l2_regularization 
     
-    def train_step(self, state, t, observed_data, y0):
+    def train_step(self, state, t, observed_data, y0, extra_args):
         """
         Perform a single training step by computing the loss and its gradients,
         and then updating the model parameters.
@@ -84,11 +98,13 @@ class NeuralODE(nn.Module):
             tuple: Updated state and loss value.
         """
         grad_fn = jax.value_and_grad(self.loss_fn)
-        loss, grads = grad_fn(state.params, state.apply_fn, t, observed_data, y0)
+        loss, grads = grad_fn(state.params, state.apply_fn, t, observed_data, y0, extra_args)
         state = state.apply_gradients(grads=grads)
         return state, loss
 
-    def train(self, state, t, observed_data, y0, num_epochs=1000):
+    def train(self, state, t, observed_data, y0, num_epochs = np.inf, loss = 0, extra_args=None):
+        self.loss = loss
+        self.max_iter = num_epochs
         """
         Train the model over a specified number of epochs.
         
@@ -103,16 +119,21 @@ class NeuralODE(nn.Module):
             train_state.TrainState: Trained model state.
         """
         @jax.jit
-        def train_step_jit(state, t, observed_data, y0):
-            return self.train_step(state, t, observed_data, y0)
+        def train_step_jit(state, t, observed_data, y0, extra_args):
+            return self.train_step(state, t, observed_data, y0, extra_args)
 
-        for epoch in range(num_epochs):
-            state, loss = train_step_jit(state, t, observed_data, y0)
+        epoch = 0
+        # for epoch in range(num_epochs):
+        while True:
+            epoch += 1
+            state, loss = train_step_jit(state, t, observed_data, y0, extra_args)
             if epoch % 100 == 0:
                 print(f'Epoch {epoch}, Loss: {loss}')
+            if loss < self.loss or epoch > self.max_iter:
+                break
         return state
 
-    def neural_ode(self, params, y0, t, state):
+    def neural_ode(self, params, y0, t, state, args = None):
         """
         Obtain the solution of the neural ODE given initial conditions and time points.
         
@@ -125,12 +146,18 @@ class NeuralODE(nn.Module):
         Returns:
             jax.numpy.ndarray: Solution of the ODE at the given time points.
         """
-        def func(y, t):
-            y = jnp.atleast_1d(y)
-            if self.time_invariant:
-                return state.apply_fn({'params': params}, y)
-            else:
-                input = jnp.append(y, t)
-                return state.apply_fn({'params': params}, input)
+        def func(y, t, args_):
+            input = jnp.atleast_1d(y)
             
-        return odeint(func, y0, t)
+            if not self.time_invariant:
+                input = jnp.append(input, t)
+            
+            if args_ is not None:
+                print("*")
+                # need to select the correct index based on the time point
+                for arg in args_[t.astype(int)]: 
+                    input = jnp.append(input, arg)
+            
+            return state.apply_fn({'params': params}, input)
+            
+        return odeint(func, y0, t, args)

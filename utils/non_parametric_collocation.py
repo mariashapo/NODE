@@ -3,6 +3,7 @@ import jax.numpy as jnp
 from jax.scipy.linalg import solve
 from jax.experimental.ode import odeint
 
+import warnings
 #-----------------------------------COLLOCATION FUNCTIONS--------------------------------#
 
 def construct_t_matrix(order, tpoints, t):
@@ -53,7 +54,7 @@ def calckernel(kernel_type, x):
     elif kernel_type == "EpanechnikovKernel":
         return (3/4) * jnp.maximum((1 - x**2), 0)
     
-def configure_extraction_vectors(data):
+def configure_extraction_vectors():
     """
     Configures the extraction vectors e1 and e2.
 
@@ -91,6 +92,7 @@ def collocate_data(data, tpoints, kernel="TriangularKernel", bandwidth=None):
     # hence, the number of datapoints should be larger than the number of dimensions
     if len(data.shape)>1 and data.shape[0] > data.shape[1]:
         data = data.T
+        warnings.warn("Data transposed to match expected dimensions.")
 #-----------------------------------BANDWIDTH----------------------------------#
     if bandwidth is None:
         bandwidth = (n**(-1/5)) * (n**(-3/35)) * (jnp.log(n)**(-1/16))
@@ -99,7 +101,7 @@ def collocate_data(data, tpoints, kernel="TriangularKernel", bandwidth=None):
 
 #-------------------------COEFFICIENT EXTRACTION VECTORS------------------------#
     # later on used to extract  coefficients from local polynomial approximations
-    e1, e2 = configure_extraction_vectors(data[:, 0])
+    e1, e2 = configure_extraction_vectors()
 
     # print(e2.shape)
     estimated_solution = []
@@ -113,7 +115,11 @@ def collocate_data(data, tpoints, kernel="TriangularKernel", bandwidth=None):
         T2 = construct_t_matrix(2, tpoints, _t)
         # constructs the weight matrix
         W = construct_w(tpoints, _t, bandwidth, kernel)
-        # print(W)
+        
+        
+        #print(f"T1 matrix at time {_t}:", T1)
+        #print(f"T2 matrix at time {_t}:", T2)
+        #print(f"Weight matrix W at time {_t}:", W)
 #-----------------------------------WEIGHT DATA-----------------------------------#
         # print(W.shape)
         # print(data.T.shape)
@@ -142,7 +148,6 @@ def collocate_data(data, tpoints, kernel="TriangularKernel", bandwidth=None):
         result_derivative = (e2.T @ solution2)
         result_derivative = jnp.squeeze(result_derivative) # remove extra dimension
         estimated_derivative.append(result_derivative)
-        # print(result_derivative)
         
         estimated_solution_ = jnp.stack(estimated_solution).T
         estimated_derivative_ = jnp.stack(estimated_derivative).T
