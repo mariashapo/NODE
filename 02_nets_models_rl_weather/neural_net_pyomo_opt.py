@@ -46,7 +46,7 @@ class NeuralODEPyomo:
         model.t_idx = RangeSet(0, N - 1)
         model.var_idx = RangeSet(0, M - 1)
 
-        lower_bound = -5.0
+        lower_bound = -1.0
         upper_bound = 5.0
 
         if self.y_init is None:
@@ -82,7 +82,7 @@ class NeuralODEPyomo:
         else:
             raise ValueError("layer_sizes should have exactly 3 elements: [input_size, hidden_size, output_size].")
             
-        model.ode = ConstraintList()
+        # model.ode = ConstraintList()
         
         iter = 0
         # for each data point
@@ -100,24 +100,30 @@ class NeuralODEPyomo:
                 
             nn_output = self.nn_output(nn_input, model)
             
+            penalty_terms = []
+            
+            
             if M > 1:
                 for k in range(M):                         
-                    model.ode.add(nn_output[k] - dy_dt[k] == 0)
+                    # model.ode.add(nn_output[k] - dy_dt[k] == 0)
+                    penalty_terms.append((nn_output[k] - dy_dt[k])**2)
                     iter += 1
             else:
                 dy_dt_value = dy_dt[0] if isinstance(dy_dt, list) else dy_dt
                 nn_output_value = nn_output[0] if isinstance(nn_output, list) else nn_output
-                model.ode.add(nn_output_value - dy_dt_value == 0)
+                # model.ode.add(nn_output_value - dy_dt_value == 0)
+                penalty_terms.append((nn_output_value - dy_dt_value)**2)
 
         def _objective(m):
-            # mae vs mse
+            # MAE vs MSE
             data_fit = sum(np.abs(m.y[i, k] - self.y_observed[i, k]) for i in m.t_idx for k in m.var_idx) 
             
             reg = sum(m.W1[j, k]**2 for j in range(self.layer_sizes[1]) for k in range(self.layer_sizes[0])) + \
                 sum(m.W2[j, k]**2 for j in range(self.layer_sizes[2]) for k in range(self.layer_sizes[1])) + \
                 sum(m.b1[j]**2 for j in range(self.layer_sizes[1])) + \
                 sum(m.b2[j]**2 for j in range(self.layer_sizes[2]))
-            return data_fit + reg * self.penalty_lambda
+                
+            return data_fit + 100*sum(penalty_terms) #+ reg * self.penalty_lambda
 
         model.obj = Objective(rule=_objective, sense=pyo.minimize)
         self.model = model 
