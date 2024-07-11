@@ -113,7 +113,9 @@ class NeuralODEPyomo:
                 nn_input.append(self.t[i])
             
             if self.extra_inputs is not None:
-                nn_input.append(self.extra_inputs[i])
+                # the expected shape is (N, num_extra_inputs)
+                for input in self.extra_inputs.T:
+                    nn_input.append(input[i])
             
             if M == 1:
                 nn_y = self.nn_output(nn_input, model)
@@ -127,8 +129,8 @@ class NeuralODEPyomo:
                 collocation_constraint_u = nn_y1 - dy1_dt
                 collocation_constraint_v = nn_y2 - dy2_dt
                 
-                model.ode.add(collocation_constraint_u == 0)
-                model.ode.add(collocation_constraint_v == 0)
+                #model.ode.add(collocation_constraint_u == 0)
+                #model.ode.add(collocation_constraint_v == 0)
         
     
         def _objective(m):
