@@ -5,3 +5,4 @@ material
 data
 *.csv
 */*.csv
+*/*.txt

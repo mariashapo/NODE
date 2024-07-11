@@ -8,7 +8,7 @@ import jax.numpy as jnp
 import warnings
 
 class NeuralODEPyomo:
-    def __init__(self, y_observed, t, first_derivative_matrix, layer_sizes, extra_input = None, penalty_lambda=1, max_iter=500, act_func="tanh", w_init_method="random", params = None, y_init = None):
+    def __init__(self, y_observed, t, first_derivative_matrix, layer_sizes, time_invariant = True, extra_input = None, penalty_lambda=1, max_iter=500, act_func="tanh", w_init_method="random", params = None, y_init = None):
         self.y_observed = y_observed
         self.t = t
         self.first_derivative_matrix = first_derivative_matrix
@@ -20,8 +20,9 @@ class NeuralODEPyomo:
         self.model = ConcreteModel()
         self.y_init = y_init
         self.w_init_method = w_init_method
+        self.time_invariant = time_invariant
         # only 1D input is supported for now
-        self.extra_input = extra_input
+        self.extra_inputs = extra_input
         self.params = params
 
     def initialize_weights(self, shape):
@@ -45,73 +46,84 @@ class NeuralODEPyomo:
         model.t_idx = RangeSet(0, N - 1)
         model.var_idx = RangeSet(0, M - 1)
 
-        lower_bound = -10.0
-        upper_bound = 10.0
+        lower_bound = -5.0
+        upper_bound = 5.0
 
         if self.y_init is None:
             model.y = Var(model.t_idx, model.var_idx, domain=pyo.Reals, initialize=0.1, bounds=(lower_bound, upper_bound))
         else:
             if self.y_init.shape[0] < self.y_init.shape[1]:
-                # less rows than columns
+                # less rows than columns
                 warnings.warn("y_init should be structured such that each row represents a new time point.")
             model.y = Var(model.t_idx, model.var_idx, domain=pyo.Reals, initialize=lambda m, i, j: np.array(self.y_init)[i, j], bounds=(lower_bound, upper_bound))
 
+        weight_bounds = (-100.0, 100.0)
+        input_size = self.layer_sizes[0]
+        layer1 = self.layer_sizes[1]
+        
+        model.W1 = pyo.Var(range(layer1), range(input_size), initialize=lambda m, i, j: self.initialize_weights((layer1, input_size))[i, j], bounds=weight_bounds)
+        model.b1 = pyo.Var(range(layer1), initialize=lambda m, i: self.initialize_biases(layer1)[i], bounds=weight_bounds)
+        
         if len(self.layer_sizes) == 3:
-            input_size = self.layer_sizes[0]
-            hidden_size = self.layer_sizes[1]
             output_size = self.layer_sizes[2]
-
-            weight_bounds = (-100.0, 100.0)
-
-            model.W1 = pyo.Var(range(hidden_size), range(input_size), initialize=lambda m, i, j: self.initialize_weights((hidden_size, input_size))[i, j], bounds=weight_bounds)
-            model.b1 = pyo.Var(range(hidden_size), initialize=lambda m, i: self.initialize_biases(hidden_size)[i], bounds=weight_bounds)
-            model.W2 = pyo.Var(range(output_size), range(hidden_size), initialize=lambda m, i, j: self.initialize_weights((output_size, hidden_size))[i, j], bounds=weight_bounds)
+            model.W2 = pyo.Var(range(output_size), range(layer1), initialize=lambda m, i, j: self.initialize_weights((output_size, layer1))[i, j], bounds=weight_bounds)
             model.b2 = pyo.Var(range(output_size), initialize=lambda m, i: self.initialize_biases(output_size)[i], bounds=weight_bounds)
             
         elif len(self.layer_sizes) == 4:
-            input_size = self.layer_sizes[0]
-            hidden_size1 = self.layer_sizes[1]
-            hidden_size2 = self.layer_sizes[2]
+            layer2 = self.layer_sizes[2]
             output_size = self.layer_sizes[3]
 
-            model.W1 = pyo.Var(range(hidden_size1), range(input_size), initialize=0.1)
-            model.b1 = pyo.Var(range(hidden_size1), initialize=0.1)
-            model.W2 = pyo.Var(range(hidden_size2), range(hidden_size1), initialize=0.1)
-            model.b2 = pyo.Var(range(hidden_size2), initialize=0.1)
-            model.W3 = pyo.Var(range(output_size), range(hidden_size2), initialize=0.1)
+            model.W1 = pyo.Var(range(layer1), range(input_size), initialize=0.1)
+            model.b1 = pyo.Var(range(layer1), initialize=0.1)
+            model.W2 = pyo.Var(range(layer2), range(layer1), initialize=0.1)
+            model.b2 = pyo.Var(range(layer2), initialize=0.1)
+            model.W3 = pyo.Var(range(output_size), range(layer2), initialize=0.1)
             model.b3 = pyo.Var(range(output_size), initialize=0.1)
         else:
             raise ValueError("layer_sizes should have exactly 3 elements: [input_size, hidden_size, output_size].")
             
-        model.ode = ConstraintList()
+        # model.ode = ConstraintList()
         
         iter = 0
+        # for each data point
         for i in range(1, N):
             dy_dt = [sum(self.first_derivative_matrix[i, j] * model.y[j, k] for j in range(N)) for k in range(M)]
             nn_input = [model.y[i, k] for k in range(M)] # for each input M; eg. u and v
             
-            if self.extra_input is not None:
-                nn_input.append(self.extra_input[i])
+            # if not time invariant, add time as input
+            if not self.time_invariant:
+                nn_input.append(self.t[i])
+            
+            if self.extra_inputs is not None:
+                for extra_input in self.extra_inputs:
+                    nn_input.append(extra_input[i])
+                
             nn_output = self.nn_output(nn_input, model)
+            
+            penalty_terms = []
+            
             
             if M > 1:
                 for k in range(M):                         
-                    model.ode.add(nn_output[k] - dy_dt[k] == 0)
+                    # model.ode.add(nn_output[k] - dy_dt[k] == 0)
+                    penalty_terms.append((nn_output[k] - dy_dt[k])**2)
                     iter += 1
             else:
                 dy_dt_value = dy_dt[0] if isinstance(dy_dt, list) else dy_dt
                 nn_output_value = nn_output[0] if isinstance(nn_output, list) else nn_output
-                model.ode.add(nn_output_value - dy_dt_value == 0)
+                # model.ode.add(nn_output_value - dy_dt_value == 0)
+                penalty_terms.append((nn_output_value - dy_dt_value)**2)
 
         def _objective(m):
-            # mae vs mse
+            # MAE vs MSE
             data_fit = sum(np.abs(m.y[i, k] - self.y_observed[i, k]) for i in m.t_idx for k in m.var_idx) 
             
             reg = sum(m.W1[j, k]**2 for j in range(self.layer_sizes[1]) for k in range(self.layer_sizes[0])) + \
                 sum(m.W2[j, k]**2 for j in range(self.layer_sizes[2]) for k in range(self.layer_sizes[1])) + \
                 sum(m.b1[j]**2 for j in range(self.layer_sizes[1])) + \
                 sum(m.b2[j]**2 for j in range(self.layer_sizes[2]))
-            return data_fit + reg * self.penalty_lambda
+                
+            return data_fit + 100*sum(penalty_terms) #+ reg * self.penalty_lambda
 
         model.obj = Objective(rule=_objective, sense=pyo.minimize)
         self.model = model 
@@ -120,13 +132,13 @@ class NeuralODEPyomo:
 
         if len(self.layer_sizes) == 3:
             hidden = np.dot(m.W1, nn_input) + m.b1
-
+            epsilon = 1e-10
             if self.act_func == "tanh":
                 hidden = [pyo.tanh(h) for h in hidden]
             elif self.act_func == "sigmoid":
-                hidden = [1 / (1 + pyo.exp(-h)) for h in hidden]
+                hidden = [1 / (1 + pyo.exp(-h) + epsilon) for h in hidden]
             elif self.act_func == "softplus":
-                hidden = [pyo.log(1 + pyo.exp(h)) for h in hidden]
+                hidden = [pyo.log(1 + pyo.exp(h) + epsilon) for h in hidden]
                 
             outputs = np.dot(m.W2, hidden) + m.b2
         
@@ -162,19 +174,10 @@ class NeuralODEPyomo:
     def solve_model(self):
         solver = pyo.SolverFactory('ipopt')
         
+        print("HERE")
+        
         if self.max_iter:
             solver.options['max_iter'] = self.max_iter
-            
-        # solver.options['print_level'] = 5
-        # solver.options['tol'] = 1e-6 # Set tolerance if needed
-        # solver.options['constr_viol_tol'] = 1e-5
-        # solver.options['bound_relax_factor'] = 1e-6  # Default is 1e-8
-        # solver.options['compl_inf_tol'] = 1e-2
-        # solver.options['dual_inf_tol'] = 10000
-        # solver.options['nlp_scaling_method'] = 'gradient-based'  # Or 'user-scaling'
-        # solver.options['mu_strategy'] = 'adaptive' # 'monotone'
-        # solver.options['check_derivatives_for_naninf'] = 'yes'
-        # solver.options['linear_solver'] = 'mumps'  # Or try 'ma27', 'ma57', 'ma86' if available #DEFAULT 'mumps'
         
         solver.options['halt_on_ampl_error'] = 'yes'
         
@@ -196,6 +199,7 @@ class NeuralODEPyomo:
             'message': message
         }
         
+        print(solver_info)
         return solver_info
 
     def extract_solution(self):
@@ -204,20 +208,18 @@ class NeuralODEPyomo:
 
     def extract_weights(self):
         weights = {}
-        if len(self.layer_sizes) == 3:
-            W1 = np.array([[pyo.value(self.model.W1[j, k]) for k in range(self.layer_sizes[0])] for j in range(self.layer_sizes[1])])
-            b1 = np.array([pyo.value(self.model.b1[j]) for j in range(self.layer_sizes[1])])
-            W2 = np.array([[pyo.value(self.model.W2[j, k]) for k in range(self.layer_sizes[1])] for j in range(self.layer_sizes[2])])
-            b2 = np.array([pyo.value(self.model.b2[j]) for j in range(self.layer_sizes[2])])
-            weights['W1'], weights['b1'], weights['W2'], weights['b2'] = W1, b1, W2, b2
-        elif len(self.layer_sizes) == 4:
-            W1 = np.array([[pyo.value(self.model.W1[j, k]) for k in range(self.layer_sizes[0])] for j in range(self.layer_sizes[1])])
-            b1 = np.array([pyo.value(self.model.b1[j]) for j in range(self.layer_sizes[1])])
-            W2 = np.array([[pyo.value(self.model.W2[j, k]) for k in range(self.layer_sizes[1])] for j in range(self.layer_sizes[2])])
-            b2 = np.array([pyo.value(self.model.b2[j]) for j in range(self.layer_sizes[2])])
+        
+        W1 = np.array([[pyo.value(self.model.W1[j, k]) for k in range(self.layer_sizes[0])] for j in range(self.layer_sizes[1])])
+        b1 = np.array([pyo.value(self.model.b1[j]) for j in range(self.layer_sizes[1])])
+        W2 = np.array([[pyo.value(self.model.W2[j, k]) for k in range(self.layer_sizes[1])] for j in range(self.layer_sizes[2])])
+        b2 = np.array([pyo.value(self.model.b2[j]) for j in range(self.layer_sizes[2])])
+        weights['W1'], weights['b1'], weights['W2'], weights['b2'] = W1, b1, W2, b2
+        
+        if len(self.layer_sizes) == 4:
+
             W3 = np.array([[pyo.value(self.model.W3[j, k]) for k in range(self.layer_sizes[2])] for j in range(self.layer_sizes[3])])
             b3 = np.array([pyo.value(self.model.b3[j]) for j in range(self.layer_sizes[3])])
-            weights['W1'], weights['b1'], weights['W2'], weights['b2'], weights['W3'], weights['b3'] = W1, b1, W2, b2, W3, b3
+            weights['W3'], weights['b3'] = W3, b3
         return weights
 
     def predict(self, input):

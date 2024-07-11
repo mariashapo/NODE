@@ -62,7 +62,16 @@ class NeuralODE(nn.Module):
                 input = jnp.append(y, t)
                 return apply_fn({'params': params}, input)
         
-        pred_solution = odeint(func, y0, t)
+        # pred_solution = odeint(func, y0, t)
+
+        # Example usage with custom tolerances
+        pred_solution = odeint(
+            func,
+            y0,
+            t,
+            rtol=1e-2,  # Relative tolerance
+            atol=1e-5   # Absolute tolerance
+        )
         # >>>>>>>>>>>>>>>>>>>>>>>>>> MSE vs MAE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< #
         loss_mse = jnp.mean(jnp.square(pred_solution - observed_data))
         loss_mae = jnp.mean(jnp.abs(pred_solution - observed_data))
