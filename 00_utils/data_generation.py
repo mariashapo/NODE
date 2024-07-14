@@ -35,6 +35,10 @@ def sinusoidal_oscillator(y, t, A, omega):
     return A * jnp.cos(omega * t)
 
 @jit
+def cosinusoidal_oscillator(y, t, omega):
+    return - omega * jnp.sin(omega * t)
+
+@jit
 def decay(y, t, c):
     return -c * y
 

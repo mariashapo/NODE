@@ -8,7 +8,9 @@ import jax.numpy as jnp
 import warnings
 
 class NeuralODEPyomo:
-    def __init__(self, y_observed, t, first_derivative_matrix, layer_sizes, time_invariant = True, extra_input = None, penalty_lambda=0.1, max_iter=500, act_func="tanh", w_init_method="random", params = None, y_init = None):
+    def __init__(self, y_observed, t, first_derivative_matrix, layer_sizes, time_invariant = True, extra_input = None, 
+                 penalty_lambda=0.1, max_iter=500, penalty_lambda_input = 0.001,
+                 act_func="tanh", w_init_method="random", params = None, y_init = None):
         self.y_observed = y_observed
         self.t = t
         self.first_derivative_matrix = first_derivative_matrix
@@ -25,6 +27,7 @@ class NeuralODEPyomo:
         self.params = params
         self.observed_dim = None
         self.data_dim = None
+        self.penalty_lambda_input = penalty_lambda_input
 
     def initialize_weights(self, shape):
         if self.w_init_method == 'random':
@@ -129,23 +132,25 @@ class NeuralODEPyomo:
                 collocation_constraint_u = nn_y1 - dy1_dt
                 collocation_constraint_v = nn_y2 - dy2_dt
                 
-                #model.ode.add(collocation_constraint_u == 0)
-                #model.ode.add(collocation_constraint_v == 0)
+                model.ode.add(collocation_constraint_u == 0)
+                model.ode.add(collocation_constraint_v == 0)
         
     
         def _objective(m):
             if M == 1:
                 data_fit = sum((m.y[i] - self.y_observed[i])**2 for i in m.t_idx)
+                penalty = sum((m.y[i] - self.y_init[i])**2 for i in range(N)) if self.y_init is not None else 0
                 smoothing = sum((m.y[i+1] - m.y[i])**2 for i in range(N-1))
             elif M == 2:
-                data_fit = sum((m.y1[i] - self.y_observed[i, 0])**2 + (m.y2[i] - self.y_observed[i, 1])**2 for i in m.t_idx)    
+                data_fit = sum((m.y1[i] - self.y_observed[i, 0])**2 + (m.y2[i] - self.y_observed[i, 1])**2 for i in m.t_idx)
+                penalty = sum((m.y1[i] - self.y_init[0][i])**2 + (m.y2[i] - self.y_init[1][i])**2 for i in range(N)) if self.y_init is not None else 0    
                 
             reg = sum(m.W1[j, k]**2 for j in range(self.layer_sizes[1]) for k in range(self.layer_sizes[0])) + \
                 sum(m.W2[j, k]**2 for j in range(self.layer_sizes[2]) for k in range(self.layer_sizes[1])) + \
                 sum(m.b1[j]**2 for j in range(self.layer_sizes[1])) + \
                 sum(m.b2[j]**2 for j in range(self.layer_sizes[2]))
             
-            return data_fit + reg * self.penalty_lambda
+            return data_fit + reg * self.penalty_lambda + self.penalty_lambda_input * penalty**2
 
 
         model.obj = Objective(rule=_objective, sense=pyo.minimize)
@@ -255,6 +260,7 @@ class NeuralODEPyomo:
             hidden1 = jnp.tanh(jnp.dot(W1, input) + b1)
             hidden2 = jnp.tanh(jnp.dot(W2, hidden1) + b2)
             outputs = jnp.dot(W3, hidden2) + b3
+            
         return outputs
 
     def mae(self, y_true, y_pred):
