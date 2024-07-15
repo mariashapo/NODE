@@ -4,18 +4,18 @@ from pyomo.environ import ConcreteModel, Var, ConstraintList, Objective, SolverF
 
 import jax
 import jax.numpy as jnp
+from jax.experimental.ode import odeint
 
 import warnings
 
 class NeuralODEPyomo:
     def __init__(self, y_observed, t, first_derivative_matrix, layer_sizes, time_invariant = True, extra_input = None, 
-                 penalty_lambda=0.1, max_iter=500, penalty_lambda_input = 0.001,
+                 penalty_lambda=0.1, penalty_lambda_input = 0.001,
                  act_func="tanh", w_init_method="random", params = None, y_init = None):
         self.y_observed = y_observed
         self.t = t
         self.first_derivative_matrix = first_derivative_matrix
         self.penalty_lambda = penalty_lambda
-        self.max_iter = max_iter
         self.act_func = act_func
         self.w_init_method = w_init_method
         self.layer_sizes = layer_sizes
@@ -198,9 +198,6 @@ class NeuralODEPyomo:
     def solve_model(self):
         solver = pyo.SolverFactory('ipopt')
         
-        if self.max_iter:
-            solver.options['max_iter'] = self.max_iter
-        
         solver.options['halt_on_ampl_error'] = 'yes'
         
         if self.params is not None:
@@ -249,6 +246,9 @@ class NeuralODEPyomo:
         return weights
 
     def predict(self, input):
+        """
+        Outputs the predicted rate of change of the observed variables.
+        """
         weights = self.extract_weights()
 
         if len(self.layer_sizes) == 3:
@@ -270,7 +270,41 @@ class NeuralODEPyomo:
     def mse(self, y_true, y_pred):
         mse_result = np.mean(np.squared(y_true - y_pred))
         return mse_result
-
+    
+    def neural_ode(self, y0, t, extra_args = None):
+        
+        def func(y, t, args):
+            input = jnp.atleast_1d(y)
+            if not self.time_invariant:
+                input = jnp.append(input, t)
+    
+            if args is not None:
+                extra_inputs, t_all = args
+            
+            if isinstance(extra_inputs, (np.ndarray, jnp.ndarray)):
+                # after confirming that extra inputs is an array
+                # there are 2 further options to consider:
+                # multiple datapoints and multiple features
+                
+                if extra_inputs.ndim == 2:
+                    # we have multiple datapoints
+                    index = jnp.argmin(jnp.abs(t_all - t))
+                    for extra_input in extra_inputs[index]:
+                            input = jnp.append(input, extra_input)
+                            
+                elif extra_inputs.ndim == 1:
+                    # we have a single datapoint so no need to slice the index
+                    for extra_input in extra_inputs:
+                            input = jnp.append(input, extra_input)
+                    
+            else: # if a single value, simply append it
+                input = jnp.append(input, extra_inputs)
+        
+            # call the predict function to simulate the ODE
+            result = self.predict(input)
+            return result
+    
+        return odeint(func, y0, t, extra_args)
 
 if __name__ == "__main__":
     """ode_model = ODEOptimizationModel(y_observed, t, first_derivative_matrix)

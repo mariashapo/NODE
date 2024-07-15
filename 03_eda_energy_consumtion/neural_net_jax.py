@@ -2,6 +2,7 @@ import numpy as np
 import jax
 import jax.numpy as jnp
 from jax import grad, jit, vmap, value_and_grad
+from jax.experimental import host_callback
 from jax.experimental.ode import odeint
 import optax
 
@@ -43,20 +44,6 @@ class NeuralODE(nn.Module):
         return train_state.TrainState.create(apply_fn=self.apply, params=params, tx=tx)
 
     def loss_fn(self, params, apply_fn, t, observed_data, y0, args):
-        """
-        Compute the loss as the mean absolute error between predicted and observed data.
-        
-        Args:
-            params (dict): Parameters of the model.
-            apply_fn (function): Function to apply the model to input data.
-            t (jax.numpy.ndarray): Time points at which the ODE is solved.
-            observed_data (jax.numpy.ndarray): True data to compare against the model's predictions.
-            y0 (jax.numpy.ndarray): Initial condition for the ODE.
-            args (jax.numpy.ndarray): Extra arguments for the ODE function.
-        
-        Returns:
-            float: The mean absolute error loss.
-        """
         def func(y, t, args):
             input = jnp.atleast_1d(y)
             
@@ -74,8 +61,11 @@ class NeuralODE(nn.Module):
                         input = jnp.append(input, extra_input)
                 else:
                     input = jnp.append(input, extra_inputs[index])"""
-                
-            return apply_fn({'params': params}, input)
+                    
+            result = apply_fn({'params': params}, input)
+            #debug_print(result, transform=lambda x: f"Result: {x}") 
+            #debug_print(t, transform=lambda t: f"t: {t}")    
+            return result
         
         pred_solution = odeint(func, y0, t, args)
         
@@ -83,7 +73,7 @@ class NeuralODE(nn.Module):
         l2_regularization = sum(jnp.sum(param ** 2) for param in jax.tree_util.tree_leaves(params))
         
         return loss_mse #+ self.regularizer * l2_regularization 
-    
+
     def train_step(self, state, t, observed_data, y0, extra_args):
         """
         Perform a single training step by computing the loss and its gradients,
@@ -105,21 +95,7 @@ class NeuralODE(nn.Module):
         return state, loss
 
     def train(self, state, t, observed_data, y0, num_epochs=np.inf, loss=0, extra_args=None):
-        """
-        Train the model over a specified number of epochs.
-        
-        Args:
-            state (train_state.TrainState): Initial state of the model.
-            t (jax.numpy.ndarray): Time points at which the ODE is solved.
-            observed_data (jax.numpy.ndarray): True data to compare against the model's predictions.
-            y0 (jax.numpy.ndarray): Initial condition for the ODE.
-            num_epochs (int, optional): Number of training epochs. Default is 1000.
-            loss (float, optional): Loss threshold for stopping the training. Default is 0.
-            extra_args (jax.numpy.ndarray, optional): Extra arguments for the ODE function.
 
-        Returns:
-            train_state.TrainState: Trained model state.
-        """
         self.loss = loss
         self.max_iter = num_epochs
         
@@ -131,48 +107,62 @@ class NeuralODE(nn.Module):
         while True:
             epoch += 1
             state, loss = train_step_jit(state, t, observed_data, y0, extra_args)
+            # state, loss = train_step(state, t, observed_data, y0, extra_args, self.loss_fn)
             if epoch % 100 == 0:
                 print(f'Epoch {epoch}, Loss: {loss}')
             if loss < self.loss or epoch > self.max_iter:
                 break
         return state
 
-    def neural_ode(self, params, y0, t, state, extra_args=None):
-        """
-        Obtain the solution of the neural ODE given initial conditions and time points.
-        
-        Args:
-            params (dict): Parameters of the model.
-            y0 (jax.numpy.ndarray): Initial condition for the ODE.
-            t (jax.numpy.ndarray): Time points at which the ODE is solved.
-            state (train_state.TrainState): State of the trained model.
-            args (jax.numpy.ndarray, optional): Extra arguments for the ODE function.
-
-        Returns:
-            jax.numpy.ndarray: Solution of the ODE at the given time points.
-        """
-        
+    def neural_ode(self, params, y0, t, state, extra_args=None): 
+        # results = []       
         def func(y, t, args):
-            print("XXX")
             input = jnp.atleast_1d(y)
+            
             if not self.time_invariant:
                 input = jnp.append(input, t)
+                
             if args is not None:
                 extra_inputs, t_all = args
                 
                 if isinstance(extra_inputs, (np.ndarray, jnp.ndarray)):
-                    print(t_all.shape)
-                    index = jnp.argmin(jnp.abs(t_all - t))
+                    # after confirming that extra inputs is an array
+                    # there are 2 further options to consider:
+                    # multiple datapoints and multiple features
                     
-                    if extra_inputs.shape[1] > 0:
+                    if extra_inputs.ndim == 2:
+                        # we have multiple datapoints
+                        index = jnp.argmin(jnp.abs(t_all - t))
                         for extra_input in extra_inputs[index]:
-                            input = jnp.append(input, extra_input)
-                    else:
-                        input = jnp.append(input, extra_inputs[index])
+                                input = jnp.append(input, extra_input)
+                                
+                    elif extra_inputs.ndim == 1:
+                        # we have a single datapoint so no need to slice the index
+                        for extra_input in extra_inputs:
+                                input = jnp.append(input, extra_input)
                         
                 else: # if a single value, simply append it
                     input = jnp.append(input, extra_inputs)
-                        
-            return state.apply_fn({'params': params}, input)
+            
+            result = state.apply_fn({'params': params}, input) 
+            
+            debug_print(result, transform=lambda x: f"Result: {x}")        
+            return result
             
         return odeint(func, y0, t, extra_args)
+
+def debug_print(value, transform=lambda x: x):
+    """A function to print during JIT execution using host_callback.id_tap."""
+    def print_func(x, _):
+        # `_` is a placeholder for auxiliary data, which we're ignoring here
+        print(transform(x))
+        return x  # Returning x is necessary as id_tap expects the function to return its input
+    return host_callback.id_tap(print_func, value)
+
+
+@jax.jit
+def train_step(state, t, observed_data, y0, extra_args, loss_fn):
+    grad_fn = jax.value_and_grad(loss_fn)
+    loss, grads = grad_fn(state.params, state.apply_fn, t, observed_data, y0, extra_args)
+    state = state.apply_gradients(grads=grads)
+    return state, loss
