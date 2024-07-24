@@ -12,9 +12,9 @@ import warnings
 
 class NeuralODEPyomo:
     def __init__(self, y_observed, t, first_derivative_matrix, layer_sizes, time_invariant=True, extra_input=None, 
-                 penalty_lambda_reg=0.1, penalty_lambda_input=0.001, constraint_penalty=0.1, 
+                 penalty_lambda_reg=0.1,
                  act_func="tanh", w_init_method="random", params=None, y_init=None, 
-                 constraint="l1", deriv_method="collocation", is_continuous=True):
+                deriv_method="collocation", is_continuous=True):
         
         """
         deriv_method = "collocation" or "pyomo"
@@ -34,9 +34,6 @@ class NeuralODEPyomo:
         self.params = params
         self.observed_dim = None
         self.data_dim = None
-        self.penalty_lambda_input = penalty_lambda_input
-        self.constraint_penalty = constraint_penalty
-        self.constraint = constraint
         self.deriv_method = deriv_method
         self.is_continuous = is_continuous
         
@@ -106,7 +103,6 @@ class NeuralODEPyomo:
             model.t_idx = RangeSet(0, N - 1)
             model.var_idx = RangeSet(0, M - 1)
 
-        # model.var_idx = RangeSet(0, M - 1)
         lower_bound = -5.0
         upper_bound = 5.0
 
@@ -187,7 +183,6 @@ class NeuralODEPyomo:
                     if t_i == self.t[0]:
                         return Constraint.Skip  
                     
-                    # define the correct neural net input
                     nn_input = [model.y1[t_i], m.y2[t_i]]  
                     if not self.time_invariant:
                         nn_input.append(t_i)
@@ -219,11 +214,9 @@ class NeuralODEPyomo:
                     
                     return nn_y2 == model.dy2_dt[t_i] 
                 
-
                 self.model.con1_y1 = Constraint(self.model.t, rule=_con1_y1)
                 self.model.con1_y2 = Constraint(self.model.t, rule=_con1_y2)
-                
-        # ------------------------------------ ORIGINAL COLLOCATION ---------------------------------------
+
         elif self.deriv_method == "collocation":
             model.ode = ConstraintList()
             # for each time point
@@ -252,24 +245,14 @@ class NeuralODEPyomo:
 
                 if M == 1:
                     nn_y = self.nn_output(nn_input, model)
-                    if self.constraint == "l2":
-                        model.ode.add((nn_y - dy_dt)**2 == 0)
-                    elif self.constraint == "l1":
-                        model.ode.add(nn_y == dy_dt)
-                    else:
-                        raise ValueError("Constraint should be either 'l1' or 'l2'.")
+                    model.ode.add(nn_y == dy_dt)
                     
                 elif M == 2:
                     nn_y1, nn_y2 = self.nn_output(nn_input, model)
-                    
-                    if self.constraint == "l2":
-                        model.ode.add((nn_y1 - dy1_dt)**2 == 0)
-                        model.ode.add((nn_y2 - dy2_dt)**2 == 0)
-                    elif self.constraint == "l1":
-                        model.ode.add((nn_y1 == dy1_dt))
-                        model.ode.add((nn_y2 == dy2_dt))
-                    else:
-                        raise ValueError("Constraint should be either 'l1' or 'l2'.")
+
+                    model.ode.add((nn_y1 == dy1_dt))
+                    model.ode.add((nn_y2 == dy2_dt))
+
         else:
             raise ValueError("deriv_method should be either 'collocation' or 'pyomo'.")
     
@@ -286,7 +269,7 @@ class NeuralODEPyomo:
                 sum(m.b1[j]**2 for j in range(self.layer_sizes[1])) + \
                 sum(m.b2[j]**2 for j in range(self.layer_sizes[2]))
             
-            return data_fit + reg * self.penalty_lambda_reg # + self.penalty_lambda_input * penalty**2
+            return data_fit + reg * self.penalty_lambda_reg 
 
         model.obj = Objective(rule=_objective, sense=pyo.minimize)
         self.model = model
@@ -368,13 +351,39 @@ class NeuralODEPyomo:
        return self.y_observed
    
     def extract_derivative(self):
-        if self.observed_dim == 1:
-            dy_dt = np.array([pyo.value(self.model.dy_dt[t]) for t in self.model.t])
-            return dy_dt
-        elif self.observed_dim == 2:
-            dy1_dt = np.array([pyo.value(self.model.dy1_dt[t]) for t in self.model.t])
-            dy2_dt = np.array([pyo.value(self.model.dy2_dt[t]) for t in self.model.t])
-            return [dy1_dt, dy2_dt]
+        if self.deriv_method == "pyomo":
+            if self.observed_dim == 1:
+                dy_dt = []
+                for t in self.model.t:
+                    try:
+                        dy_dt.append(pyo.value(self.model.dy_dt[t]))
+                    except ValueError:
+                        dy_dt.append(None) 
+                return np.array(dy_dt)
+            elif self.observed_dim == 2:
+                dy1_dt = np.array([pyo.value(self.model.dy1_dt[t]) for t in self.model.t])
+                dy2_dt = np.array([pyo.value(self.model.dy2_dt[t]) for t in self.model.t])
+                return [dy1_dt, dy2_dt]
+        elif self.deriv_method == "collocation":
+            if self.observed_dim == 1:
+                dy_dt = []
+                for i in range(self.data_dim):
+                    t_i = self.t[i]
+                    dy_dt_i = sum(self.first_derivative_matrix[i, j] * pyo.value(self.model.y[self.model.t[j]]) for j in range(self.data_dim))
+                    dy_dt.append(dy_dt_i)
+                return np.array(dy_dt)
+            elif self.observed_dim == 2:
+                dy1_dt = []
+                dy2_dt = []
+                for i in range(self.data_dim):
+                    t_i = self.t[i]
+                    dy1_dt_i = sum(self.first_derivative_matrix[i, j] * pyo.value(self.model.y1[self.model.t[j]]) for j in range(self.data_dim))
+                    dy2_dt_i = sum(self.first_derivative_matrix[i, j] * pyo.value(self.model.y2[self.model.t[j]]) for j in range(self.data_dim))
+                    dy1_dt.append(dy1_dt_i)
+                    dy2_dt.append(dy2_dt_i)
+                return [np.array(dy1_dt), np.array(dy2_dt)]
+        else:
+            raise ValueError("Invalid derivative method. Should be either 'pyomo' or 'collocation'.")
 
 
     def extract_weights(self):
@@ -492,9 +501,7 @@ class NeuralODEPyomo:
         )
         #print("solution.ts", solution.ts)
         return solution.ys
-    
-    
-    
+      
 def linear_interpolate(x, xp, yp):
     """
     Interpolate data points (xp, yp) to find the value at x.
