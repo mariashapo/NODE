@@ -11,7 +11,7 @@ import warnings
 
 class NeuralODEPyomo:
     def __init__(self, y_observed, t, first_derivative_matrix, layer_sizes, time_invariant = True, extra_input = None, 
-                 penalty_lambda_reg=0.1, penalty_lambda_input = 0, constraint_penalty = 0.1, 
+                 penalty_lambda_reg=0.1,
                  act_func="tanh", w_init_method="random", params = None, y_init = None, constraint = "l1"):
         
         self.y_observed = y_observed
@@ -29,8 +29,6 @@ class NeuralODEPyomo:
         self.params = params
         self.observed_dim = None
         self.data_dim = None
-        self.penalty_lambda_input = penalty_lambda_input
-        self.constraint_penalty = constraint_penalty
         self.constraint = constraint
         
     def update_y_observed(self, new_y_observed):

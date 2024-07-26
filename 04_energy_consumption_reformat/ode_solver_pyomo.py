@@ -4,7 +4,7 @@ from pyomo.environ import ConcreteModel, Var, Constraint, ConstraintList, Object
 from pyomo.dae import ContinuousSet, DerivativeVar
 
 class DirectODESolver:
-    def __init__(self, t, layer_sizes, weights, biases, initial_state, params = None, act_func="tanh", time_invariant=True, extra_input=None):
+    def __init__(self, t, layer_sizes, weights, biases, initial_state, params = None, act_func="tanh", time_invariant=True, extra_input=None,  discretization_scheme = 'LAGRANGE-RADAU'):
         self.t = t
         self.layer_sizes = layer_sizes
         self.weights = weights
@@ -19,6 +19,7 @@ class DirectODESolver:
         self.b1 = biases[0]
         self.b2 = biases[1]
         self.params = params
+        self.discretization_scheme = discretization_scheme
         
         """
         W1 = trained_weights_biases['W1']
@@ -29,7 +30,7 @@ class DirectODESolver:
         
     def build_model(self):
         self.model.t = ContinuousSet(initialize=self.t)
-        self.model.y = Var(self.model.t, domain=pyo.Reals, initialize=0.1)
+        self.model.y = Var(self.model.t, domain=pyo.Reals, initialize=1)
         self.model.dy_dt = DerivativeVar(self.model.y, wrt=self.model.t)
         
         # self.model.init_condition = Constraint(expr= (self.model.y[self.t[0]] == self.initial_state ))
@@ -48,8 +49,8 @@ class DirectODESolver:
         self.model.ode = Constraint(self.model.t, rule=_ode)
         
         def _objective(m):
-            return np.abs(self.model.y[self.t[0]] - self.initial_state)
-            # return 1
+            return np.abs(m.y[self.t[0]] - self.initial_state)
+            #return 1
         
         self.model.obj = Objective(rule=_objective, sense=pyo.minimize)
         
@@ -73,9 +74,16 @@ class DirectODESolver:
 
     def solve_model(self):
         # Apply discretization
-        discretizer = pyo.TransformationFactory('dae.collocation')
-        discretizer.apply_to(self.model, nfe=len(self.t)-1, ncp=3, scheme='LAGRANGE-RADAU')
-        
+        if self.discretization_scheme == 'LAGRANGE-RADAU':
+            discretizer = pyo.TransformationFactory('dae.collocation')
+            discretizer.apply_to(self.model, nfe=len(self.t)-1, ncp=1, scheme='LAGRANGE-RADAU')
+        elif self.discretization_scheme == 'BACKWARD':
+            discretizer = pyo.TransformationFactory('dae.finite_difference')
+            discretizer.apply_to(self.model, nfe=len(self.t)-1, scheme='BACKWARD')
+        elif self.discretization_scheme == 'LAGRANGE-LEGENDRE':
+            discretizer = pyo.TransformationFactory('dae.collocation')
+            discretizer.apply_to(self.model, nfe=len(self.t)-1, ncp=3, scheme='LAGRANGE-LEGENDRE')
+
         # Solve the model
         solver = SolverFactory('ipopt')
         if self.params is not None:
@@ -98,6 +106,8 @@ class DirectODESolver:
         return solver_info
     
     def extract_solution(self):
-        y = np.array([value(self.model.y[t]) for t in self.model.t])
-        return y
+        t_values = np.array([t for t in self.model.t])
+        y_values = np.array([value(self.model.y[t]) for t in self.model.t])
+        return t_values, y_values
+
 

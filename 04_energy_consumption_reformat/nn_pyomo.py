@@ -12,7 +12,8 @@ import warnings
 
 class NeuralODEPyomo:
     def __init__(self, y_observed, t, first_derivative_matrix, layer_sizes, time_invariant=True, extra_input=None, 
-                 penalty_lambda_reg=0.1,
+                 penalty_lambda_reg=0.1, penalty_lambda_smooth = 0.1,
+                 discretization_scheme = "LAGRANGE-RADAU", ncp = 3,
                  act_func="tanh", w_init_method="random", params=None, y_init=None, 
                 deriv_method="collocation", is_continuous=True):
         
@@ -36,6 +37,9 @@ class NeuralODEPyomo:
         self.data_dim = None
         self.deriv_method = deriv_method
         self.is_continuous = is_continuous
+        self.discretization_scheme = discretization_scheme
+        self.penalty_lambda_smooth = penalty_lambda_smooth
+        self.ncp = ncp
         
     def update_y_observed(self, new_y_observed):
         """
@@ -216,18 +220,17 @@ class NeuralODEPyomo:
                 
                 self.model.con1_y1 = Constraint(self.model.t, rule=_con1_y1)
                 self.model.con1_y2 = Constraint(self.model.t, rule=_con1_y2)
-
+        # ------------------------------------ COLLOCATION ---------------------------------------
         elif self.deriv_method == "collocation":
             model.ode = ConstraintList()
-            # for each time point
             
             for i, t_i in enumerate(self.t):
                 if i == 0:
-                    continue  # Skip the first time point to avoid boundary issues
-
+                    continue 
                 if M == 1: 
                     # (np.abs(self.t - t)).argmin()
                     dy_dt = sum(self.first_derivative_matrix[i, j] * model.y[self.t[j]] for j in range(N))
+                    print(type(dy_dt))
                     nn_input = [model.y[t_i]]  
                 elif M == 2:
                     dy1_dt = sum(self.first_derivative_matrix[i, j] * model.y1[self.t[j]] for j in range(N))
@@ -255,21 +258,28 @@ class NeuralODEPyomo:
 
         else:
             raise ValueError("deriv_method should be either 'collocation' or 'pyomo'.")
-    
+
+        
         def _objective(m):
             if M == 1:
                 data_fit = sum((m.y[t_i] - self.y_observed[i])**2 for i, t_i in enumerate(self.t))
-                # penalty = sum((m.y[t_i] - self.y_init[t_i])**2 for t_i in self.t) if self.y_init is not None else 0
+                # reg_smooth = sum((m.y[self.t[i+1]] - m.y[self.t[i]])**2 for i in range(len(self.t) - 1))
+                # reg_smooth_derivative = _sign_change_penalty(m) * self.penalty_lambda_smooth
+                
             elif M == 2:
                 data_fit = sum((m.y1[t_i] - self.y_observed[i, 0])**2 + (m.y2[t_i] - self.y_observed[i, 1])**2 for i, t_i in enumerate(self.t))
-                # enalty = sum((m.y1[t_i] - self.y_init[0][t_i])**2 + (m.y2[t_i] - self.y_init[1][t_i])**2 for t_i in self.t) if self.y_init is not None else 0    
-                
-            reg = sum(m.W1[j, k]**2 for j in range(self.layer_sizes[1]) for k in range(self.layer_sizes[0])) + \
-                sum(m.W2[j, k]**2 for j in range(self.layer_sizes[2]) for k in range(self.layer_sizes[1])) + \
-                sum(m.b1[j]**2 for j in range(self.layer_sizes[1])) + \
-                sum(m.b2[j]**2 for j in range(self.layer_sizes[2]))
-            
-            return data_fit + reg * self.penalty_lambda_reg 
+                #reg_smooth_1 = sum((m.y1[self.t[i+1]] - m.y1[self.t[i]])**2 for i in range(len(self.t) - 1))
+                #reg_smooth_2 = sum((m.y2[self.t[i+1]] - m.y2[self.t[i]])**2 for i in range(len(self.t) - 1))
+                #reg_smooth = reg_smooth_1 + reg_smooth_2
+
+            # Regularization for weights and biases
+            reg = (sum(m.W1[j, k]**2 for j in range(self.layer_sizes[1]) for k in range(self.layer_sizes[0])) + 
+                sum(m.W2[j, k]**2 for j in range(self.layer_sizes[2]) for k in range(self.layer_sizes[1])) + 
+                sum(m.b1[j]**2 for j in range(self.layer_sizes[1])) + 
+                sum(m.b2[j]**2 for j in range(self.layer_sizes[2])))
+
+            return data_fit + reg * self.penalty_lambda_reg #+ reg_smooth_derivative
+
 
         model.obj = Objective(rule=_objective, sense=pyo.minimize)
         self.model = model
@@ -315,9 +325,16 @@ class NeuralODEPyomo:
 
     def solve_model(self):
         # Apply discretization
-        discretizer = pyo.TransformationFactory('dae.collocation')
-        discretizer.apply_to(self.model, nfe=len(self.t)-1, ncp=3, scheme='LAGRANGE-RADAU')
-        
+        if self.discretization_scheme == 'LAGRANGE-RADAU':
+            discretizer = pyo.TransformationFactory('dae.collocation')
+            discretizer.apply_to(self.model, nfe=len(self.t)-1, ncp=self.ncp, scheme='LAGRANGE-RADAU')
+        elif self.discretization_scheme == 'BACKWARD':
+            discretizer = pyo.TransformationFactory('dae.finite_difference')
+            discretizer.apply_to(self.model, nfe=len(self.t)-1, scheme='BACKWARD')
+        elif self.discretization_scheme == 'LAGRANGE-LEGENDRE':
+            discretizer = pyo.TransformationFactory('dae.collocation')
+            discretizer.apply_to(self.model, nfe=len(self.t)-1, ncp=self.ncp, scheme='LAGRANGE-LEGENDRE')
+
         # Solve the model
         solver = SolverFactory('ipopt')
         if self.params is not None:
@@ -368,8 +385,7 @@ class NeuralODEPyomo:
             if self.observed_dim == 1:
                 dy_dt = []
                 for i in range(self.data_dim):
-                    t_i = self.t[i]
-                    dy_dt_i = sum(self.first_derivative_matrix[i, j] * pyo.value(self.model.y[self.model.t[j]]) for j in range(self.data_dim))
+                    dy_dt_i = sum(self.first_derivative_matrix[i, j] * pyo.value(self.model.y[t_i]) for j, t_i in enumerate(self.t))
                     dy_dt.append(dy_dt_i)
                 return np.array(dy_dt)
             elif self.observed_dim == 2:
@@ -384,7 +400,6 @@ class NeuralODEPyomo:
                 return [np.array(dy1_dt), np.array(dy2_dt)]
         else:
             raise ValueError("Invalid derivative method. Should be either 'pyomo' or 'collocation'.")
-
 
     def extract_weights(self):
         weights = {}

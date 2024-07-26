@@ -73,7 +73,6 @@ class NeuralODE(nn.Module):
             stepsize_controller=stepsize_controller,
             saveat=saveat,
             adjoint=dfx.RecursiveCheckpointAdjoint(checkpoints=100) 
-            
         )
 
         #debug_print_simple(solution.ts)
