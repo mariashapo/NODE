@@ -8,8 +8,6 @@ import jax.numpy as jnp
 from jax.experimental.ode import odeint
 import diffrax as dfx
 
-import warnings
-
 class NeuralODEPyomo:
     def __init__(self, y_observed, t, first_derivative_matrix, layer_sizes, time_invariant=True, extra_input=None, 
                  penalty_lambda_reg=0.1, penalty_lambda_smooth = 0.1,
@@ -220,42 +218,6 @@ class NeuralODEPyomo:
                 
                 self.model.con1_y1 = Constraint(self.model.t, rule=_con1_y1)
                 self.model.con1_y2 = Constraint(self.model.t, rule=_con1_y2)
-        # ------------------------------------ COLLOCATION ---------------------------------------
-        elif self.deriv_method == "collocation":
-            model.ode = ConstraintList()
-            
-            for i, t_i in enumerate(self.t):
-                if i == 0:
-                    continue 
-                if M == 1: 
-                    # (np.abs(self.t - t)).argmin()
-                    dy_dt = sum(self.first_derivative_matrix[i, j] * model.y[self.t[j]] for j in range(N))
-                    # print(type(dy_dt))
-                    nn_input = [model.y[t_i]]  
-                elif M == 2:
-                    dy1_dt = sum(self.first_derivative_matrix[i, j] * model.y1[self.t[j]] for j in range(N))
-                    dy2_dt = sum(self.first_derivative_matrix[i, j] * model.y2[self.t[j]] for j in range(N))
-                    nn_input = [model.y1[t_i], model.y2[t_i]]
-
-                # add time and extra inputs
-                if not self.time_invariant:
-                    nn_input.append(self.t[i])
-                
-                if self.extra_inputs is not None:
-                    # the expected shape is (N, num_extra_inputs)
-                    for input in self.extra_inputs.T:
-                        nn_input.append(input[i])
-
-                if M == 1:
-                    nn_y = self.nn_output(nn_input, model)
-                    model.ode.add(nn_y == dy_dt)
-                    
-                elif M == 2:
-                    nn_y1, nn_y2 = self.nn_output(nn_input, model)
-
-                    model.ode.add((nn_y1 == dy1_dt))
-                    model.ode.add((nn_y2 == dy2_dt))
-
         else:
             raise ValueError("deriv_method should be either 'collocation' or 'pyomo'.")
 
@@ -264,22 +226,16 @@ class NeuralODEPyomo:
             if M == 1:
                 data_fit = sum((m.y[t_i] - self.y_observed[i])**2 for i, t_i in enumerate(self.t))
                 reg_smooth = sum((m.y[self.t[i+1]] - m.y[self.t[i]])**2 for i in range(len(self.t) - 1))
-                # reg_smooth_derivative = _sign_change_penalty(m) * self.penalty_lambda_smooth
                 
             elif M == 2:
                 data_fit = sum((m.y1[t_i] - self.y_observed[i, 0])**2 + (m.y2[t_i] - self.y_observed[i, 1])**2 for i, t_i in enumerate(self.t))
-                #reg_smooth_1 = sum((m.y1[self.t[i+1]] - m.y1[self.t[i]])**2 for i in range(len(self.t) - 1))
-                #reg_smooth_2 = sum((m.y2[self.t[i+1]] - m.y2[self.t[i]])**2 for i in range(len(self.t) - 1))
-                #reg_smooth = reg_smooth_1 + reg_smooth_2
 
-            # Regularization for weights and biases
             reg = (sum(m.W1[j, k]**2 for j in range(self.layer_sizes[1]) for k in range(self.layer_sizes[0])) + 
                 sum(m.W2[j, k]**2 for j in range(self.layer_sizes[2]) for k in range(self.layer_sizes[1])) + 
                 sum(m.b1[j]**2 for j in range(self.layer_sizes[1])) + 
                 sum(m.b2[j]**2 for j in range(self.layer_sizes[2])))
 
             return data_fit + reg * self.penalty_lambda_reg + reg_smooth * self.penalty_lambda_smooth
-
 
         model.obj = Objective(rule=_objective, sense=pyo.minimize)
         self.model = model
@@ -381,23 +337,6 @@ class NeuralODEPyomo:
                 dy1_dt = np.array([pyo.value(self.model.dy1_dt[t]) for t in self.model.t])
                 dy2_dt = np.array([pyo.value(self.model.dy2_dt[t]) for t in self.model.t])
                 return [dy1_dt, dy2_dt]
-        elif self.deriv_method == "collocation":
-            if self.observed_dim == 1:
-                dy_dt = []
-                for i in range(self.data_dim):
-                    dy_dt_i = sum(self.first_derivative_matrix[i, j] * pyo.value(self.model.y[t_i]) for j, t_i in enumerate(self.t))
-                    dy_dt.append(dy_dt_i)
-                return np.array(dy_dt)
-            elif self.observed_dim == 2:
-                dy1_dt = []
-                dy2_dt = []
-                for i in range(self.data_dim):
-                    t_i = self.t[i]
-                    dy1_dt_i = sum(self.first_derivative_matrix[i, j] * pyo.value(self.model.y1[self.model.t[j]]) for j in range(self.data_dim))
-                    dy2_dt_i = sum(self.first_derivative_matrix[i, j] * pyo.value(self.model.y2[self.model.t[j]]) for j in range(self.data_dim))
-                    dy1_dt.append(dy1_dt_i)
-                    dy2_dt.append(dy2_dt_i)
-                return [np.array(dy1_dt), np.array(dy2_dt)]
         else:
             raise ValueError("Invalid derivative method. Should be either 'pyomo' or 'collocation'.")
 

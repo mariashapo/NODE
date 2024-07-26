@@ -185,17 +185,17 @@ class NeuralODEPyomo:
         def _objective(m):
             if M == 1:
                 data_fit = sum((m.y[i] - self.y_observed[i])**2 for i in m.t_idx)
-                penalty = sum((m.y[i] - self.y_init[i])**2 for i in range(N)) if self.y_init is not None else 0
+                #penalty = sum((m.y[i] - self.y_init[i])**2 for i in range(N)) if self.y_init is not None else 0
             elif M == 2:
                 data_fit = sum((m.y1[i] - self.y_observed[i, 0])**2 + (m.y2[i] - self.y_observed[i, 1])**2 for i in m.t_idx)
-                penalty = sum((m.y1[i] - self.y_init[0][i])**2 + (m.y2[i] - self.y_init[1][i])**2 for i in range(N)) if self.y_init is not None else 0    
+                #penalty = sum((m.y1[i] - self.y_init[0][i])**2 + (m.y2[i] - self.y_init[1][i])**2 for i in range(N)) if self.y_init is not None else 0    
                 
             reg = sum(m.W1[j, k]**2 for j in range(self.layer_sizes[1]) for k in range(self.layer_sizes[0])) + \
                 sum(m.W2[j, k]**2 for j in range(self.layer_sizes[2]) for k in range(self.layer_sizes[1])) + \
                 sum(m.b1[j]**2 for j in range(self.layer_sizes[1])) + \
                 sum(m.b2[j]**2 for j in range(self.layer_sizes[2]))
             
-            return data_fit + reg * self.penalty_lambda_reg + self.penalty_lambda_input * penalty**2
+            return data_fit + reg * self.penalty_lambda_reg #+ self.penalty_lambda_input * penalty**2
 
 
         model.obj = Objective(rule=_objective, sense=pyo.minimize)
