@@ -97,72 +97,72 @@ class NeuralODEPyomo:
         N, M = self.y_observed.shape
         self.data_dim = N
         self.observed_dim = M
-        model = self.model
+        # model = self.model
 
         if self.is_continuous:
-            model.t = ContinuousSet(initialize=self.t)
+            self.model.t = ContinuousSet(initialize=self.t)
         else:
-            model.t_idx = RangeSet(0, N - 1)
-            model.var_idx = RangeSet(0, M - 1)
+            self.model.t_idx = RangeSet(0, N - 1)
+            self.model.var_idx = RangeSet(0, M - 1)
 
         lower_bound = -5.0
         upper_bound = 5.0
 
         if self.y_init is None:
             if M == 1:
-                model.y = Var(model.t, domain=pyo.Reals, initialize=0.1, bounds=(lower_bound, upper_bound))
+                self.model.y = Var(self.model.t, domain=pyo.Reals, initialize=0.1, bounds=(lower_bound, upper_bound))
             elif M == 2:
-                model.y1 = Var(model.t, domain=pyo.Reals, initialize=0.1, bounds=(lower_bound, upper_bound))
-                model.y2 = Var(model.t, domain=pyo.Reals, initialize=0.1, bounds=(lower_bound, upper_bound))
+                self.model.y1 = Var(self.model.t, domain=pyo.Reals, initialize=0.1, bounds=(lower_bound, upper_bound))
+                self.model.y2 = Var(self.model.t, domain=pyo.Reals, initialize=0.1, bounds=(lower_bound, upper_bound))
         else:
             if M == 1:
-                model.y = Var(model.t, domain=pyo.Reals, 
+                self.model.y = Var(self.model.t, domain=pyo.Reals, 
                             initialize=lambda m, t: self.y_init[(np.abs(self.t - t)).argmin()], 
+                            bounds=(lower_bound, upper_bound))
                             # y_init passed in would be a numpy array
                             # hence, need to determine the index of the closest time point
-                            bounds=(lower_bound, upper_bound))
             elif M == 2:
-                model.y1 = Var(model.t, domain=pyo.Reals, 
+                self.model.y1 = Var(self.model.t, domain=pyo.Reals, 
                             initialize=lambda m, t: self.y_init[0][(np.abs(self.t - t)).argmin()], 
                             bounds=(lower_bound, upper_bound))
-                model.y2 = Var(model.t, domain=pyo.Reals, 
+                self.model.y2 = Var(self.model.t, domain=pyo.Reals, 
                             initialize=lambda m, t: self.y_init[1][(np.abs(self.t - t)).argmin()], 
                             bounds=(lower_bound, upper_bound))
-
 
         weight_bounds = (-100.0, 100.0)
         input_size = self.layer_sizes[0]
         layer1 = self.layer_sizes[1]
         
-        model.W1 = Var(range(layer1), range(input_size), initialize=lambda m, i, j: self.initialize_weights((layer1, input_size))[i, j], bounds=weight_bounds)
-        model.b1 = Var(range(layer1), initialize=lambda m, i: self.initialize_biases(layer1)[i], bounds=weight_bounds)
+        self.model.W1 = Var(range(layer1), range(input_size), initialize=lambda m, i, j: self.initialize_weights((layer1, input_size))[i, j], bounds=weight_bounds)
+        self.model.b1 = Var(range(layer1), initialize=lambda m, i: self.initialize_biases(layer1)[i], bounds=weight_bounds)
         
         if len(self.layer_sizes) == 3:
             output_size = self.layer_sizes[2]
-            model.W2 = Var(range(output_size), range(layer1), initialize=lambda m, i, j: self.initialize_weights((output_size, layer1))[i, j], bounds=weight_bounds)
-            model.b2 = Var(range(output_size), initialize=lambda m, i: self.initialize_biases(output_size)[i], bounds=weight_bounds)
+            self.model.W2 = Var(range(output_size), range(layer1), initialize=lambda m, i, j: self.initialize_weights((output_size, layer1))[i, j], bounds=weight_bounds)
+            self.model.b2 = Var(range(output_size), initialize=lambda m, i: self.initialize_biases(output_size)[i], bounds=weight_bounds)
             
         elif len(self.layer_sizes) == 4:
             layer2 = self.layer_sizes[2]
             output_size = self.layer_sizes[3]
-            model.W2 = Var(range(layer2), range(layer1), initialize=0.1)
-            model.b2 = Var(range(layer2), initialize=0.1)
-            model.W3 = Var(range(output_size), range(layer2), initialize=0.1)
-            model.b3 = Var(range(output_size), initialize=0.1)
+            self.model.W2 = Var(range(layer2), range(layer1), initialize=0.1)
+            self.model.b2 = Var(range(layer2), initialize=0.1)
+            self.model.W3 = Var(range(output_size), range(layer2), initialize=0.1)
+            self.model.b3 = Var(range(output_size), initialize=0.1)
         else:
             raise ValueError("layer_sizes should have exactly 3 elements: [input_size, hidden_size, output_size].")
         
+        # ----------------------------------------- CONSTRAINTS -------------------------------------------
         # ------------------------------------ DERIVATIVE VARIABLES ---------------------------------------
         if self.deriv_method == "pyomo":
             if M == 1:
-                model.dy_dt = DerivativeVar(model.y, wrt=model.t)
+                self.model.dy_dt = DerivativeVar(self.model.y, wrt=self.model.t)
                 
                 def _con1_y(m, t_i):
                     if t_i == self.t[0]:
                         return Constraint.Skip 
                     
                     # define the correct neural net input
-                    nn_input = [model.y[t_i]]  
+                    nn_input = [m.y[t_i]]  
                     if not self.time_invariant:
                         nn_input.append(t_i)
                 
@@ -173,19 +173,19 @@ class NeuralODEPyomo:
 
                     nn_y1 = self.nn_output(nn_input, m)
                     
-                    return nn_y1 == model.dy_dt[t_i] 
+                    return nn_y1 == m.dy_dt[t_i] 
                 
                 self.model.con1_y = Constraint(self.model.t, rule=_con1_y)
                 
             elif M == 2: 
-                model.dy1_dt = DerivativeVar(model.y1, wrt=model.t)
-                model.dy2_dt = DerivativeVar(model.y2, wrt=model.t)
+                self.model.dy1_dt = DerivativeVar(self.model.y1, wrt=self.model.t)
+                self.model.dy2_dt = DerivativeVar(self.model.y2, wrt=self.model.t)
 
                 def _con1_y1(m, t_i):
                     if t_i == self.t[0]:
                         return Constraint.Skip  
                     
-                    nn_input = [model.y1[t_i], m.y2[t_i]]  
+                    nn_input = [self.model.y1[t_i], m.y2[t_i]]  
                     if not self.time_invariant:
                         nn_input.append(t_i)
                 
@@ -196,14 +196,14 @@ class NeuralODEPyomo:
 
                     nn_y1, _ = self.nn_output(nn_input, m)
 
-                    return nn_y1 == model.dy1_dt[t_i] 
+                    return nn_y1 == self.model.dy1_dt[t_i] 
 
                 def _con1_y2(m, t_i):
                     if t_i == self.t[0]:
                         return Constraint.Skip 
                     
                     # define the correct neural net input
-                    nn_input = [model.y1[t_i], m.y2[t_i]]  
+                    nn_input = [self.model.y1[t_i], m.y2[t_i]]  
                     if not self.time_invariant:
                         nn_input.append(t_i)
                 
@@ -214,7 +214,7 @@ class NeuralODEPyomo:
 
                     _, nn_y2 = self.nn_output(nn_input, m)
                     
-                    return nn_y2 == model.dy2_dt[t_i] 
+                    return nn_y2 == self.model.dy2_dt[t_i] 
                 
                 self.model.con1_y1 = Constraint(self.model.t, rule=_con1_y1)
                 self.model.con1_y2 = Constraint(self.model.t, rule=_con1_y2)
@@ -237,8 +237,7 @@ class NeuralODEPyomo:
 
             return data_fit + reg * self.penalty_lambda_reg + reg_smooth * self.penalty_lambda_smooth
 
-        model.obj = Objective(rule=_objective, sense=pyo.minimize)
-        self.model = model
+        self.model.obj = Objective(rule=_objective, sense=pyo.minimize)
     
     def nn_output(self, nn_input, m):
 

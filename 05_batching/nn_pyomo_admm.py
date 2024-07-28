@@ -1,38 +1,54 @@
 import numpy as np
 import pyomo.environ as pyo
-from pyomo.environ import ConcreteModel, Var, Constraint, ConstraintList, Objective, SolverFactory
+from pyomo.environ import ConcreteModel, Var, Constraint, ConstraintList, Objective, SolverFactory, value, RangeSet
 from pyomo.dae import ContinuousSet, DerivativeVar
 
-"""
-This method is a Pyomo implementation of the ADMM algorithm for training a neural network.
-The approach is based on having one shared model with 2 sets of parameters and 2 separate objective functions.
-The model is trained in an alternating fashion, where the parameters are updated for each objective function.
-"""
+import jax
+import jax.numpy as jnp
+from jax.experimental.ode import odeint
+import diffrax as dfx
+
+import warnings
 
 class NeuralODEPyomoADMM:
-    def __init__(self, y_observed, t, layer_sizes, extra_input = None, penalty_lambda_reg=0.1, penalty_rho=1.0):
-        midpoint = len(t) // 2
-        self.t1 = t[:midpoint]
-        self.t2 = t[midpoint:]
-        self.y_observed1 = y_observed[:midpoint]
-        self.y_observed2 = y_observed[midpoint:]
-        
+    def __init__(self, y_observed, t, first_derivative_matrix, layer_sizes, time_invariant=True, extra_input=None, 
+                 penalty_lambda_reg=0.01, penalty_lambda_smooth=0.0, act_func="tanh", w_init_method="random", params=None, y_init=None):
+
+        self.midpoint = len(t) // 2
+        self.y_observed1 = y_observed[:self.midpoint]
+        self.y_observed2 = y_observed[self.midpoint:]
+        self.t1 = t[:self.midpoint]
+        self.t2 = t[self.midpoint:]
+        self.model1 = ConcreteModel()
+        self.model2 = ConcreteModel()
+
         if extra_input is not None:
-            self.extra_input1 = extra_input[:midpoint]
-            self.extra_input2 = extra_input[midpoint:]
+            self.extra_input1 = extra_input[:self.midpoint]
+            self.extra_input2 = extra_input[self.midpoint:]
         else:
             self.extra_input1 = None
             self.extra_input2 = None
-        
-        self.layer_sizes = layer_sizes
-        self.penalty_lambda_reg = penalty_lambda_reg
-        self.penalty_rho = penalty_rho
 
-        self.model = ConcreteModel()
+        if y_init is not None:
+            self.y_init1 = y_init[:self.midpoint]
+            self.y_init2 = y_init[self.midpoint:]
+        else:
+            self.y_init1 = None
+            self.y_init2 = None
+
+        self.D1 = first_derivative_matrix[0]
+        self.D2 = first_derivative_matrix[1]
+
+        self.penalty_lambda_reg = penalty_lambda_reg
+        self.act_func = act_func
+        self.w_init_method = w_init_method
+        self.layer_sizes = layer_sizes
+        self.time_invariant = time_invariant
+        self.params = params
+        self.penalty_lambda_smooth = penalty_lambda_smooth
         
-        self.setup_variables()
-        self.setup_constraints()
-    
+        self.iter = 0
+
     def initialize_weights(self, shape):
         if self.w_init_method == 'random':
             return np.random.randn(*shape) * 0.1
@@ -46,64 +62,136 @@ class NeuralODEPyomoADMM:
     def initialize_biases(self, size):
         return np.random.randn(size) * 0.1
 
-    def setup_variables(self):
-        self.model.t1 = ContinuousSet(initialize=self.t1)
-        self.model.t2 = ContinuousSet(initialize=self.t2)
-        
+    def build_model(self):
+        # N = number of time steps
+        # M = number of observed variables (e.g., 2 for u and v)
+        N, M = self.y_observed1.shape
+        self.data_dim = N
+        self.observed_dim = M
+
+        self.model1.t = RangeSet(0, N - 1)
+        self.model2.t = RangeSet(0, N - 1)
+
         lower_bound = -5.0
         upper_bound = 5.0
-        
-        # initialize y1 and y2 with the observed data
-        self.model.y1 = Var(self.model.t, domain=pyo.Reals, 
-                    initialize=lambda m, t: self.y_observed1[0][(np.abs(self.t1 - t)).argmin()], 
-                    bounds=(lower_bound, upper_bound))
-        
-        self.model.y2 = Var(self.model.t, domain=pyo.Reals, 
-                    initialize=lambda m, t: self.y_observed2[1][(np.abs(self.t2 - t)).argmin()], 
-                    bounds=(lower_bound, upper_bound))
-        
-        # lambda is used to ensure the dimensions match
-        # self.model.lambda_ = Var(self.t1.union(self.t2), within=pyo.Reals)
-        
-        self.model.dy1_dt = DerivativeVar(self.model.y1, wrt=self.model.t1)
-        self.model.dy2_dt = DerivativeVar(self.model.y2, wrt=self.model.t2)
 
-    def setup_constraints(self):
-        def _con1_y1(m, t_i):
-            if t_i == self.t[0]:
-                return Constraint.Skip  
-            
-            # define the correct neural net input
-            nn_input = [m.y1[t_i]]  
-            if not self.time_invariant:
-                nn_input.append(t_i)
+        if self.y_init1 is None:
+            self.model1.y = Var(self.model1.t, domain=pyo.Reals, initialize=0.1, bounds=(lower_bound, upper_bound))
+            self.model2.y = Var(self.model2.t, domain=pyo.Reals, initialize=0.1, bounds=(lower_bound, upper_bound))
+        else:
+            self.model1.y = pyo.Var(self.model1.t, domain=pyo.Reals, initialize=lambda m, i: self.y_init1[i], bounds=(lower_bound, upper_bound))
+            self.model2.y = pyo.Var(self.model2.t, domain=pyo.Reals, initialize=lambda m, i: self.y_init2[i], bounds=(lower_bound, upper_bound))
+
+        weight_bounds = (-100.0, 100.0)
+        input_size, layer1, output_size = self.layer_sizes[0], self.layer_sizes[1], self.layer_sizes[2]
+
+        # model 1 weights and biases
+        self.model1.W1 = Var(range(layer1), range(input_size), initialize=lambda m, i, j: self.initialize_weights((layer1, input_size))[i, j], bounds=weight_bounds)
+        self.model1.b1 = Var(range(layer1), initialize=lambda m, i: self.initialize_biases(layer1)[i], bounds=weight_bounds)
+        self.model1.W2 = Var(range(output_size), range(layer1), initialize=lambda m, i, j: self.initialize_weights((output_size, layer1))[i, j], bounds=weight_bounds)
+        self.model1.b2 = Var(range(output_size), initialize=lambda m, i: self.initialize_biases(output_size)[i], bounds=weight_bounds)
+
+        # model 2 weights and biases        
+        self.model2.W1 = Var(range(layer1), range(input_size), initialize=lambda m, i, j: self.initialize_weights((layer1, input_size))[i, j], bounds=weight_bounds)
+        self.model2.b1 = Var(range(layer1), initialize=lambda m, i: self.initialize_biases(layer1)[i], bounds=weight_bounds)
+        self.model2.W2 = Var(range(output_size), range(layer1), initialize=lambda m, i, j: self.initialize_weights((output_size, layer1))[i, j], bounds=weight_bounds)
+        self.model2.b2 = Var(range(output_size), initialize=lambda m, i: self.initialize_biases(output_size)[i], bounds=weight_bounds)
         
+        # consensus
+        self.W1_consensus = np.zeros((layer1, input_size))
+        self.b1_consensus = np.zeros(layer1)
+        self.W2_consensus = np.zeros((output_size, layer1))
+        self.b2_consensus = np.zeros(output_size)
+
+        # dual
+        self.dual_W1 = np.zeros((layer1, input_size))
+        self.dual_b1 = np.zeros(layer1)
+        self.dual_W2 = np.zeros((output_size, layer1))
+        self.dual_b2 = np.zeros(output_size)
+        # ------------------------------------ COLLOCATION CONSTRAINTS ---------------------------------------
+
+        self.model1.ode = ConstraintList()
+        self.model2.ode = ConstraintList()
+
+        for i in range(len(self.t1)):
+
+            if i == 0:
+                continue
+
+            dy_dt_1 = sum(self.D1[i, j] * self.model1.y[j] for j in range(N))
+            dy_dt_2 = sum(self.D2[i, j] * self.model2.y[j] for j in range(N))
+
+            nn_input_1 = [self.model1.y[i]]
+            nn_input_2 = [self.model2.y[i]]
+
+            # add time and extra inputs
+            if not self.time_invariant:
+                nn_input_1.append(self.t1[i])
+                nn_input_2.append(self.t2[i])
+
             if self.extra_input1 is not None:
-                index = (np.abs(self.t1 - t_i)).argmin()
                 for input in self.extra_input1.T:
-                    nn_input.append(input[index])
-
-            nn_y1 = self.nn_output(nn_input, m)
-            return nn_y1 == m.dy1_dt[t_i] 
-
-        def _con1_y2(m, t_i):
-            if t_i == self.t[0]:
-                return Constraint.Skip 
-            
-            nn_input = [m.y2[t_i]]  
-            if not self.time_invariant:
-                nn_input.append(t_i)
-        
+                    nn_input_1.append(input[i])
             if self.extra_input2 is not None:
-                index = (np.abs(self.t2 - t_i)).argmin()
                 for input in self.extra_input2.T:
-                    nn_input.append(input[index])
+                    nn_input_2.append(input[i])
 
-            nn_y2 = self.nn_output(nn_input, m)
-            return nn_y2 == model.dy2_dt[t_i] 
-        
-        self.model.con1_y1 = Constraint(self.model.t1, rule=_con1_y1)
-        self.model.con1_y2 = Constraint(self.model.t2, rule=_con1_y2)
+            nn_y_1 = self.nn_output(nn_input_1, self.model1)
+            nn_y_2 = self.nn_output(nn_input_2, self.model2)
+
+            self.model1.ode.add(nn_y_1 == dy_dt_1)
+            self.model2.ode.add(nn_y_2 == dy_dt_2)
+
+        def _objective1(m):
+            # data fit term
+            data_fit = sum((m.y[i] - self.y_observed1[i])**2 for i in range(len(self.t1)))
+            reg_smooth = sum((m.y[i] - m.y[i + 1])**2 for i in range(len(self.t1) - 1))
+
+            # regularization term for weights and biases
+            reg = (sum(m.W1[j, k]**2 for j in range(self.layer_sizes[1]) for k in range(self.layer_sizes[0])) +
+                sum(m.W2[j, k]**2 for j in range(self.layer_sizes[2]) for k in range(self.layer_sizes[1])) +
+                sum(m.b1[j]**2 for j in range(self.layer_sizes[1])) +
+                sum(m.b2[j]**2 for j in range(self.layer_sizes[2])))
+
+            if self.iter >= 1:
+                # ADMM penalty term for consensus
+                admm_penalty = (self.rho / 2) * (
+                    sum((m.W1[i, j] - self.W1_consensus[i, j] + self.dual_W1[i, j] / self.rho)**2 for i in range(self.layer_sizes[1]) for j in range(self.layer_sizes[0])) +
+                    sum((m.b1[i] - self.b1_consensus[i] + self.dual_b1[i] / self.rho)**2 for i in range(self.layer_sizes[1])) +
+                    sum((m.W2[i, j] - self.W2_consensus[i, j] + self.dual_W2[i, j] / self.rho)**2 for i in range(self.layer_sizes[2]) for j in range(self.layer_sizes[1])) +
+                    sum((m.b2[i] - self.b2_consensus[i] + self.dual_b2[i] / self.rho)**2 for i in range(self.layer_sizes[2]))
+                )
+            else:
+                admm_penalty = 0
+
+            return data_fit + self.penalty_lambda_reg * reg + self.penalty_lambda_smooth * reg_smooth + admm_penalty
+
+
+        def _objective2(m):
+            data_fit = sum((m.y[i] - self.y_observed2[i])**2 for i in range(len(self.t2)))
+            reg_smooth = sum((m.y[i] - m.y[i+1])**2 for i in range(len(self.t2) - 1))
+
+            # regularization for weights and biases
+            reg = (sum(m.W1[j, k]**2 for j in range(self.layer_sizes[1]) for k in range(self.layer_sizes[0])) + 
+                sum(m.W2[j, k]**2 for j in range(self.layer_sizes[2]) for k in range(self.layer_sizes[1])) + 
+                sum(m.b1[j]**2 for j in range(self.layer_sizes[1])) + 
+                sum(m.b2[j]**2 for j in range(self.layer_sizes[2])))
+            
+            if self.iter >= 1:
+                # ADMM penalty term for consensus
+                admm_penalty = (self.rho / 2) * (
+                    sum((m.W1[i, j] - self.W1_consensus[i, j] + self.dual_W1[i, j] / self.rho)**2 for i in range(self.layer_sizes[1]) for j in range(self.layer_sizes[0])) +
+                    sum((m.b1[i] - self.b1_consensus[i] + self.dual_b1[i] / self.rho)**2 for i in range(self.layer_sizes[1])) +
+                    sum((m.W2[i, j] - self.W2_consensus[i, j] + self.dual_W2[i, j] / self.rho)**2 for i in range(self.layer_sizes[2]) for j in range(self.layer_sizes[1])) +
+                    sum((m.b2[i] - self.b2_consensus[i] + self.dual_b2[i] / self.rho)**2 for i in range(self.layer_sizes[2]))
+                )
+            else:
+                admm_penalty = 0            
+            
+            return data_fit + self.penalty_lambda_reg * reg + self.penalty_lambda_smooth * reg_smooth + admm_penalty
+
+        self.model1.obj = Objective(rule=_objective1, sense=pyo.minimize)
+        self.model2.obj = Objective(rule=_objective2, sense=pyo.minimize)
 
     def nn_output(self, nn_input, m):
         hidden = np.dot(m.W1, nn_input) + m.b1
@@ -114,68 +202,185 @@ class NeuralODEPyomoADMM:
             hidden = [1 / (1 + pyo.exp(-h) + epsilon) for h in hidden]
         elif self.act_func == "softplus":
             hidden = [pyo.log(1 + pyo.exp(h) + epsilon) for h in hidden]
-            
+
         outputs = np.dot(m.W2, hidden) + m.b2
+
         return outputs
 
-    def _objective1(self, m):
-        # access model y parameter at the correct time point
-        # and y_observed at the correct index;
-        data_fit =  sum((m.y1[t_i] - self.y_observed1[i])**2 for i, t_i in enumerate(self.t1))
-        # next index (i+1) is used to access the next time point
-        reg_smooth = sum((m.y1[self.t1[i+1]] - m.y[self.t1[i]])**2 for i in range(len(self.t1) - 1))
-        return data_fit + self.penalty_lambda_reg * reg_smooth
-    
-    def _objective2(self, m):
-        data_fit =  sum((m.y2[t_i] - self.y_observed2[i])**2 for i, t_i in enumerate(self.t2))
-        reg_smooth = sum((m.y2[self.t1[i+1]] - m.y[self.t2[i]])**2 for i in range(len(self.t2) - 1))
-        return data_fit + self.penalty_lambda_reg * reg_smooth
+    def solve_model(self):
+        solver_info = {}
+
+        # Solve model1
+        solver = SolverFactory('ipopt')
+        if self.params is not None:
+            for key, value in self.params.items():
+                solver.options[key] = value
+        result1 = solver.solve(self.model1, tee=True)
+
+        # Extract solver information for model1
+        solver_info['model1'] = {
+            'solver_time': result1.solver.time,
+            'termination_condition': result1.solver.termination_condition,
+            'message': result1.solver.message
+        }
+        
+        self.update_consensus_variables()
+        self.update_dual_variables()
+
+        # Solve model2
+        result2 = solver.solve(self.model2, tee=True)
+
+        # Extract solver information for model2
+        solver_info['model2'] = {
+            'solver_time': result2.solver.time,
+            'termination_condition': result2.solver.termination_condition,
+            'message': result2.solver.message
+        }
+        
+        print(solver_info)
+        
+        self.update_consensus_variables()
+        self.update_dual_variables()
+        
+        return solver_info
     
     def admm_solve(self, iterations=50):
-        solver = SolverFactory('ipopt')
-        tolerance = 1e-4  # Convergence tolerance
-        converged = False
-
         for i in range(iterations):
-            # batch 1
-            self.model.obj = Objective(expr=self._objective1(self.model), sense=pyo.minimize)
-            solver.solve(self.model)
-            # remove the objective to redefine in the next step
-            self.model.del_component(self.model.obj)  
+            print(f"ADMM Iteration {i+1}/{iterations}")
 
-            # batch 2
-            self.model.obj = Objective(expr=self._objective2(self.model), sense=pyo.minimize)
-            solver.solve(self.model)
-            self.model.del_component(self.model.obj)
+            # Update model1 while keeping model2 fixed
+            self.solve_model()
             
-            self.update_dual_variables()
-
-            # Check for convergence (this can be defined more elaborately depending on the problem specifics)
-            if self.check_convergence(tolerance):
-                converged = True
-                break
-
-        return converged
+            self.iter += 1
 
     def update_dual_variables(self):
-        # Update the dual variables using the discrepancy between y1 and y2
-        for t in self.t1.union(self.t2):
-            if t in self.t1 and t in self.t2:  # Ensure t is in both time sets
-                discrepancy = self.model.y1[t].value - self.model.y2[t].value
-                self.model.lambda_[t].set_value(self.model.lambda_[t].value + self.penalty_rho * discrepancy)
+        for i in range(self.layer_sizes[1]):
+            for j in range(self.layer_sizes[0]):
+                self.dual_W1[i, j] += 0.5 * (self.model1.W1[i, j]() - self.W1_consensus[i, j])
+                self.dual_W1[i, j] += 0.5 * (self.model2.W1[i, j]() - self.W1_consensus[i, j])
+        for i in range(self.layer_sizes[1]):
+            self.dual_b1[i] += 0.5 * (self.model1.b1[i]() - self.b1_consensus[i])
+            self.dual_b1[i] += 0.5 * (self.model2.b1[i]() - self.b1_consensus[i])
+        for i in range(self.layer_sizes[2]):
+            for j in range(self.layer_sizes[1]):
+                self.dual_W2[i, j] += 0.5 * (self.model1.W2[i, j]() - self.W2_consensus[i, j])
+                self.dual_W2[i, j] += 0.5 * (self.model2.W2[i, j]() - self.W2_consensus[i, j])
+        for i in range(self.layer_sizes[2]):
+            self.dual_b2[i] += 0.5 * (self.model1.b2[i]() - self.b2_consensus[i])
+            self.dual_b2[i] += 0.5 * (self.model2.b2[i]() - self.b2_consensus[i])
+            
+    def update_consensus_variables(self):
+        self.W1_consensus = (np.array([[self.model1.W1[i, j].value for j in range(self.layer_sizes[0])] for i in range(self.layer_sizes[1])]) + 
+                             np.array([[self.model2.W1[i, j].value for j in range(self.layer_sizes[0])] for i in range(self.layer_sizes[1])])) / 2
+        self.b1_consensus = (np.array([self.model1.b1[i].value for i in range(self.layer_sizes[1])]) +
+                             np.array([self.model2.b1[i].value for i in range(self.layer_sizes[1])])) / 2
+        self.W2_consensus = (np.array([[self.model1.W2[i, j].value for j in range(self.layer_sizes[1])] for i in range(self.layer_sizes[2])]) + 
+                             np.array([[self.model2.W2[i, j].value for j in range(self.layer_sizes[1])] for i in range(self.layer_sizes[2])])) / 2
+        self.b2_consensus = (np.array([self.model1.b2[i].value for i in range(self.layer_sizes[2])]) + 
+                             np.array([self.model2.b2[i].value for i in range(self.layer_sizes[2])])) / 2
 
-    def check_convergence(self, tolerance):
-        # Check if the maximum absolute dual update is below the tolerance
-        max_update = max(abs(self.model.lambda_[t].value - (self.model.y1[t].value - self.model.y2[t].value) * self.penalty_rho)
-                        for t in self.t1.union(self.t2) if t in self.t1 and t in self.t2)
-        return max_update < tolerance
+    
+    def extract_solution(self):
+        y1 = np.array([value(self.model1.y[i]) for i in self.model1.t])
+        y2 = np.array([value(self.model2.y[i]) for i in self.model2.t])
+        return np.concatenate([y1, y2])
+
+    def extract_derivative(self):
+        dy_dt_1, dy_dt_2 = [], []
+        for i in range(len(self.t1)):
+            dy_dt_1_i = sum(self.D1[i, j] * pyo.value(self.model1.y[j]) for j in range(len(self.t1)))
+            dy_dt_1.append(dy_dt_1_i)
+        
+        for i in range(len(self.t2)):
+            dy_dt_2_i = sum(self.D2[i, j] * pyo.value(self.model2.y[j]) for j in range(len(self.t2)))
+            dy_dt_2.append(dy_dt_2_i)
+        
+        return np.array(dy_dt_1), np.array(dy_dt_2)
+
+    def extract_weights(self, m):
+        weights = {}
+
+        W1 = np.array([[value(m.W1[j, k]) for k in range(self.layer_sizes[0])] for j in range(self.layer_sizes[1])])
+        b1 = np.array([value(m.b1[j]) for j in range(self.layer_sizes[1])])
+        W2 = np.array([[value(m.W2[j, k]) for k in range(self.layer_sizes[1])] for j in range(self.layer_sizes[2])])
+        b2 = np.array([value(m.b2[j]) for j in range(self.layer_sizes[2])])
+        weights['W1'], weights['b1'], weights['W2'], weights['b2'] = W1, b1, W2, b2
+
+        return weights
 
 
-# Example usage:
-y_observed = np.random.rand(100)
-t = np.linspace(0, 10, 100)
-first_derivative_matrix = np.random.rand(100, 100)  # Example matrix
-layer_sizes = {'theta': 3}
+    def predict(self, input, weights):
+        # Extract weights from both models
+        if weights == 'both':
+            weights1 = self.extract_weights(self.model1)
+            weights2 = self.extract_weights(self.model2)
 
-model = NeuralODEPyomoADMM(y_observed, t, first_derivative_matrix, layer_sizes)
-model.admm_solve()
+            # Average the weights and biases
+            W1 = (weights1['W1'] + weights2['W1']) / 2
+            b1 = (weights1['b1'] + weights2['b1']) / 2
+            W2 = (weights1['W2'] + weights2['W2']) / 2
+            b2 = (weights1['b2'] + weights2['b2']) / 2
+        elif weights == 'consensus':
+            W1, b1, W2, b2 = self.W1_consensus, self.b1_consensus, self.W2_consensus, self.b2_consensus
+        else:
+            if weights == 'model1':
+                weights1 = self.extract_weights(self.model1)
+                W1, b1, W2, b2 = weights1['W1'], weights1['b1'], weights1['W2'], weights1['b2']
+            elif weights == 'model2':
+                weights2 = self.extract_weights(self.model2)
+                W1, b1, W2, b2 = weights2['W1'], weights2['b1'], weights2['W2'], weights2['b2']
+            else:
+                raise ValueError("Not a valid weights argument.")
+
+        # Compute the hidden layer output
+        hidden = jnp.tanh(jnp.dot(W1, input) + b1)
+
+        # Compute the output layer
+        outputs = jnp.dot(W2, hidden) + b2
+
+        return outputs
+
+
+    def neural_ode(self, y0, t, extra_args = None, weights = 'both'):
+        """
+        Args:
+            weights (str, optional): 'both', 'model1', 'model2', 'consensus'. Defaults to 'both'.
+        """
+        def func(t, y, args):
+            input = jnp.atleast_1d(y)
+            if not self.time_invariant:
+                input = jnp.append(input, t)
+
+            if args is not None:
+                extra_inputs, t_all = args
+                if isinstance(extra_inputs, (np.ndarray, jnp.ndarray)):
+                    if extra_inputs.ndim == 2:
+                        interpolated_inputs = jnp.array([jnp.interp(t, t_all, extra_inputs[:, i]) for i in range(extra_inputs.shape[1])])
+                        input = jnp.append(input, interpolated_inputs)
+                    elif extra_inputs.ndim == 1:
+                        interpolated_input = jnp.interp(t, t_all, extra_inputs)
+                        input = jnp.append(input, interpolated_input)
+                else:
+                    input = jnp.append(input, extra_inputs)
+
+            result = self.predict(input, weights)
+            return result
+
+        term = dfx.ODETerm(func)
+        solver = dfx.Tsit5()
+        stepsize_controller = dfx.PIDController(rtol=1e-3, atol=1e-6)
+        saveat = dfx.SaveAt(ts=t)
+
+        solution = dfx.diffeqsolve(
+            term,  # function
+            solver,
+            t0=t[0],
+            t1=t[-1],
+            dt0=1e-3,
+            y0=y0,
+            args=extra_args,
+            stepsize_controller=stepsize_controller,
+            saveat=saveat
+        )
+        # print("solution.ts", solution.ts)
+        return solution.ys
