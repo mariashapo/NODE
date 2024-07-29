@@ -21,13 +21,6 @@ class DirectODESolver:
         self.params = params
         self.discretization_scheme = discretization_scheme
         
-        """
-        W1 = trained_weights_biases['W1']
-        b1 = trained_weights_biases['b1']
-        W2 = trained_weights_biases['W2']
-        b2 = trained_weights_biases['b2']
-        """
-        
     def build_model(self):
         self.model.t = ContinuousSet(initialize=self.t)
         self.model.y = Var(self.model.t, domain=pyo.Reals, initialize=1)
@@ -49,8 +42,8 @@ class DirectODESolver:
         self.model.ode = Constraint(self.model.t, rule=_ode)
         
         def _objective(m):
-            return np.abs(m.y[self.t[0]] - self.initial_state)
-            #return 1
+            #return np.abs(m.y[self.t[0]] - self.initial_state)
+            return 1
         
         self.model.obj = Objective(rule=_objective, sense=pyo.minimize)
         

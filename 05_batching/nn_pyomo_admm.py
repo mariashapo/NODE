@@ -1,20 +1,18 @@
 import numpy as np
 import pyomo.environ as pyo
-from pyomo.environ import ConcreteModel, Var, Constraint, ConstraintList, Objective, SolverFactory, value, RangeSet
-from pyomo.dae import ContinuousSet, DerivativeVar
+from pyomo.environ import ConcreteModel, Var, ConstraintList, Objective, SolverFactory, value, RangeSet
 
 import jax
 import jax.numpy as jnp
-from jax.experimental.ode import odeint
 import diffrax as dfx
 
-import warnings
+np.random.seed(42)
 
 class NeuralODEPyomoADMM:
-    def __init__(self, y_observed, t, first_derivative_matrix, layer_sizes, time_invariant=True, extra_input=None, 
+    def __init__(self, y_observed, t, first_derivative_matrix, layer_sizes, time_invariant=True, extra_input=None, rho = 1.0,
                  penalty_lambda_reg=0.01, penalty_lambda_smooth=0.0, act_func="tanh", w_init_method="random", params=None, y_init=None):
 
-        self.midpoint = len(t) // 2
+        self.midpoint = len(t) // 2 
         self.y_observed1 = y_observed[:self.midpoint]
         self.y_observed2 = y_observed[self.midpoint:]
         self.t1 = t[:self.midpoint]
@@ -46,6 +44,8 @@ class NeuralODEPyomoADMM:
         self.time_invariant = time_invariant
         self.params = params
         self.penalty_lambda_smooth = penalty_lambda_smooth
+        
+        self.rho = rho
         
         self.iter = 0
 
@@ -138,62 +138,74 @@ class NeuralODEPyomoADMM:
 
             nn_y_1 = self.nn_output(nn_input_1, self.model1)
             nn_y_2 = self.nn_output(nn_input_2, self.model2)
-
+            #print("nn_y_1 ", nn_y_1)
+            #print("dy_dt_1 ", dy_dt_1)
+            # when are nn_y_1 and dy_dt_1 recalculated?
             self.model1.ode.add(nn_y_1 == dy_dt_1)
             self.model2.ode.add(nn_y_2 == dy_dt_2)
 
-        def _objective1(m):
-            # data fit term
-            data_fit = sum((m.y[i] - self.y_observed1[i])**2 for i in range(len(self.t1)))
-            reg_smooth = sum((m.y[i] - m.y[i + 1])**2 for i in range(len(self.t1) - 1))
+        self.update_objective()
+    
+    def update_objective(self):
+            if hasattr(self.model1, 'obj'):
+                self.model1.del_component('obj')
+            if hasattr(self.model2, 'obj'):
+                self.model2.del_component('obj')
+        
+            def _objective1(m):
+                # data fit term
+                data_fit = sum((m.y[i] - self.y_observed1[i])**2 for i in range(len(self.t1)))
+                reg_smooth = sum((m.y[i] - m.y[i + 1])**2 for i in range(len(self.t1) - 1))
 
-            # regularization term for weights and biases
-            reg = (sum(m.W1[j, k]**2 for j in range(self.layer_sizes[1]) for k in range(self.layer_sizes[0])) +
-                sum(m.W2[j, k]**2 for j in range(self.layer_sizes[2]) for k in range(self.layer_sizes[1])) +
-                sum(m.b1[j]**2 for j in range(self.layer_sizes[1])) +
-                sum(m.b2[j]**2 for j in range(self.layer_sizes[2])))
+                # regularization term for weights and biases
+                reg = (sum(m.W1[j, k]**2 for j in range(self.layer_sizes[1]) for k in range(self.layer_sizes[0])) +
+                    sum(m.W2[j, k]**2 for j in range(self.layer_sizes[2]) for k in range(self.layer_sizes[1])) +
+                    sum(m.b1[j]**2 for j in range(self.layer_sizes[1])) +
+                    sum(m.b2[j]**2 for j in range(self.layer_sizes[2])))
 
-            if self.iter >= 1:
-                # ADMM penalty term for consensus
-                admm_penalty = (self.rho / 2) * (
-                    sum((m.W1[i, j] - self.W1_consensus[i, j] + self.dual_W1[i, j] / self.rho)**2 for i in range(self.layer_sizes[1]) for j in range(self.layer_sizes[0])) +
-                    sum((m.b1[i] - self.b1_consensus[i] + self.dual_b1[i] / self.rho)**2 for i in range(self.layer_sizes[1])) +
-                    sum((m.W2[i, j] - self.W2_consensus[i, j] + self.dual_W2[i, j] / self.rho)**2 for i in range(self.layer_sizes[2]) for j in range(self.layer_sizes[1])) +
-                    sum((m.b2[i] - self.b2_consensus[i] + self.dual_b2[i] / self.rho)**2 for i in range(self.layer_sizes[2]))
-                )
-            else:
-                admm_penalty = 0
+                if self.iter >= 1:
+                    # ADMM penalty term for consensus
+                    admm_penalty = (self.rho / 2) * (
+                        sum((m.W1[i, j] - self.W1_consensus[i, j] + self.dual_W1[i, j] / self.rho)**2 for i in range(self.layer_sizes[1]) for j in range(self.layer_sizes[0])) +
+                        sum((m.b1[i] - self.b1_consensus[i] + self.dual_b1[i] / self.rho)**2 for i in range(self.layer_sizes[1])) +
+                        sum((m.W2[i, j] - self.W2_consensus[i, j] + self.dual_W2[i, j] / self.rho)**2 for i in range(self.layer_sizes[2]) for j in range(self.layer_sizes[1])) +
+                        sum((m.b2[i] - self.b2_consensus[i] + self.dual_b2[i] / self.rho)**2 for i in range(self.layer_sizes[2]))
+                    )
+                else:
+                    admm_penalty = 0
 
-            return data_fit + self.penalty_lambda_reg * reg + self.penalty_lambda_smooth * reg_smooth + admm_penalty
+                return data_fit + self.penalty_lambda_reg * reg + self.penalty_lambda_smooth * reg_smooth + admm_penalty
 
+            def _objective2(m):
+                data_fit = sum((m.y[i] - self.y_observed2[i])**2 for i in range(len(self.t2)))
+                reg_smooth = sum((m.y[i] - m.y[i + 1])**2 for i in range(len(self.t2) - 1))
 
-        def _objective2(m):
-            data_fit = sum((m.y[i] - self.y_observed2[i])**2 for i in range(len(self.t2)))
-            reg_smooth = sum((m.y[i] - m.y[i+1])**2 for i in range(len(self.t2) - 1))
+                # regularization for weights and biases
+                reg = (sum(m.W1[j, k]**2 for j in range(self.layer_sizes[1]) for k in range(self.layer_sizes[0])) +
+                    sum(m.W2[j, k]**2 for j in range(self.layer_sizes[2]) for k in range(self.layer_sizes[1])) +
+                    sum(m.b1[j]**2 for j in range(self.layer_sizes[1])) +
+                    sum(m.b2[j]**2 for j in range(self.layer_sizes[2])))
 
-            # regularization for weights and biases
-            reg = (sum(m.W1[j, k]**2 for j in range(self.layer_sizes[1]) for k in range(self.layer_sizes[0])) + 
-                sum(m.W2[j, k]**2 for j in range(self.layer_sizes[2]) for k in range(self.layer_sizes[1])) + 
-                sum(m.b1[j]**2 for j in range(self.layer_sizes[1])) + 
-                sum(m.b2[j]**2 for j in range(self.layer_sizes[2])))
-            
-            if self.iter >= 1:
-                # ADMM penalty term for consensus
-                admm_penalty = (self.rho / 2) * (
-                    sum((m.W1[i, j] - self.W1_consensus[i, j] + self.dual_W1[i, j] / self.rho)**2 for i in range(self.layer_sizes[1]) for j in range(self.layer_sizes[0])) +
-                    sum((m.b1[i] - self.b1_consensus[i] + self.dual_b1[i] / self.rho)**2 for i in range(self.layer_sizes[1])) +
-                    sum((m.W2[i, j] - self.W2_consensus[i, j] + self.dual_W2[i, j] / self.rho)**2 for i in range(self.layer_sizes[2]) for j in range(self.layer_sizes[1])) +
-                    sum((m.b2[i] - self.b2_consensus[i] + self.dual_b2[i] / self.rho)**2 for i in range(self.layer_sizes[2]))
-                )
-            else:
-                admm_penalty = 0            
-            
-            return data_fit + self.penalty_lambda_reg * reg + self.penalty_lambda_smooth * reg_smooth + admm_penalty
+                if self.iter >= 1:
+                    # ADMM penalty term for consensus
+                    admm_penalty = (self.rho / 2) * (
+                        sum((m.W1[i, j] - self.W1_consensus[i, j] + self.dual_W1[i, j] / self.rho)**2 for i in range(self.layer_sizes[1]) for j in range(self.layer_sizes[0])) +
+                        sum((m.b1[i] - self.b1_consensus[i] + self.dual_b1[i] / self.rho)**2 for i in range(self.layer_sizes[1])) +
+                        sum((m.W2[i, j] - self.W2_consensus[i, j] + self.dual_W2[i, j] / self.rho)**2 for i in range(self.layer_sizes[2]) for j in range(self.layer_sizes[1])) +
+                        sum((m.b2[i] - self.b2_consensus[i] + self.dual_b2[i] / self.rho)**2 for i in range(self.layer_sizes[2]))
+                    )
+                else:
+                    admm_penalty = 0
+                    
+                return data_fit + self.penalty_lambda_reg * reg + self.penalty_lambda_smooth * reg_smooth + admm_penalty
 
-        self.model1.obj = Objective(rule=_objective1, sense=pyo.minimize)
-        self.model2.obj = Objective(rule=_objective2, sense=pyo.minimize)
-
+            self.model1.obj = Objective(rule=_objective1, sense=pyo.minimize)
+            self.model2.obj = Objective(rule=_objective2, sense=pyo.minimize)
+                        
     def nn_output(self, nn_input, m):
+        # sum(a[i] * b[i] for i in range(len(a)))
+        # hidden = sum()
+        # print('inside nn_output')
         hidden = np.dot(m.W1, nn_input) + m.b1
         epsilon = 1e-10
         if self.act_func == "tanh":
@@ -244,15 +256,40 @@ class NeuralODEPyomoADMM:
         
         return solver_info
     
-    def admm_solve(self, iterations=50):
+    def admm_solve(self, iterations=50, tol_primal=1e-3, tol_dual=1e-3):
         for i in range(iterations):
-            print(f"ADMM Iteration {i+1}/{iterations}")
-
+            print(''.join(['-' for i in range(100)]))
+            print(f"ADMM Iteration {i+1}/{iterations}; {self.iter}")
+            print(''.join(['-' for i in range(100)]))
+            
             # Update model1 while keeping model2 fixed
             self.solve_model()
+            self.update_objective()
+            
+            self.prev_W1_consensus = self.W1_consensus.copy()
+            self.prev_b1_consensus = self.b1_consensus.copy()
+            self.prev_W2_consensus = self.W2_consensus.copy()
+            self.prev_b2_consensus = self.b2_consensus.copy()
+            
+            primal_residual = self.compute_primal_residual()
+            # dual_residual = self.compute_dual_residual()
+            
+            print(f"Primal Residual: {primal_residual}")
+
+            # check for convergence
+            if primal_residual < tol_primal:
+                print(''.join(['*' for i in range(100)]))
+                print(f"Converged at iteration {i+1}")
+                print(''.join(['*' for i in range(100)]))
+                return
             
             self.iter += 1
-
+        
+        print(''.join(['*' for i in range(100)]))
+        print(f"Model did not converge.")
+        print(f"Primal Residual: {primal_residual}")
+        print(''.join(['*' for i in range(100)]))
+        
     def update_dual_variables(self):
         for i in range(self.layer_sizes[1]):
             for j in range(self.layer_sizes[0]):
@@ -268,7 +305,7 @@ class NeuralODEPyomoADMM:
         for i in range(self.layer_sizes[2]):
             self.dual_b2[i] += 0.5 * (self.model1.b2[i]() - self.b2_consensus[i])
             self.dual_b2[i] += 0.5 * (self.model2.b2[i]() - self.b2_consensus[i])
-            
+    
     def update_consensus_variables(self):
         self.W1_consensus = (np.array([[self.model1.W1[i, j].value for j in range(self.layer_sizes[0])] for i in range(self.layer_sizes[1])]) + 
                              np.array([[self.model2.W1[i, j].value for j in range(self.layer_sizes[0])] for i in range(self.layer_sizes[1])])) / 2
@@ -278,7 +315,31 @@ class NeuralODEPyomoADMM:
                              np.array([[self.model2.W2[i, j].value for j in range(self.layer_sizes[1])] for i in range(self.layer_sizes[2])])) / 2
         self.b2_consensus = (np.array([self.model1.b2[i].value for i in range(self.layer_sizes[2])]) + 
                              np.array([self.model2.b2[i].value for i in range(self.layer_sizes[2])])) / 2
+    
+    def to_array(self, pyomo_var, shape):
+        return np.array([[pyomo_var[i, j].value for j in range(shape[1])] for i in range(shape[0])])
 
+    def to_vector(self, pyomo_var, size):
+        return np.array([pyomo_var[i].value for i in range(size)])
+    
+    def get_model_vars(self, model):
+        return {
+            'W1': self.to_array(model.W1, (self.layer_sizes[1], self.layer_sizes[0])),
+            'b1': self.to_vector(model.b1, self.layer_sizes[1]),
+            'W2': self.to_array(model.W2, (self.layer_sizes[2], self.layer_sizes[1])),
+            'b2': self.to_vector(model.b2, self.layer_sizes[2])
+        }
+
+    def compute_primal_residual(self):
+        model1_vars = self.get_model_vars(self.model1)
+        model2_vars = self.get_model_vars(self.model2)
+
+        primal_residuals = [
+            np.linalg.norm(model1_vars[var] - getattr(self, f"{var}_consensus")) + np.linalg.norm(model2_vars[var] - getattr(self, f"{var}_consensus"))
+            for var in ['W1', 'b1', 'W2', 'b2']
+        ]
+
+        return sum(primal_residuals) 
     
     def extract_solution(self):
         y1 = np.array([value(self.model1.y[i]) for i in self.model1.t])
@@ -297,18 +358,20 @@ class NeuralODEPyomoADMM:
         
         return np.array(dy_dt_1), np.array(dy_dt_2)
 
-    def extract_weights(self, m):
+    def extract_weights(self, m = None):
         weights = {}
-
-        W1 = np.array([[value(m.W1[j, k]) for k in range(self.layer_sizes[0])] for j in range(self.layer_sizes[1])])
-        b1 = np.array([value(m.b1[j]) for j in range(self.layer_sizes[1])])
-        W2 = np.array([[value(m.W2[j, k]) for k in range(self.layer_sizes[1])] for j in range(self.layer_sizes[2])])
-        b2 = np.array([value(m.b2[j]) for j in range(self.layer_sizes[2])])
-        weights['W1'], weights['b1'], weights['W2'], weights['b2'] = W1, b1, W2, b2
+        if m is None:
+            weights['W1'], weights['b1'] = self.W1_consensus, self.b1_consensus
+            weights['W2'], weights['b2'] = self.W2_consensus, self.b2_consensus
+        else:
+            W1 = np.array([[value(m.W1[j, k]) for k in range(self.layer_sizes[0])] for j in range(self.layer_sizes[1])])
+            b1 = np.array([value(m.b1[j]) for j in range(self.layer_sizes[1])])
+            W2 = np.array([[value(m.W2[j, k]) for k in range(self.layer_sizes[1])] for j in range(self.layer_sizes[2])])
+            b2 = np.array([value(m.b2[j]) for j in range(self.layer_sizes[2])])   
+            weights['W1'], weights['b1'], weights['W2'], weights['b2'] = W1, b1, W2, b2
 
         return weights
-
-
+    
     def predict(self, input, weights):
         # Extract weights from both models
         if weights == 'both':
@@ -340,7 +403,6 @@ class NeuralODEPyomoADMM:
 
         return outputs
 
-
     def neural_ode(self, y0, t, extra_args = None, weights = 'both'):
         """
         Args:
@@ -368,7 +430,7 @@ class NeuralODEPyomoADMM:
 
         term = dfx.ODETerm(func)
         solver = dfx.Tsit5()
-        stepsize_controller = dfx.PIDController(rtol=1e-3, atol=1e-6)
+        stepsize_controller = dfx.PIDController(rtol=1e-8, atol=1e-8)
         saveat = dfx.SaveAt(ts=t)
 
         solution = dfx.diffeqsolve(
@@ -376,11 +438,14 @@ class NeuralODEPyomoADMM:
             solver,
             t0=t[0],
             t1=t[-1],
-            dt0=1e-3,
+            # dt0=1e-3,
+            dt0 = t[-1] - t[0],
             y0=y0,
             args=extra_args,
             stepsize_controller=stepsize_controller,
             saveat=saveat
+            #adjoint=dfx.RecursiveCheckpointAdjoint(checkpoints=100),
+            #max_steps = 10000
         )
         # print("solution.ts", solution.ts)
         return solution.ys
