@@ -12,6 +12,10 @@ def generate_chebyshev_nodes(n, start, end):
     nodes = 0.5 * (end - start) * x + 0.5 * (start + end)
     return np.sort(nodes)
 
+def add_time_features(data_subsample):
+    data_subsample['t'] = jnp.linspace(0., 1., len(data_subsample))
+    return data_subsample
+
 def load_data(file_path, start_date, number_of_points):
 
     data = pd.read_csv(file_path)
@@ -35,9 +39,6 @@ def load_data(file_path, start_date, number_of_points):
     one_day_map = (data_subsample['settlement_date'].dt.day == np.min(data_subsample['settlement_date'].dt.day))
     n_pt_per_day = one_day_map.sum()
     print(f"Number of points per day: {n_pt_per_day}")
-
-    one_day_offset = (1/data_subsample.shape[0]) * n_pt_per_day
-    print(f"Time offset needed for 1 day: {one_day_offset}")
 
     data_subsample.rename(columns={'settlement_date': 'date', 'temperature': 'var1', 'hour':'var2', 'nd':'y'}, inplace=True)
     data_subsample['t'] = t

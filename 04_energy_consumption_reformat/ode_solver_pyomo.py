@@ -42,8 +42,8 @@ class DirectODESolver:
         self.model.ode = Constraint(self.model.t, rule=_ode)
         
         def _objective(m):
-            #return np.abs(m.y[self.t[0]] - self.initial_state)
-            return 1
+            return np.abs(m.y[self.t[0]] - self.initial_state)
+            # return 1
         
         self.model.obj = Objective(rule=_objective, sense=pyo.minimize)
         
