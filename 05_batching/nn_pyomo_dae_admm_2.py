@@ -9,7 +9,7 @@ from jax.experimental.ode import odeint
 import diffrax as dfx
 
 class NeuralODEPyomoADMM:
-    def __init__(self, y_observed, t, first_derivative_matrix, layer_sizes, time_invariant=True, extra_input=None, 
+    def __init__(self, y_observed, t, layer_sizes, time_invariant=True, extra_input=None, 
                  penalty_lambda_reg=0.1, penalty_lambda_smooth = 0.1,
                  discretization_scheme = "LAGRANGE-RADAU", ncp = 3,
                  act_func="tanh", w_init_method="random", params=None, y_init=None, 
@@ -26,8 +26,6 @@ class NeuralODEPyomoADMM:
         self.t2 = t[ midpoint: ]
         self.model1 = ConcreteModel()
         self.model2 = ConcreteModel()
-        self.D1 = first_derivative_matrix[0]
-        self.D2 = first_derivative_matrix[1]
             
         if extra_input is not None:
             self.extra_input1 = extra_input[:midpoint]
@@ -39,7 +37,6 @@ class NeuralODEPyomoADMM:
         self.w_init_method = w_init_method
         self.act_func = act_func
         
-        self.first_derivative_matrix = first_derivative_matrix
         self.penalty_lambda_reg = penalty_lambda_reg
         self.layer_sizes = layer_sizes
         self.y_init = y_init

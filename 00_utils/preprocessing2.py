@@ -5,17 +5,44 @@ from scipy.interpolate import CubicSpline
 from sklearn.preprocessing import StandardScaler
 from scipy.ndimage import gaussian_filter1d
 
+# TO DO :
+
+# 1) current implementation only allows to load lags within the time segment
+# -> 
+
+# 2) currently the data is loaded twice, this does not make sense
+# -> implement a DataPreprocessor class that loads data with the spacing in between data points specified
+# ---> should it be spacing or just 2 separate start dates?
+
 class DataPreprocessor:
-    def __init__(self, file_path, start_date, number_of_points, tau, m, sigma=1, split=300, num_nodes_mult=1, equally_spaced=False):
+    def __init__(self, file_path, start_date, number_of_points, tau, m, 
+                 feature_encoding, target = 'nd',
+                 sigma=1, split=300, num_nodes_mult=1, equally_spaced=False,
+                 batch_gap = 7):
         self.file_path = file_path
-        self.start_date = start_date
+        
+        self.start_date = pd.to_datetime(start_date)
         self.number_of_points = number_of_points
-        self.tau = tau
-        self.m = m
         self.sigma = sigma
         self.split = split
         self.num_nodes_mult = num_nodes_mult
         self.equally_spaced = equally_spaced
+        
+        # expected feature-columns
+        self.feature_encoding = feature_encoding
+        self.target = target
+        
+        # lags
+        self.prev_week = True 
+        self.prev_year = True 
+        # m and tau are used for short term embeddings
+        self.tau = tau # number of points behind
+        self.m = m
+        # difference btw prev day and prev day last day [?]
+        # is_holiday [?]
+        
+        # batch_gap expressed in 
+        self.batch_gap = batch_gap
 
     def generate_chebyshev_nodes(self, n, start, end):
         k = np.arange(n)
@@ -23,64 +50,118 @@ class DataPreprocessor:
         nodes = 0.5 * (end - start) * x + 0.5 * (start + end)
         return np.sort(nodes)
 
-    def load_data(self):
+    def load_data(self, offset_days=0):
+        """Load data with an offset to accommodate time lags."""
+        
         data = pd.read_csv(self.file_path)
-        data_subsample = data[data.settlement_date >= self.start_date][:self.number_of_points]
+        
+        data['settlement_date'] = pd.to_datetime(data['settlement_date'])
+        
+        # obtain the subsample
+        data_subsample = data[data['settlement_date'] >= self.start_date][:self.number_of_points]
+        # extract hour as a feature
+        data_subsample.loc[:,'hour'] = data_subsample['settlement_date'].dt.hour
+        
+        # extract the relevant columns
         data_subsample.reset_index(drop=True, inplace=True)
-        data_subsample['settlement_date'] = pd.to_datetime(data_subsample['settlement_date'])
-        data_subsample.loc[:, 'hour'] = data_subsample['settlement_date'].dt.hour
-        data_subsample = data_subsample[['settlement_date', 'temperature', 'hour', 'nd']]
-        data_subsample.rename(columns={'settlement_date': 'date', 'temperature': 'var1', 'hour': 'var2', 'nd': 'y'}, inplace=True)
-        t = jnp.linspace(0., 1., data_subsample.shape[0])
-        data_subsample['t'] = t
+        cols = list(self.feature_encoding.keys())
+        data_subsample = data_subsample[cols]
+        
+        # rename the columns
+        data_subsample.rename(columns=self.feature_encoding, inplace=True)
+        
+        data_subsample['var_weekend'] = (data_subsample['t'].dt.dayofweek >= 5).astype(int)
+        
+        data_subsample = self.add_time_features(data_subsample)
+        
         return data_subsample
+    
+    def load_embeddings(self, adjusted_start_date):
+        """Load data with an offset to accommodate time lags."""
+        
+        data = pd.read_csv(self.file_path)
+        
+        data['settlement_date'] = pd.to_datetime(data['settlement_date'])
+        
+        # obtain the subsample
+        data_subsample = data[data['settlement_date'] >= adjusted_start_date][:self.number_of_points]
+        
+        # extract the target column
+        y = data_subsample[self.target]
+        
+        return y
 
+    def add_time_features(self, data_subsample):
+        data_subsample['t'] = jnp.linspace(0., 1., len(data_subsample))
+        return data_subsample
+    
+    def smooth_signal(self, data, sigma=1):
+        for col in data.columns:
+            if 'y' == col or 'y' in col:  # Checks if 'y' is part of the column name
+                data[col] = gaussian_filter1d(data[col], sigma=sigma)
+        return data
+    
+    def interpolate_data(self, data, t_train, t_test, cols_to_interpolate):
+        interpolated_data_train = {}
+        interpolated_data_test = {}
+        for col in cols_to_interpolate:
+            cs = CubicSpline(data['t'], data[col])
+            interpolated_data_train[col] = cs(t_train)
+            interpolated_data_test[col] = cs(t_test)
+        return interpolated_data_train, interpolated_data_test
+    
     def preprocess_data(self, data_subsample):
         d = data_subsample.copy()
         t, y = d['t'], d['y']
-        y = gaussian_filter1d(y, sigma=self.sigma)
-        d['y'] = y
-        
-        for i in range(1, self.m + 1):
-            d[f'y_lag{i}'] = d['y'].shift(self.tau * i)
-        
-        first_index = d[f'y_lag{self.m}'].index[~d[f'y_lag{self.m}'].isna()][0]
-        self.split -= first_index
-        d = d.iloc[first_index:]
-        t = d['t']
 
+        # short term embeddings based on the number of points
+        for lag in range(1, self.m + 1): 
+            days_offset = self.tau * lag 
+            offset_date = self.start_date - pd.DateOffset(days=days_offset)
+            embedding = self.load_embeddings(adjusted_start_date=offset_date)
+            d[f'y_lag{lag}'] = embedding.values 
+        
+        # week embeddings
+        if self.prev_week:
+            previous_week_date = self.start_date - pd.DateOffset(days=7)
+            embedding = self.load_embeddings(adjusted_start_date=previous_week_date)
+            d[f'y_lag_week'] = embedding.values 
+            
+        # year embeddings
+        previous_year_date = self.start_date - pd.DateOffset(years=1)
+        if self.prev_year:
+            previous_year_date = self.start_date - pd.DateOffset(years=1)
+            embedding = self.load_embeddings(adjusted_start_date=previous_year_date)
+            d[f'y_lag_year'] = embedding.values 
+        
+        d = self.smooth_signal(d, sigma = self.sigma)
+        
         t_train, t_test = t[:self.split], t[self.split:]
         
         num_nodes = len(t_train) * self.num_nodes_mult
+        
         if self.equally_spaced:
             t_train = np.linspace(t_train.min(), t_train.max(), num_nodes)
         else:
             t_train = self.generate_chebyshev_nodes(num_nodes, t_train.min(), t_train.max())
         
-        interpolated_data_train, interpolated_data_test = {}, {}
-        var_cols = [col for col in d.columns if 'var' in col]
         
-        for var in var_cols:
-            cs = CubicSpline(t, d[var])
-            interpolated_data_train[var] = cs(t_train)
-            interpolated_data_test[var] = cs(t_test)
+        data_train, data_test = self.interpolate_data(d, t_train, t_test, d.columns.difference(['t']))
         
-        cs_y = CubicSpline(t, d['y'])
-        interpolated_data_train['y'], interpolated_data_test['y'] = cs_y(t_train), cs_y(t_test)
+        data_train['t'], data_test['t'] = t_train, t_test
         
-        for i in range(1, self.m + 1):
-            cs = CubicSpline(t, d[f'y_lag{i}'])
-            interpolated_data_train[f'y_lag{i}'] = cs(t_train)
-            interpolated_data_test[f'y_lag{i}'] = cs(t_test)
-            for p in range(self.tau * i, len(t_test)):
-                interpolated_data_test[f'y_lag{i}'][p] = np.nan
+        df_train, df_test = pd.DataFrame(data_train), pd.DataFrame(data_test)
         
-        interpolated_data_train['t'], interpolated_data_test['t'] = t_train, t_test
-        
-        df_train, df_test = pd.DataFrame(interpolated_data_train), pd.DataFrame(interpolated_data_test)
         scaler = StandardScaler()
         columns_to_scale = df_train.columns.difference(['t'])
         df_train[columns_to_scale] = scaler.fit_transform(df_train[columns_to_scale])
         df_test[columns_to_scale] = scaler.transform(df_test[columns_to_scale])
+        
+        # rearrange columns
+        y_columns = [col for col in df_train.columns if col.startswith('y')]
+        other_columns = [col for col in df_train.columns if col not in y_columns]
+        new_order = y_columns + other_columns
+        df_train = df_train[new_order]
+        df_test = df_test[new_order]
         
         return df_train, df_test

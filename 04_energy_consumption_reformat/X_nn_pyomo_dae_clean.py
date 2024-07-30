@@ -40,33 +40,8 @@ class NeuralODEPyomo:
         self.discretization_scheme = discretization_scheme
         self.penalty_lambda_smooth = penalty_lambda_smooth
         self.ncp = ncp
+
         
-    def update_y_observed(self, new_y_observed):
-        if not isinstance(new_y_observed, np.ndarray):
-            raise ValueError("new_y_observed must be a numpy array.")
-        if new_y_observed.shape != self.y_observed.shape:
-            raise ValueError("new_y_observed must have the same shape as the original y_observed.")
-        
-        self.y_observed = new_y_observed
-        self.y_init = new_y_observed
-        
-        print("y_observed has been updated.")
-        
-    def update_model_y(self, new_y):
-        if not isinstance(new_y, np.ndarray):
-            raise ValueError("new_y must be a numpy array.")
-        if self.observed_dim == 1:
-            if new_y.shape[0] != self.data_dim:
-                raise ValueError("new_y must have the same number of time steps as the original data.")
-            for i in range(self.data_dim):
-                self.model.y[i].set_value(new_y[i])
-        elif self.observed_dim == 2:
-            if new_y.shape != (self.data_dim, 2):
-                raise ValueError("new_y must have the same shape as the original data (N, 2).")
-            for i in range(self.data_dim):
-                self.model.y1[i].set_value(new_y[i, 0])
-                self.model.y2[i].set_value(new_y[i, 1])
-        print("model.y has been updated.")    
         
     def initialize_weights(self, shape):
         if self.w_init_method == 'random':

@@ -22,11 +22,14 @@ class DirectODESolver:
         self.discretization_scheme = discretization_scheme
         
     def build_model(self):
+        lower_bound = -5.0
+        upper_bound = 5.0
+        
         self.model.t = ContinuousSet(initialize=self.t)
-        self.model.y = Var(self.model.t, domain=pyo.Reals, initialize=1)
+        self.model.y = Var(self.model.t, domain=pyo.Reals, initialize=0.1, bounds=(lower_bound, upper_bound))
         self.model.dy_dt = DerivativeVar(self.model.y, wrt=self.model.t)
         
-        # self.model.init_condition = Constraint(expr= (self.model.y[self.t[0]] == self.initial_state ))
+        #self.model.init_condition = Constraint(expr= (self.model.y[self.t[0]] == self.initial_state ))
         
         def _ode(m, t_i):
             nn_input = [m.y[t_i]]
@@ -42,7 +45,7 @@ class DirectODESolver:
         self.model.ode = Constraint(self.model.t, rule=_ode)
         
         def _objective(m):
-            return np.abs(m.y[self.t[0]] - self.initial_state)
+            return np.abs(m.y[self.t[0]] - self.initial_state) 
             # return 1
         
         self.model.obj = Objective(rule=_objective, sense=pyo.minimize)
@@ -69,7 +72,7 @@ class DirectODESolver:
         # Apply discretization
         if self.discretization_scheme == 'LAGRANGE-RADAU':
             discretizer = pyo.TransformationFactory('dae.collocation')
-            discretizer.apply_to(self.model, nfe=len(self.t)-1, ncp=1, scheme='LAGRANGE-RADAU')
+            discretizer.apply_to(self.model, nfe=(len(self.t)-1)*5, ncp=6, scheme='LAGRANGE-RADAU')
         elif self.discretization_scheme == 'BACKWARD':
             discretizer = pyo.TransformationFactory('dae.finite_difference')
             discretizer.apply_to(self.model, nfe=len(self.t)-1, scheme='BACKWARD')
@@ -102,5 +105,16 @@ class DirectODESolver:
         t_values = np.array([t for t in self.model.t])
         y_values = np.array([value(self.model.y[t]) for t in self.model.t])
         return t_values, y_values
-
+    
+    def extract_derivative(self):
+        dy_dt = []
+        ts = []
+        for t in self.model.t:
+            try:
+                dy_dt.append(pyo.value(self.model.dy_dt[t]))
+                ts.append(t)
+            except ValueError:
+                dy_dt.append(None) 
+                ts.append(t)
+        return (ts, dy_dt)
 

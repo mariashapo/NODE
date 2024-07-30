@@ -12,10 +12,6 @@ def generate_chebyshev_nodes(n, start, end):
     nodes = 0.5 * (end - start) * x + 0.5 * (start + end)
     return np.sort(nodes)
 
-def add_time_features(data_subsample):
-    data_subsample['t'] = jnp.linspace(0., 1., len(data_subsample))
-    return data_subsample
-
 def load_data(file_path, start_date, number_of_points):
 
     data = pd.read_csv(file_path)
@@ -44,7 +40,6 @@ def load_data(file_path, start_date, number_of_points):
     data_subsample['t'] = t
     
     return data_subsample
-
 
 def preprocess_data(data_subsample, tau, m, sigma = 1, split = 300, num_nodes_mult = 1, equally_spaced = False):
     """

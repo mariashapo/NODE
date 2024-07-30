@@ -1,7 +1,6 @@
 import numpy as np
 import pyomo.environ as pyo
 from pyomo.environ import ConcreteModel, Var, ConstraintList, Objective, SolverFactory, value, RangeSet
-
 import jax
 import jax.numpy as jnp
 import diffrax as dfx
@@ -9,119 +8,16 @@ import diffrax as dfx
 np.random.seed(42)
 
 class NeuralODEPyomoADMM:
-
-    # --------------------------------------------- CLASS INITIALIZATION ------------------------------------------- #
-    def __init__(self, y_observed, t, first_derivative_matrix, layer_sizes, time_invariant=True, extra_input=None, rho = 1.0,
+    def __init__(self, y_observed, t, first_derivative_matrix, layer_sizes, time_invariant=True, extra_input=None, rho=1.0,
                  penalty_lambda_reg=0.01, penalty_lambda_smooth=0.0, act_func="tanh", w_init_method="random", params=None, y_init=None):
-
-        # class parameters
-        self.initialize_data_params(y_observed, t, extra_input, y_init, first_derivative_matrix)
-        self.initialize_model_params(penalty_lambda_reg, act_func, w_init_method, 
-                                layer_sizes, time_invariant, params, penalty_lambda_smooth, rho)
-        self.initialize_admm_variables()
         
-        self.iter = 0
-        
-        # model initialization
+        self.initialize_parameters(y_observed, t, first_derivative_matrix, layer_sizes, time_invariant, extra_input, rho,
+                                   penalty_lambda_reg, penalty_lambda_smooth, act_func, w_init_method, params, y_init)
         self.model1, self.model2 = ConcreteModel(), ConcreteModel()
         self.create_submodels()
 
-    def initialize_data_params(self, y_observed, t, extra_input, y_init, first_derivative_matrix):
-        self.midpoint = len(t) // 2
-        self.y_observed1, self.y_observed2 = y_observed[:self.midpoint], y_observed[self.midpoint:]
-        self.t1, self.t2 = t[:self.midpoint], t[self.midpoint:]
-        self.extra_input1, self.extra_input2 = self.split_if_not_none(extra_input)
-        self.y_init1, self.y_init2 = self.split_if_not_none(y_init)
-        self.D1, self.D2 = first_derivative_matrix
-    
-    def initialize_model_params(self, penalty_lambda_reg, act_func, w_init_method, 
-                                layer_sizes, time_invariant, params, penalty_lambda_smooth, rho):
-        self.w_init_method = w_init_method
-        self.act_func = act_func
-        self.layer_sizes = layer_sizes
-        self.time_invariant = time_invariant
-        self.params = params
-        self.penalty_lambda_smooth = penalty_lambda_smooth
-        self.penalty_lambda_reg = penalty_lambda_reg
-        self.rho = rho
 
-    def initialize_admm_variables(self):
-        input_size, layer1, output_size = self.layer_sizes
-        self.W1_consensus, self.b1_consensus = np.zeros((layer1, input_size)), np.zeros(layer1)
-        self.W2_consensus, self.b2_consensus = np.zeros((output_size, layer1)), np.zeros(output_size)
-        self.dual_W1, self.dual_b1 = np.zeros((layer1, input_size)), np.zeros(layer1)
-        self.dual_W2, self.dual_b2 = np.zeros((output_size, layer1)), np.zeros(output_size)
 
-    def split_if_not_none(self, arr):
-        if arr is not None:
-            return arr[:self.midpoint], arr[self.midpoint:]
-        return None, None
-    
-    # --------------------------------------------- MODEL INITIALIZATION ---------------------------------------------- #
-    def create_submodels(self):
-        N, M = self.y_observed1.shape
-        lower_bound, upper_bound = -5.0, 5.0
-        self.data_dim, self.observed_dim = N, M
-        self.model1.t, self.model2.t = RangeSet(0, N - 1), RangeSet(0, N - 1)
-        self.initialize_target_variable(self.model1, self.y_init1, lower_bound, upper_bound)
-        self.initialize_target_variable(self.model2, self.y_init2, lower_bound, upper_bound)
-        self.initialize_nn_variables(self.model1)
-        self.initialize_nn_variables(self.model2)
-        self.model1.ode, self.model2.ode = ConstraintList(), ConstraintList()
-        self.add_collocation_constraints()
-        self.update_objective()
-    
-    def initialize_target_variable(self, model, y_init, lower_bound, upper_bound):
-        if y_init is None:
-            model.y = Var(model.t, domain=pyo.Reals, initialize=0.1, bounds=(lower_bound, upper_bound))
-        else:
-            model.y = Var(model.t, domain=pyo.Reals, initialize=lambda m, i: y_init[i], bounds=(lower_bound, upper_bound))
-    
-    def initialize_nn_variables(self, model):
-        input_size, layer1, output_size = self.layer_sizes
-        weight_bounds = (-100.0, 100.0)
-        model.W1 = Var(range(layer1), range(input_size), initialize=lambda m, i, j: self.initialize_weights((layer1, input_size))[i, j], bounds=weight_bounds)
-        model.b1 = Var(range(layer1), initialize=lambda m, i: self.initialize_biases(layer1)[i], bounds=weight_bounds)
-        model.W2 = Var(range(output_size), range(layer1), initialize=lambda m, i, j: self.initialize_weights((output_size, layer1))[i, j], bounds=weight_bounds)
-        model.b2 = Var(range(output_size), initialize=lambda m, i: self.initialize_biases(output_size)[i], bounds=weight_bounds)
-    
-    def initialize_weights(self, shape):
-        if self.w_init_method == 'random':
-            return np.random.randn(*shape) * 0.1
-        elif self.w_init_method == 'xavier':
-            return np.random.randn(*shape) * np.sqrt(2 / (shape[0] + shape[1]))
-        elif self.w_init_method == 'he':
-            return np.random.randn(*shape) * np.sqrt(2 / shape[0])
-        else:
-            raise ValueError("Unsupported initialization method. Use 'random', 'xavier', or 'he'.")
-
-    def initialize_biases(self, size):
-        return np.random.randn(size) * 0.1
-    
-    def add_collocation_constraints(self):
-        for i in range(1, len(self.t1)):
-            dy_dt_1 = sum(self.D1[i, j] * self.model1.y[j] for j in range(self.data_dim))
-            dy_dt_2 = sum(self.D2[i, j] * self.model2.y[j] for j in range(self.data_dim))
-            nn_input_1, nn_input_2 = [self.model1.y[i]], [self.model2.y[i]]
-            nn_input_1, nn_input_2 = self.add_time_and_extra_inputs(nn_input_1, nn_input_2, i)
-            nn_y_1, nn_y_2 = self.nn_output(nn_input_1, self.model1), self.nn_output(nn_input_2, self.model2)
-            self.model1.ode.add(nn_y_1 == dy_dt_1)
-            self.model2.ode.add(nn_y_2 == dy_dt_2)
-    
-    def add_time_and_extra_inputs(self, nn_input_1, nn_input_2, i):
-        if not self.time_invariant:
-            nn_input_1.append(self.t1[i])
-            nn_input_2.append(self.t2[i])
-        if self.extra_input1 is not None:
-            for input in self.extra_input1.T:
-                nn_input_1.append(input[i])
-        if self.extra_input2 is not None:
-            for input in self.extra_input2.T:
-                nn_input_2.append(input[i])
-        return nn_input_1, nn_input_2
-
-    # --------------------------------------------- MODEL UPDATES ---------------------------------------------- #
-    
     def update_objective(self):
         if hasattr(self.model1, 'obj'):
             self.model1.del_component('obj')
@@ -129,6 +25,15 @@ class NeuralODEPyomoADMM:
             self.model2.del_component('obj')
         self.model1.obj = Objective(rule=self.create_objective(self.model1, self.y_observed1, self.t1), sense=pyo.minimize)
         self.model2.obj = Objective(rule=self.create_objective(self.model2, self.y_observed2, self.t2), sense=pyo.minimize)
+
+    def create_objective(self, model, y_observed, t):
+        def _objective(m):
+            data_fit = sum((m.y[i] - y_observed[i])**2 for i in range(len(t)))
+            reg_smooth = sum((m.y[i] - m.y[i + 1])**2 for i in range(len(t) - 1))
+            reg = self.compute_regularization_term(m)
+            admm_penalty = self.compute_admm_penalty(m) if self.iter >= 1 else 0
+            return data_fit + self.penalty_lambda_reg * reg + self.penalty_lambda_smooth * reg_smooth + admm_penalty
+        return _objective
 
     def compute_regularization_term(self, m):
         layer1, input_size, output_size = self.layer_sizes[1], self.layer_sizes[0], self.layer_sizes[2]
@@ -147,34 +52,22 @@ class NeuralODEPyomoADMM:
             sum((m.b2[i] - self.b2_consensus[i] + self.dual_b2[i] / self.rho)**2 for i in range(output_size))
         )
         return admm_penalty
-    
-    def create_objective(self, model, y_observed, t):
-        def _objective(m):
-            data_fit = sum((m.y[i] - y_observed[i])**2 for i in range(len(t)))
-            reg_smooth = sum((m.y[i] - m.y[i + 1])**2 for i in range(len(t) - 1))
-            reg = self.compute_regularization_term(m)
-            admm_penalty = self.compute_admm_penalty(m) if self.iter >= 1 else 0
-            return data_fit + self.penalty_lambda_reg * reg + self.penalty_lambda_smooth * reg_smooth + admm_penalty
-        return _objective
-    
-    # --------------------------------------------- MODEL OUTPUT ---------------------------------------------- # 
 
     def nn_output(self, nn_input, m):
-        hidden = self.apply_activation_function(np.dot(m.W1, nn_input) + m.b1)
-        outputs = np.dot(m.W2, hidden) + m.b2
+        hidden = self.apply_activation_function(jnp.dot(m.W1, nn_input) + m.b1)
+        outputs = jnp.dot(m.W2, hidden) + m.b2
         return outputs
 
     def apply_activation_function(self, hidden):
         epsilon = 1e-10
         if self.act_func == "tanh":
-            return [pyo.tanh(h) for h in hidden]
+            return jnp.tanh(hidden)
         if self.act_func == "sigmoid":
-            return [1 / (1 + pyo.exp(-h) + epsilon) for h in hidden]
+            return 1 / (1 + jnp.exp(-hidden) + epsilon)
         if self.act_func == "softplus":
-            return [pyo.log(1 + pyo.exp(h) + epsilon) for h in hidden]
+            return jnp.log(1 + jnp.exp(hidden) + epsilon)
         raise ValueError("Unsupported activation function. Use 'tanh', 'sigmoid', or 'softplus'.")
 
-    # --------------------------------------------- SOLVER INITIALIZATION ---------------------------------------------- # 
     def solve_model(self):
         solver = SolverFactory('ipopt')
         if self.params is not None:
@@ -216,8 +109,7 @@ class NeuralODEPyomoADMM:
         print('*' * 100)
         print(f"Model did not converge. Primal Residual: {primal_residual}")
         print('*' * 100)
-    
-    # --------------------------------------------- ADMM UPDATES ---------------------------------------------- # 
+
     def update_dual_variables(self):
         self.dual_W1 += 0.5 * (self.to_array(self.model1.W1) - self.W1_consensus + self.to_array(self.model2.W1) - self.W1_consensus)
         self.dual_b1 += 0.5 * (self.to_vector(self.model1.b1) - self.b1_consensus + self.to_vector(self.model2.b1) - self.b1_consensus)
@@ -231,21 +123,11 @@ class NeuralODEPyomoADMM:
         self.b2_consensus = (self.to_vector(self.model1.b2) + self.to_vector(self.model2.b2)) / 2
 
     def to_array(self, pyomo_var):
-        index_set = list(pyomo_var.index_set())
-        shape = (max(i for i, j in index_set) + 1, max(j for i, j in index_set) + 1)
-        return np.array([[pyomo_var[i, j].value for j in range(shape[1])] for i in range(shape[0])])
+        return np.array([[pyomo_var[i, j].value for j in range(pyomo_var.index_set().dimen)] for i in range(pyomo_var.index_set().dimen)])
 
     def to_vector(self, pyomo_var):
-        size = max(pyomo_var.index_set()) + 1
-        return np.array([pyomo_var[i].value for i in range(size)])
+        return np.array([pyomo_var[i].value for i in range(pyomo_var.index_set().dimen)])
 
-    def compute_primal_residual(self):
-        model1_vars = self.get_model_vars(self.model1)
-        model2_vars = self.get_model_vars(self.model2)
-        primal_residuals = [np.linalg.norm(model1_vars[var] - getattr(self, f"{var}_consensus")) + np.linalg.norm(model2_vars[var] - getattr(self, f"{var}_consensus"))
-                            for var in ['W1', 'b1', 'W2', 'b2']]
-        return sum(primal_residuals)
-    
     def get_model_vars(self, model):
         return {
             'W1': self.to_array(model.W1),
@@ -253,8 +135,14 @@ class NeuralODEPyomoADMM:
             'W2': self.to_array(model.W2),
             'b2': self.to_vector(model.b2)
         }
-    
-    # --------------------------------------------- EXTRACT LEARNT SOLUTIONS ---------------------------------------------- # 
+
+    def compute_primal_residual(self):
+        model1_vars = self.get_model_vars(self.model1)
+        model2_vars = self.get_model_vars(self.model2)
+        primal_residuals = [np.linalg.norm(model1_vars[var] - getattr(self, f"{var}_consensus")) + np.linalg.norm(model2_vars[var] - getattr(self, f"{var}_consensus"))
+                            for var in ['W1', 'b1', 'W2', 'b2']]
+        return sum(primal_residuals)
+
     def extract_solution(self):
         y1 = np.array([value(self.model1.y[i]) for i in self.model1.t])
         y2 = np.array([value(self.model2.y[i]) for i in self.model2.t])
@@ -273,8 +161,7 @@ class NeuralODEPyomoADMM:
         W2 = np.array([[value(m.W2[j, k]) for k in range(self.layer_sizes[1])] for j in range(self.layer_sizes[2])])
         b2 = np.array([value(m.b2[j]) for j in range(self.layer_sizes[2])])
         return {'W1': W1, 'b1': b1, 'W2': W2, 'b2': b2}
-    
-    # --------------------------------------------- PREDICTIONS ---------------------------------------------- #
+
     def predict(self, input, weights):
         if weights == 'both':
             weights1, weights2 = self.extract_weights(self.model1), self.extract_weights(self.model2)
