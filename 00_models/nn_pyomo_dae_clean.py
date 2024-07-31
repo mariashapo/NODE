@@ -287,10 +287,10 @@ class NeuralODEPyomo:
                 if isinstance(extra_inputs, (np.ndarray, jnp.ndarray)):
                     if extra_inputs.ndim == 2:
                         # use interpolation to obtain the value of the extra inputs at the time point t
-                        interpolated_inputs = jnp.array([linear_interpolate(t, t_all, extra_inputs[:, i]) for i in range(extra_inputs.shape[1])])
+                        interpolated_inputs = jnp.array([jnp.interp(t, t_all, extra_inputs[:, i]) for i in range(extra_inputs.shape[1])])
                         input = jnp.append(input, interpolated_inputs)
                     elif extra_inputs.ndim == 1:
-                        interpolated_input = linear_interpolate(t, t_all, extra_inputs)
+                        interpolated_input = jnp.interp(t, t_all, extra_inputs)
                         input = jnp.append(input, interpolated_input)
                 else:
                     input = jnp.append(input, extra_inputs)
@@ -317,8 +317,3 @@ class NeuralODEPyomo:
         #print("solution.ts", solution.ts)
         return solution.ys
       
-def linear_interpolate(x, xp, yp):
-    """
-    Interpolate data points (xp, yp) to find the value at x.
-    """
-    return jnp.interp(x, xp, yp)

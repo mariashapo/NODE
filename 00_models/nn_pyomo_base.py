@@ -352,3 +352,24 @@ class NeuralODEPyomo:
         #print("solution.ts", solution.ts)
         return solution.ys
     
+    def check_violated_constraints(self, tolerance=1e-8):
+        violated_constraints = []
+        constraint_list = self.model.ode
+
+        for i in range(1, len(constraint_list) + 1):
+            constr = constraint_list[i]
+            if constr.body() is not None:  # Ensure there is a body expression
+                if not constr.lower is None and value(constr.body()) < value(constr.lower) - tolerance:
+                    violated_constraints.append((i, "lower", value(constr.body()), value(constr.lower)))
+                if not constr.upper is None and value(constr.body()) > value(constr.upper) + tolerance:
+                    violated_constraints.append((i, "upper", value(constr.body()), value(constr.upper)))
+
+        if violated_constraints:
+            print("\nViolated Constraints:")
+            for v_constr in violated_constraints:
+                index, bound_type, body_val, bound_val = v_constr
+                print(f"Constraint index: {index} - {bound_type} bound violated")
+                print(f"Value: {body_val} vs. Bound: {bound_val}")
+        else:
+            print("No explicit violations found (note: IPOPT may still consider the problem infeasible due to numerical issues or other considerations).")
+    

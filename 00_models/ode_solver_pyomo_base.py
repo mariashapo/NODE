@@ -1,7 +1,6 @@
 import numpy as np
 import pyomo.environ as pyo
 from pyomo.environ import ConcreteModel, Var, Constraint, ConstraintList, Objective, SolverFactory, value, RangeSet
-from pyomo.dae import ContinuousSet, DerivativeVar
 
 # To do:
 # Rewrite this solver to work with discrete t points and using D matrix
@@ -29,7 +28,6 @@ class DirectODESolver:
         
         # first_derivative_matrix
         self.D = D
-        
         self.model = ConcreteModel()
         
         self.params = params
@@ -37,15 +35,18 @@ class DirectODESolver:
     def build_model(self):
         self.N = len(self.t)
         
-        lower_bound = -2.0
-        upper_bound = 2.0
+        lower_bound = -5.0
+        upper_bound = 5.0
         
         self.model.t = RangeSet(0, self.N - 1)
         self.model.y = Var(self.model.t, domain=pyo.Reals, initialize=0.1, bounds=(lower_bound, upper_bound))
-        # self.model.init_condition = Constraint(expr= (self.model.y[0] == self.initial_state))
-        
+
+        self.model.slack = Var(domain=pyo.NonNegativeReals, bounds=(0, 1e-1), initialize=0.0)  # Slack variable for flexibility
+
+        # Add the flexible initial condition constraint
+        self.model.init_condition = Constraint(expr=(self.model.y[0] == self.initial_state + self.model.slack))
+
         self.model.ode = ConstraintList()
-        
         for i in range(self.N):
             nn_input = [self.model.y[i]]
 
@@ -62,8 +63,7 @@ class DirectODESolver:
             self.model.ode.add(nn_y == dy_dt)
         
         def _objective(m):
-            # return np.abs(m.y[self.t[0]] - self.initial_state) 
-            return 1
+            return 1 + 1e6 * m.slack
         
         self.model.obj = Objective(rule=_objective, sense=pyo.minimize)
         
@@ -110,5 +110,33 @@ class DirectODESolver:
     def extract_solution(self):
         y_values = np.array([value(self.model.y[i]) for i in range(self.N)])
         return y_values
+    
+    def check_violated_constraints(self, tolerance=1e-8):
+        violated_constraints = []
+        initial_constr = self.model.init_condition
+        constraint_list = self.model.ode
+
+        if initial_constr.body() is not None:
+            if not initial_constr.lower is None and value(initial_constr.body()) < value(initial_constr.lower) - tolerance:
+                violated_constraints.append(("initial_condition", "lower", value(initial_constr.body()), value(initial_constr.lower)))
+            if not initial_constr.upper is None and value(initial_constr.body()) > value(initial_constr.upper) + tolerance:
+                violated_constraints.append(("initial_condition", "upper", value(initial_constr.body()), value(initial_constr.upper)))
+        
+        for i in range(1, len(constraint_list) + 1):
+            constr = constraint_list[i]
+            if constr.body() is not None:  # Ensure there is a body expression
+                if not constr.lower is None and value(constr.body()) < value(constr.lower) - tolerance:
+                    violated_constraints.append((i, "lower", value(constr.body()), value(constr.lower)))
+                if not constr.upper is None and value(constr.body()) > value(constr.upper) + tolerance:
+                    violated_constraints.append((i, "upper", value(constr.body()), value(constr.upper)))
+
+        if violated_constraints:
+            print("\nViolated Constraints:")
+            for v_constr in violated_constraints:
+                index, bound_type, body_val, bound_val = v_constr
+                print(f"Constraint index: {index} - {bound_type} bound violated")
+                print(f"Value: {body_val} vs. Bound: {bound_val}")
+        else:
+            print("No explicit violations found (note: IPOPT may still consider the problem infeasible due to numerical issues or other considerations).")
 
 

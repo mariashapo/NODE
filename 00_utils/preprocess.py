@@ -38,8 +38,6 @@ class DataPreprocessor:
         # m and tau are used for short term embeddings
         self.tau = tau # number of points behind
         self.m = m
-        # difference btw prev day and prev day last day [?]
-        # is_holiday [?]
         
         # batch_gap expressed in 
         self.batch_gap = batch_gap
@@ -139,12 +137,14 @@ class DataPreprocessor:
         t_train, t_test = t[:self.split], t[self.split:]
         
         num_nodes = len(t_train) * self.num_nodes_mult
+        num_nodes_test = len(t_test) * self.num_nodes_mult
         
         if self.equally_spaced:
             t_train = np.linspace(t_train.min(), t_train.max(), num_nodes)
+            t_test = np.linspace(t_test.min(), t_test.max(), num_nodes_test)
         else:
             t_train = self.generate_chebyshev_nodes(num_nodes, t_train.min(), t_train.max())
-        
+            t_test = self.generate_chebyshev_nodes(num_nodes_test, t_test.min(), t_test.max())
         
         data_train, data_test = self.interpolate_data(d, t_train, t_test, d.columns.difference(['t']))
         
