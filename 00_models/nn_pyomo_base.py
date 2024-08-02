@@ -102,6 +102,9 @@ class NeuralODEPyomo:
             raise ValueError("layer_sizes should have exactly 3 elements: [input_size, hidden_size, output_size].")
         
         # CONSTRAINTS
+        # self.model.slack = Var(domain=pyo.Reals, bounds=(-1e-2, 1e-2), initialize=0.0)
+        self.model.init_condition = Constraint(expr=(self.model.y[0] == self.y_observed[0][0])) # + self.model.slack
+        
         model.ode = ConstraintList()
         # for each data point
         for i in range(1, N):

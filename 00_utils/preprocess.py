@@ -7,10 +7,7 @@ from scipy.ndimage import gaussian_filter1d
 
 # TO DO :
 
-# 1) current implementation only allows to load lags within the time segment
-# -> 
-
-# 2) currently the data is loaded twice, this does not make sense
+# currently the data is loaded twice for ADMM, this does not make sense
 # -> implement a DataPreprocessor class that loads data with the spacing in between data points specified
 # ---> should it be spacing or just 2 separate start dates?
 
@@ -18,7 +15,7 @@ class DataPreprocessor:
     def __init__(self, file_path, start_date, number_of_points, tau, m, 
                  feature_encoding, target = 'nd',
                  sigma=1, split=300, num_nodes_mult=1, equally_spaced=False,
-                 batch_gap = 7):
+                 batch_gap = 7, smooth = True):
         self.file_path = file_path
         
         self.start_date = pd.to_datetime(start_date)
@@ -27,6 +24,7 @@ class DataPreprocessor:
         self.split = split
         self.num_nodes_mult = num_nodes_mult
         self.equally_spaced = equally_spaced
+        self.smooth = smooth
         
         # expected feature-columns
         self.feature_encoding = feature_encoding
@@ -103,9 +101,14 @@ class DataPreprocessor:
         interpolated_data_train = {}
         interpolated_data_test = {}
         for col in cols_to_interpolate:
-            cs = CubicSpline(data['t'], data[col])
-            interpolated_data_train[col] = cs(t_train)
-            interpolated_data_test[col] = cs(t_test)
+            if col == 'var_weekend':
+                interpolated_data_train[col] = data['var_weekend'][:len(t_train)]
+                interpolated_data_test[col] = data['var_weekend'][len(t_train):]
+            else:
+                cs = CubicSpline(data['t'], data[col])
+                interpolated_data_train[col] = cs(t_train)
+                interpolated_data_test[col] = cs(t_test)
+        
         return interpolated_data_train, interpolated_data_test
     
     def preprocess_data(self, data_subsample):
@@ -132,7 +135,8 @@ class DataPreprocessor:
             embedding = self.load_embeddings(adjusted_start_date=previous_year_date)
             d[f'y_lag_year'] = embedding.values 
         
-        d = self.smooth_signal(d, sigma = self.sigma)
+        if self.smooth:
+            d = self.smooth_signal(d, sigma = self.sigma)
         
         t_train, t_test = t[:self.split], t[self.split:]
         
@@ -153,7 +157,7 @@ class DataPreprocessor:
         df_train, df_test = pd.DataFrame(data_train), pd.DataFrame(data_test)
         
         scaler = StandardScaler()
-        columns_to_scale = df_train.columns.difference(['t'])
+        columns_to_scale = df_train.columns.difference(['t', 'var_weekend'])
         df_train[columns_to_scale] = scaler.fit_transform(df_train[columns_to_scale])
         df_test[columns_to_scale] = scaler.transform(df_test[columns_to_scale])
         

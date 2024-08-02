@@ -1,14 +1,11 @@
 import numpy as np
 import pyomo.environ as pyo
-from pyomo.environ import ConcreteModel, Var, Constraint, ConstraintList, Objective, SolverFactory, value, RangeSet
-
-# To do:
-# Rewrite this solver to work with discrete t points and using D matrix
+from pyomo.environ import ConcreteModel, Var, Constraint, Objective, SolverFactory, value, RangeSet
 
 class DirectODESolver:
     def __init__(self, t, layer_sizes, weights, biases, initial_state, D, 
                  act_func="tanh", time_invariant=True, extra_input=None,
-                 params = None):
+                 params=None):
         
         self.t = t
         self.layer_sizes = layer_sizes
@@ -41,29 +38,29 @@ class DirectODESolver:
         self.model.t = RangeSet(0, self.N - 1)
         self.model.y = Var(self.model.t, domain=pyo.Reals, initialize=0.1, bounds=(lower_bound, upper_bound))
 
-        self.model.slack = Var(domain=pyo.Reals, bounds=(-1e-1, 1e-1), initialize=0.0)  # Slack variable for flexibility
-
-        # Add the flexible initial condition constraint
+        self.model.slack = Var(domain=pyo.Reals, bounds=(-1e-1, 1e-1), initialize=0.0)
         self.model.init_condition = Constraint(expr=(self.model.y[0] == self.initial_state + self.model.slack))
-
-        self.model.ode = ConstraintList()
-        for i in range(self.N):
-            nn_input = [self.model.y[i]]
-
-            # add time and extra inputs
-            if not self.time_invariant:
-                nn_input.append(self.t[i])
-
-            if self.extra_input is not None:
-                for input in self.extra_input.T:
-                    nn_input.append(input[i])
-            
-            nn_y = self.nn_output(nn_input)
-            dy_dt = sum(self.D[i, j] * self.model.y[j] for j in range(self.N))
-            self.model.ode.add(nn_y == dy_dt)
         
         def _objective(m):
-            return 1 + 1e6 * m.slack
+            penalty = 0
+            
+            # ODE penalties
+            for i in range(self.N):
+                nn_input = [m.y[i]]
+
+                # add time and extra inputs
+                if not self.time_invariant:
+                    nn_input.append(self.t[i])
+
+                if self.extra_input is not None:
+                    for input in self.extra_input.T:
+                        nn_input.append(input[i])
+                
+                nn_y = self.nn_output(nn_input)
+                dy_dt = sum(self.D[i, j] * m.y[j] for j in range(self.N))
+                penalty += (nn_y - dy_dt)**2
+            
+            return penalty + self.model.slack
         
         self.model.obj = Objective(rule=_objective, sense=pyo.minimize)
         
@@ -110,33 +107,5 @@ class DirectODESolver:
     def extract_solution(self):
         y_values = np.array([value(self.model.y[i]) for i in range(self.N)])
         return y_values
-    
-    def check_violated_constraints(self, tolerance=1e-8):
-        violated_constraints = []
-        initial_constr = self.model.init_condition
-        constraint_list = self.model.ode
-
-        if initial_constr.body() is not None:
-            if not initial_constr.lower is None and value(initial_constr.body()) < value(initial_constr.lower) - tolerance:
-                violated_constraints.append(("initial_condition", "lower", value(initial_constr.body()), value(initial_constr.lower)))
-            if not initial_constr.upper is None and value(initial_constr.body()) > value(initial_constr.upper) + tolerance:
-                violated_constraints.append(("initial_condition", "upper", value(initial_constr.body()), value(initial_constr.upper)))
-        
-        for i in range(1, len(constraint_list) + 1):
-            constr = constraint_list[i]
-            if constr.body() is not None:  # Ensure there is a body expression
-                if not constr.lower is None and value(constr.body()) < value(constr.lower) - tolerance:
-                    violated_constraints.append((i, "lower", value(constr.body()), value(constr.lower)))
-                if not constr.upper is None and value(constr.body()) > value(constr.upper) + tolerance:
-                    violated_constraints.append((i, "upper", value(constr.body()), value(constr.upper)))
-
-        if violated_constraints:
-            print("\nViolated Constraints:")
-            for v_constr in violated_constraints:
-                index, bound_type, body_val, bound_val = v_constr
-                print(f"Constraint index: {index} - {bound_type} bound violated")
-                print(f"Value: {body_val} vs. Bound: {bound_val}")
-        else:
-            print("No explicit violations found (note: IPOPT may still consider the problem infeasible due to numerical issues or other considerations).")
 
 

@@ -59,7 +59,7 @@ class NeuralODE(nn.Module):
             return result
         
         solver = dfx.Tsit5()
-        stepsize_controller = dfx.PIDController(rtol=1e-3, atol=1e-3)
+        stepsize_controller = dfx.PIDController(rtol=1e-3, atol=1e-6)
         saveat = dfx.SaveAt(ts=t)
 
         solution = dfx.diffeqsolve(
