@@ -35,7 +35,6 @@ class NeuralODE(nn.Module):
 
     def loss_fn(self, params, apply_fn, t, observed_data, y0, args):
         def func(t, y, args):
-            # print("t: ", t)
             input = jnp.atleast_1d(y)
 
             if not self.time_invariant:
@@ -45,12 +44,12 @@ class NeuralODE(nn.Module):
                 extra_inputs, t_all = args
 
                 if isinstance(extra_inputs, (np.ndarray, jnp.ndarray)):
-                    # Interpolate extra_inputs to get continuous values
+                    # interpolate extra_inputs to get continuous values
                     if extra_inputs.ndim == 2:
-                        interpolated_inputs = jnp.array([linear_interpolate(t, t_all, extra_inputs[:, i]) for i in range(extra_inputs.shape[1])])
+                        interpolated_inputs = jnp.array([jnp.interp(t, t_all, extra_inputs[:, i]) for i in range(extra_inputs.shape[1])])
                         input = jnp.append(input, interpolated_inputs)
                     elif extra_inputs.ndim == 1:
-                        interpolated_input = linear_interpolate(t, t_all, extra_inputs)
+                        interpolated_input = jnp.interp(t, t_all, extra_inputs)
                         input = jnp.append(input, interpolated_input)
                 else:
                     input = jnp.append(input, extra_inputs)
@@ -74,12 +73,10 @@ class NeuralODE(nn.Module):
             saveat=saveat,
             adjoint=dfx.RecursiveCheckpointAdjoint(checkpoints=100) 
         )
-
-        #debug_print_simple(solution.ts)
         
         pred_solution = solution.ys
-        loss_mse = jnp.sum(jnp.square(pred_solution - observed_data))
-        l2_regularization = sum(jnp.sum(param ** 2) for param in jax.tree_util.tree_leaves(params))
+        loss_mse = jnp.mean(jnp.square(pred_solution - observed_data))
+        l2_regularization = jnp.mean(jnp.square(param) for param in jax.tree_util.tree_leaves(params))
         
         return loss_mse + self.regularizer * l2_regularization
 
@@ -110,9 +107,6 @@ class NeuralODE(nn.Module):
     def neural_ode(self, params, y0, t, state, extra_args=None): 
         def func(t, y, args):
             input = jnp.atleast_1d(y)
-            #print('t: ', t)
-            #print('extra_args: ', extra_args[1])
-            #print('y0: ', y0)
             if not self.time_invariant:
                 input = jnp.append(input, t)
 
@@ -121,17 +115,15 @@ class NeuralODE(nn.Module):
                 if isinstance(extra_inputs, (np.ndarray, jnp.ndarray)):
                     # interpolate extra_inputs to get continuous values
                     if extra_inputs.ndim == 2:
-                        interpolated_inputs = jnp.array([linear_interpolate(t, t_all, extra_inputs[:, i]) for i in range(extra_inputs.shape[1])])
+                        interpolated_inputs = jnp.array([jnp.interp(t, t_all, extra_inputs[:, i]) for i in range(extra_inputs.shape[1])])
                         input = jnp.append(input, interpolated_inputs)
                     elif extra_inputs.ndim == 1:
-                        interpolated_input = linear_interpolate(t, t_all, extra_inputs)
+                        interpolated_input = jnp.interp(t, t_all, extra_inputs)
                         input = jnp.append(input, interpolated_input)
                 else:
                     input = jnp.append(input, extra_inputs)
 
             result = state.apply_fn({'params': params}, input)
-            #print("Result: ")
-            #debug_print(result, transform=lambda x: f"Result: {x}") 
             return result
         
         term = dfx.ODETerm(func)
@@ -150,15 +142,7 @@ class NeuralODE(nn.Module):
             stepsize_controller=stepsize_controller,
             saveat=saveat
         )
-        #print("solution.ts", solution.ts)
         return solution.ys
-
-
-def linear_interpolate(x, xp, yp):
-    """
-    Interpolate data points (xp, yp) to find the value at x.
-    """
-    return jnp.interp(x, xp, yp)
 
 def debug_print_simple(value):
     """A function to print during JIT execution using host_callback.id_tap."""
