@@ -12,6 +12,7 @@ import flax.linen.initializers as initializers
 import diffrax as dfx
 
 class NeuralODE(nn.Module):
+    print("To do: Interpolation can be done a single time before training & function saved")
     layer_widths: list
     time_invariant: bool = True
     loss: int = 0
@@ -34,12 +35,11 @@ class NeuralODE(nn.Module):
         return train_state.TrainState.create(apply_fn=self.apply, params=params, tx=tx)
 
     def loss_fn(self, params, apply_fn, t, observed_data, y0, args):
+        # func acts as a forward pass for the neural ODE
         def func(t, y, args):
             input = jnp.atleast_1d(y)
-
             if not self.time_invariant:
                 input = jnp.append(input, t)
-
             if args is not None:
                 extra_inputs, t_all = args
 
@@ -73,10 +73,10 @@ class NeuralODE(nn.Module):
             saveat=saveat,
             adjoint=dfx.RecursiveCheckpointAdjoint(checkpoints=100) 
         )
-        
+
         pred_solution = solution.ys
         loss_mse = jnp.mean(jnp.square(pred_solution - observed_data))
-        l2_regularization = jnp.mean(jnp.square(param) for param in jax.tree_util.tree_leaves(params))
+        l2_regularization = sum(jnp.sum(param ** 2) for param in jax.tree_util.tree_leaves(params))
         
         return loss_mse + self.regularizer * l2_regularization
 
@@ -124,6 +124,8 @@ class NeuralODE(nn.Module):
                     input = jnp.append(input, extra_inputs)
 
             result = state.apply_fn({'params': params}, input)
+            #print("Result: ")
+            #debug_print(result, transform=lambda x: f"Result: {x}") 
             return result
         
         term = dfx.ODETerm(func)
@@ -142,6 +144,7 @@ class NeuralODE(nn.Module):
             stepsize_controller=stepsize_controller,
             saveat=saveat
         )
+        #print("solution.ts", solution.ts)
         return solution.ys
 
 def debug_print_simple(value):
