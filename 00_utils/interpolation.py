@@ -6,7 +6,6 @@ class BarycentricInterpolation:
         self.n = n
         self.start = start
         self.stop = stop
-        # if spacing == "Chebyshev":
         self.nodes = self.chebyshev_nodes_second_kind()
         self.weights = self.compute_barycentric_weights()
     
@@ -37,7 +36,7 @@ class BarycentricInterpolation:
         denominator = jnp.zeros_like(x, dtype=float)
         exact_matches = jnp.isclose(x[:, None], self.nodes)
 
-        # Compute weights and contributions for non-exact matches
+        # compute weights and contributions for non-exact matches
         diffs = x[:, None] - self.nodes
         weights = jnp.where(exact_matches, jnp.inf, self.weights / diffs)
         contributions = jnp.where(exact_matches, jnp.inf, weights * self.coefficients)
@@ -47,7 +46,7 @@ class BarycentricInterpolation:
 
         result = jnp.where(denominator != 0, numerator / denominator, 0.0)
 
-        # Handle exact matches separately
+        # handle exact matches separately
         result = jnp.where(jnp.any(exact_matches, axis=1), self.coefficients[jnp.argmax(exact_matches, axis=1)], result)
 
         return result

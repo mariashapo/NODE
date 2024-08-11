@@ -14,7 +14,7 @@ from scipy.ndimage import gaussian_filter1d
 class DataPreprocessor:
     def __init__(self, file_path, start_date, number_of_points, n_days, m, 
                  feature_encoding, target = 'nd',
-                 sigma=1, split=300, num_nodes_mult=1, equally_spaced=False,
+                 sigma = 1, split = 300, num_nodes_mult = 1, equally_spaced=False,
                  batch_gap = 7, smooth = True):
         
         self.file_path = file_path
@@ -39,6 +39,9 @@ class DataPreprocessor:
         
         # batch_gap expressed in 
         self.batch_gap = batch_gap
+        
+        if self.split >= self.number_of_points:
+            raise ValueError('Split should be less than the number of points')
 
     def generate_chebyshev_nodes(self, n, start, end):
         k = np.arange(n)
@@ -52,11 +55,13 @@ class DataPreprocessor:
         data = pd.read_csv(self.file_path)
         
         data['settlement_date'] = pd.to_datetime(data['settlement_date'])
-        
+                
         # obtain the subsample
         data_subsample = data[data['settlement_date'] >= self.start_date][:self.number_of_points]
         # extract hour as a feature
         data_subsample.loc[:,'hour'] = data_subsample['settlement_date'].dt.hour
+        
+        self.end_date = data['settlement_date'][:self.split].max()
         
         # extract the relevant columns
         data_subsample.reset_index(drop=True, inplace=True)
@@ -69,6 +74,9 @@ class DataPreprocessor:
         data_subsample = self.add_time_features(data_subsample)
         
         return data_subsample
+    
+    def get_end_date(self):
+        return self.end_date
     
     def load_embeddings(self, adjusted_start_date):
         """Load data with an offset to accommodate time lags."""
@@ -98,8 +106,9 @@ class DataPreprocessor:
     def interpolate_data(self, data, t_train, t_test, cols_to_interpolate):
         interpolated_data_train = {}
         interpolated_data_test = {}
+        exclude_var_weekend = False
         for col in cols_to_interpolate:
-            if col == 'var_weekend':
+            if col == 'var_weekend' and exclude_var_weekend:
                 interpolated_data_train[col] = data['var_weekend'][:len(t_train)]
                 interpolated_data_test[col] = data['var_weekend'][len(t_train):]
             else:
@@ -156,6 +165,7 @@ class DataPreprocessor:
         
         scaler = StandardScaler()
         columns_to_scale = df_train.columns.difference(['t', 'var_weekend'])
+
         df_train[columns_to_scale] = scaler.fit_transform(df_train[columns_to_scale])
         df_test[columns_to_scale] = scaler.transform(df_test[columns_to_scale])
         

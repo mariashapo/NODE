@@ -44,13 +44,32 @@ def decay(y, t, c):
 
 #---------------------------------------SPACING--------------------------------------#
 def generate_chebyshev_nodes(n, start, end):
+    # Chebyshev nodes second kind
     k = jnp.arange(n)
     x = jnp.cos(jnp.pi * k / (n - 1))
     nodes = 0.5 * (end - start) * x + 0.5 * (start + end)
     return jnp.sort(nodes)
 
+def legendre_gauss_nodes(n, start, end):
+    """
+    Compute the Legendre-Gauss nodes for interpolation.
+    
+    Parameters:
+    n (int): Number of nodes.
+    start (float): Lower bound of the interval.
+    end (float): Upper bound of the interval.
+    
+    Returns:
+    array_like: Legendre-Gauss nodes in the interval [start, end].
+    """
+    # Use NumPy to find the roots of the Legendre polynomial of degree n
+    nodes, _ = np.polynomial.legendre.leggauss(n)
+    # Transform from [-1, 1] to [start, end]
+    nodes = 0.5 * (end - start) * (nodes + 1) + start
+    return jnp.array(nodes)
+
 #------------------------------------DATA GENERATION---------------------------------#
-def generate_ode_data(n_points, noise_level, ode_type, params, start_time=0, end_time=10, spacing_type="equally_spaced", initial_state=None, seed=0):
+def generate_ode_data(n_points, noise_level, ode_type, params, start_time=0, end_time=10, spacing_type="equally_spaced", initial_state=None, seed=0, t = None):
     
     if initial_state is None:
         if ode_type != "decay":
@@ -59,12 +78,13 @@ def generate_ode_data(n_points, noise_level, ode_type, params, start_time=0, end
             initial_state = 1.0
 
     #-----------------------------------------SPACING-------------------------------------#
-    if spacing_type == "equally_spaced" or spacing_type == "uniform":
-        t = jnp.linspace(start_time, end_time, n_points, dtype=jnp.float64)
-    elif spacing_type == "chebyshev":
-        t = generate_chebyshev_nodes(n_points, start_time, end_time)
-    else:
-        raise ValueError("Unsupported spacing type. Use 'equally_spaced' or 'chebyshev'.")
+    if t is None:
+        if spacing_type == "equally_spaced" or spacing_type == "uniform":
+            t = jnp.linspace(start_time, end_time, n_points, dtype=jnp.float64)
+        elif spacing_type == "chebyshev":
+            t = generate_chebyshev_nodes(n_points, start_time, end_time)
+        else:
+            raise ValueError("Unsupported spacing type. Use 'equally_spaced' or 'chebyshev'.")
 
     #-------------------------------------ODE FUNCTION-------------------------------------#
     if ode_type == "harmonic_oscillator":

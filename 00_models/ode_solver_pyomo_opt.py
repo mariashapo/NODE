@@ -3,25 +3,23 @@ import pyomo.environ as pyo
 from pyomo.environ import ConcreteModel, Var, Constraint, Objective, SolverFactory, value, RangeSet
 
 class DirectODESolver:
-    def __init__(self, t, layer_sizes, weights, biases, initial_state, D, 
+    def __init__(self, t, layer_sizes, trained_weights_biases, initial_state, D, 
                  act_func="tanh", time_invariant=True, extra_input=None,
                  params=None):
         
         self.t = t
         self.layer_sizes = layer_sizes
-        self.weights = weights
-        self.biases = biases
+
         self.initial_state = initial_state  
         self.act_func = act_func
         self.time_invariant = time_invariant
         self.extra_input = extra_input
         self.model = ConcreteModel()
         
-        # model weights
-        self.W1 = weights[0]
-        self.W2 = weights[1]
-        self.b1 = biases[0]
-        self.b2 = biases[1]
+        self.W1 = trained_weights_biases['W1']
+        self.W2 = trained_weights_biases['W2']
+        self.b1 = trained_weights_biases['b1']
+        self.b2 = trained_weights_biases['b2']
         
         # first_derivative_matrix
         self.D = D

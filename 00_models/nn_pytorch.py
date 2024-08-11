@@ -20,7 +20,7 @@ class NeuralODE(nn.Module):
                 layers.append(nn.Tanh())
                 
         self.network = nn.Sequential(*layers)
-        self.optimizer = Adam(self.parameters(), lr=learning_rate)
+        self.optimizer = Adam(self.parameters(), lr=learning_rate, weight_decay=1e-5)
         self.criterion = torch.nn.MSELoss()
         self.time_invariant = time_invariant
                 
@@ -60,16 +60,20 @@ class NeuralODE(nn.Module):
     def train_model(self, t, observed_data, y0, num_epochs=1000, extra_inputs=None):
         NeuralODE.ensure_tensor(t)
         NeuralODE.ensure_tensor(y0)
+
+        rtol = 1e-3  # relative tolerance
+        atol = 1e-4  # absolute tolerance
         
-        self.extra_inputs = np.squeeze(extra_inputs) # remove extra dimensions
+        self.extra_inputs = extra_inputs
         if self.extra_inputs is not None:
+            self.extra_inputs = np.squeeze(extra_inputs) # remove extra dimensions
             # note: t will be coming in as a tensor
             self.t = t.clone().detach().numpy()
             self.create_interpolators()
         
         for epoch in range(num_epochs):
             self.optimizer.zero_grad()
-            pred_solution = odeint(self, y0, t)
+            pred_solution = odeint(self, y0, t, rtol=rtol, atol=atol)
             loss = self.criterion(pred_solution, observed_data)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(self.parameters(), max_norm=1.0)
@@ -78,7 +82,7 @@ class NeuralODE(nn.Module):
             if epoch % 100 == 0:
                 print(f'Epoch {epoch}, Loss: {loss.item()}')
     
-    def predict(self, t, y0):
+    def predict(self, t, y0, extra_inputs = None):
         NeuralODE.ensure_tensor(t)
         NeuralODE.ensure_tensor(y0)
             
