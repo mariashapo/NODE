@@ -57,12 +57,10 @@ class NeuralODE(nn.Module):
                 
         return self.network(y)
 
-    def train_model(self, t, observed_data, y0, num_epochs=1000, extra_inputs=None):
+    def train_model(self, t, observed_data, y0, num_epochs=1000, extra_inputs=None, rtol=1e-3, atol=1e-4):
         NeuralODE.ensure_tensor(t)
         NeuralODE.ensure_tensor(y0)
-
-        rtol = 1e-3  # relative tolerance
-        atol = 1e-4  # absolute tolerance
+        NeuralODE.ensure_tensor(observed_data)
         
         self.extra_inputs = extra_inputs
         if self.extra_inputs is not None:

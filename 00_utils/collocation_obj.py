@@ -96,7 +96,7 @@ class Collocation:
         """
         nodes = jnp.array(nodes)
         n = len(nodes)
-        weights = jnp.zeros(nodes)
+        weights = jnp.zeros(n)
 
         for j in range(n):
             # exclude the j-th term and compute the product of (x_j - x_m) for all m != j

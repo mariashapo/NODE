@@ -43,7 +43,6 @@ class NeuralODEPyomo:
             self.y_collocation = y_collocation
         else:
             self.y_collocation = y_observed
-        
 
 # ---------------------------------------------------- INITIALIZATION ----------------------------------------------------
 
@@ -111,9 +110,14 @@ class NeuralODEPyomo:
             raise ValueError("layer_sizes should have exactly 3 elements: [input_size, hidden_size, output_size].")
         
         # CONSTRAINTS
-        self.model.init_condition = Constraint(expr=(self.model.y[0] == self.y_observed[0][0])) # + self.model.slack
+        if M == 1:
+            self.model.init_condition = Constraint(expr=(self.model.y[0] == self.y_observed[0][0])) # + self.model.slack
+        elif M == 2:
+            self.model.init_condition1 = Constraint(expr=(self.model.y1[0] == self.y_observed[0][0]))
+            self.model.init_condition2 = Constraint(expr=(self.model.y2[0] == self.y_observed[0][1]))
         
         self.model.ode = ConstraintList()
+        
         # for each collocation data point
         for i in range(1, N):
             if M == 1:

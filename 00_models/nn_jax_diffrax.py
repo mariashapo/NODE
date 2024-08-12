@@ -12,7 +12,6 @@ import flax.linen.initializers as initializers
 import diffrax as dfx
 
 class NeuralODE(nn.Module):
-    print("To do: Interpolation can be done a single time before training & function saved")
     layer_widths: list
     time_invariant: bool = True
     loss: int = 0
@@ -27,8 +26,11 @@ class NeuralODE(nn.Module):
         x = nn.Dense(self.layer_widths[-1], kernel_init=initializers.lecun_normal())(x)
         return x
 
-    def create_train_state(self, rng, learning_rate, regularizer=1e-5):
+    def create_train_state(self, rng, learning_rate, regularizer=1e-5, rtol = 1e-3, atol = 1e-6, dt0 = 1e-3):
         self.regularizer = regularizer
+        self.rtol = rtol
+        self.atol = atol
+        self.dt0 = dt0
         
         params = self.init(rng, jnp.ones((self.layer_widths[0],)))['params']
         tx = optax.adam(learning_rate)
@@ -58,7 +60,7 @@ class NeuralODE(nn.Module):
             return result
         
         solver = dfx.Tsit5()
-        stepsize_controller = dfx.PIDController(rtol=1e-3, atol=1e-6)
+        stepsize_controller = dfx.PIDController(rtol=self.rtol, atol=self.atol)
         saveat = dfx.SaveAt(ts=t)
 
         solution = dfx.diffeqsolve(
@@ -66,7 +68,7 @@ class NeuralODE(nn.Module):
             solver,
             t0=t[0],
             t1=t[-1],
-            dt0=1e-3,
+            dt0 = self.dt0,
             y0=y0,
             args=args,
             stepsize_controller=stepsize_controller,
@@ -86,8 +88,8 @@ class NeuralODE(nn.Module):
         state = state.apply_gradients(grads=grads)
         return state, loss
 
-    def train(self, state, t, observed_data, y0, num_epochs=np.inf, loss=0, extra_args=None):
-        self.loss = loss
+    def train(self, state, t, observed_data, y0, num_epochs=np.inf, termination_loss=0, extra_args=None, verbose=True):
+        self.term_loss = termination_loss
         self.max_iter = num_epochs
         
         @jax.jit
@@ -99,8 +101,9 @@ class NeuralODE(nn.Module):
             epoch += 1
             state, loss = train_step_jit(state, t, observed_data, y0, extra_args)
             if epoch % 100 == 0:
-                print(f'Epoch {epoch}, Loss: {loss}')
-            if loss < self.loss or epoch > self.max_iter:
+                if verbose:
+                    print(f'Epoch {epoch}, Loss: {loss}')
+            if loss < self.term_loss or epoch > self.max_iter:
                 break
         return state
 
@@ -124,8 +127,6 @@ class NeuralODE(nn.Module):
                     input = jnp.append(input, extra_inputs)
 
             result = state.apply_fn({'params': params}, input)
-            #print("Result: ")
-            #debug_print(result, transform=lambda x: f"Result: {x}") 
             return result
         
         term = dfx.ODETerm(func)
@@ -144,7 +145,6 @@ class NeuralODE(nn.Module):
             stepsize_controller=stepsize_controller,
             saveat=saveat
         )
-        #print("solution.ts", solution.ts)
         return solution.ys
 
 def debug_print_simple(value):
