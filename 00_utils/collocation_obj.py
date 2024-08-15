@@ -3,16 +3,18 @@ import jax
 import jax.numpy as jnp
 from jax import grad, jit
 # from scipy.optimize import newton
+# from numpy.polynomial.legendre import legendre, legder
 from scipy.special import roots_legendre, legendre
 
 jax.config.update("jax_enable_x64", True)
 
 class Collocation:
-    def __init__(self, n, a = -1, b = 1, spacing_type = "chebyshev"):
+    def __init__(self, n, a = -1, b = 1, spacing_type = "chebyshev", include_zero = True):
         self.n = n
         self.a = a
         self.b = b
         self.spacing_type = spacing_type
+        # self.include_zero = include_zero
     
     def compute_nodes(self, unscaled = False):
         if self.spacing_type == "chebyshev":

@@ -19,8 +19,10 @@ class NeuralODEPyomo:
                  penalty_lambda_reg=0.1,
                  act_func="tanh", w_init_method="random", 
                  params = None, y_init = None, constraint = "l1",
-                 y_collocation = None):
+                 y_collocation = None,
+                 reg_norm = False):
         
+        print('current_14_08')
         np.random.seed(42)
         self.y_observed = y_observed
         self.t = t
@@ -38,6 +40,7 @@ class NeuralODEPyomo:
         self.observed_dim = None
         self.data_dim = None
         self.constraint = constraint
+        self.reg_norm = reg_norm
         
         if y_collocation is not None:
             self.y_collocation = y_collocation
@@ -167,9 +170,11 @@ class NeuralODEPyomo:
             reg = (sum(m.W1[j, k]**2 for j in range(self.layer_sizes[1]) for k in range(self.layer_sizes[0])) +
                 sum(m.W2[j, k]**2 for j in range(self.layer_sizes[2]) for k in range(self.layer_sizes[1])) +
                 sum(m.b1[j]**2 for j in range(self.layer_sizes[1])) +
-                sum(m.b2[j]**2 for j in range(self.layer_sizes[2]))) / \
-                (self.layer_sizes[1]*self.layer_sizes[0] + self.layer_sizes[2]*self.layer_sizes[1] + self.layer_sizes[1] + self.layer_sizes[2])
+                sum(m.b2[j]**2 for j in range(self.layer_sizes[2]))) 
 
+            if self.reg_norm:
+                reg = reg / (self.layer_sizes[1]*self.layer_sizes[0] + self.layer_sizes[2]*self.layer_sizes[1] + self.layer_sizes[1] + self.layer_sizes[2])
+                
             return data_fit + reg * self.penalty_lambda_reg 
 
         # print('_objective')
