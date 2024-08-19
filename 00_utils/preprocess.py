@@ -5,6 +5,16 @@ from scipy.interpolate import CubicSpline
 from sklearn.preprocessing import StandardScaler
 from scipy.ndimage import gaussian_filter1d
 
+import sys
+import os
+
+path_ = os.path.abspath(os.path.join('..', '00_utils'))
+if path_ not in sys.path:
+    sys.path.append(path_)
+
+import collocation_obj
+Collocation = collocation_obj.Collocation
+
 # TO DO :
 
 # currently the data is loaded twice for ADMM, this does not make sense
@@ -14,8 +24,9 @@ from scipy.ndimage import gaussian_filter1d
 class DataPreprocessor:
     def __init__(self, file_path, start_date, number_of_points, n_days, m, 
                  feature_encoding, target = 'nd',
-                 sigma = 1, split = 300, num_nodes_mult = 1, equally_spaced=False,
-                 batch_gap = 7, smooth = True):
+                 prev_hour = False, prev_week = True, prev_year = True,
+                 sigma = 1, split = 300, num_nodes_mult = 1, 
+                 spacing = None, smooth = True):
         
         self.file_path = file_path
         self.start_date = pd.to_datetime(start_date)
@@ -23,7 +34,7 @@ class DataPreprocessor:
         self.sigma = sigma
         self.split = split
         self.num_nodes_mult = num_nodes_mult
-        self.equally_spaced = equally_spaced
+        self.spacing = spacing
         self.smooth = smooth
         
         # expected feature-columns
@@ -31,14 +42,12 @@ class DataPreprocessor:
         self.target = target
         
         # lags
-        self.prev_week = True 
-        self.prev_year = True 
+        self.prev_hour = prev_hour
+        self.prev_week = prev_week 
+        self.prev_year = prev_year 
         # m and tau are used for short term embeddings
         self.n_days = n_days # number of days behind
         self.m = m
-        
-        # batch_gap expressed in 
-        self.batch_gap = batch_gap
         
         if self.split >= self.number_of_points:
             raise ValueError('Split should be less than the number of points')
@@ -129,6 +138,12 @@ class DataPreprocessor:
             embedding = self.load_embeddings(adjusted_start_date=offset_date)
             d[f'y_lag{lag}'] = embedding.values 
         
+        if self.prev_hour:
+            # last recording
+            last_recording_date = self.start_date - pd.DateOffset(hours=1)
+            embedding = self.load_embeddings(adjusted_start_date=last_recording_date)
+            d[f'y_lag_hour'] = embedding.values
+        
         # week embeddings
         if self.prev_week:
             previous_week_date = self.start_date - pd.DateOffset(days=7)
@@ -150,16 +165,21 @@ class DataPreprocessor:
         num_nodes = len(t_train) * self.num_nodes_mult
         num_nodes_test = len(t_test) * self.num_nodes_mult
         
-        if self.equally_spaced:
+        if not self.spacing: # assume equally spaced nodes
             t_train = np.linspace(t_train.min(), t_train.max(), num_nodes)
             t_test = np.linspace(t_test.min(), t_test.max(), num_nodes_test)
         else:
-            t_train = self.generate_chebyshev_nodes(num_nodes, t_train.min(), t_train.max())
-            t_test = self.generate_chebyshev_nodes(num_nodes_test, t_test.min(), t_test.max())
+            collocation_train = Collocation(num_nodes, t_train.min(), t_train.max(), self.spacing)
+            t_train = collocation_train.compute_nodes()
+            self.collocation_train = collocation_train
+            
+            collocation_test = Collocation(num_nodes_test, t_test.min(), t_test.max(), self.spacing)
+            t_test = collocation_test.compute_nodes()
+            self.collocation_test = collocation_test
         
         data_train, data_test = self.interpolate_data(d, t_train, t_test, d.columns.difference(['t']))
         
-        data_train['t'], data_test['t'] = t_train, t_test
+        data_train['t'], data_test['t'] = np.array(t_train), np.array(t_test)
         
         df_train, df_test = pd.DataFrame(data_train), pd.DataFrame(data_test)
         
@@ -177,3 +197,8 @@ class DataPreprocessor:
         df_test = df_test[new_order]
         
         return df_train, df_test
+    
+    def derivative_matrix(self):
+        Ds_train = self.collocation_train.compute_derivative_matrix()
+        Ds_test = self.collocation_test.compute_derivative_matrix()
+        return np.array(Ds_train), np.array(Ds_test)

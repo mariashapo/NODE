@@ -14,7 +14,7 @@ from scipy.ndimage import gaussian_filter1d
 class DataPreprocessor:
     def __init__(self, file_path, start_date, number_of_points, tau, m, 
                  feature_encoding, target = 'nd',
-                 prev_week = True, prev_year = True,
+                 prev_hour = False, prev_week = True, prev_year = True,
                  var_weekend = True,
                  split=300, smooth = False, sigma=1):
         self.file_path = file_path
@@ -33,6 +33,7 @@ class DataPreprocessor:
         # lags
         self.prev_week = prev_week 
         self.prev_year = prev_year 
+        self.prev_hour = prev_hour
         # m and tau are used for short term embeddings
         self.tau = tau # number of points behind
         self.m = m
@@ -101,6 +102,12 @@ class DataPreprocessor:
             offset_date = self.start_date - pd.DateOffset(days=days_offset)
             embedding = self.load_embeddings(adjusted_start_date=offset_date)
             d[f'y_lag{lag}'] = embedding.values 
+        
+        if self.prev_hour:
+            # last recording
+            last_recording_date = self.start_date - pd.DateOffset(hour=1)
+            embedding = self.load_embeddings(adjusted_start_date=last_recording_date)
+            d[f'y_lag_hout'] = embedding.values
         
         # week embeddings
         if self.prev_week:

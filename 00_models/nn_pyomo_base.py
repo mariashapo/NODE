@@ -13,16 +13,19 @@ import os
 import pickle
 import warnings
 
+# to do: develop a strategy to only train with a portion of collocation constraints:
+# th simplest methodology is to drop every n-th constraint
+
 class NeuralODEPyomo:
     def __init__(self, y_observed, t, first_derivative_matrix, layer_sizes, 
                  time_invariant = True, extra_input = None, 
                  penalty_lambda_reg=0.1,
                  act_func="tanh", w_init_method="random", 
                  params = None, y_init = None, constraint = "l1",
-                 y_collocation = None,
-                 reg_norm = False):
+                 y_collocation = None, reg_norm = False, 
+                 skip_collocation = np.inf):
         
-        print('current_14_08')
+        print('current_16_08')
         np.random.seed(42)
         self.y_observed = y_observed
         self.t = t
@@ -41,6 +44,7 @@ class NeuralODEPyomo:
         self.data_dim = None
         self.constraint = constraint
         self.reg_norm = reg_norm
+        self.skip_collocation = skip_collocation
         
         if y_collocation is not None:
             self.y_collocation = y_collocation
@@ -123,6 +127,8 @@ class NeuralODEPyomo:
         
         # for each collocation data point
         for i in range(1, N):
+            if i % self.skip_collocation == 0:
+                continue
             if M == 1:
                 dy_dt = sum(self.first_derivative_matrix[i, j] * self.model.y[j] for j in range(N))
                 nn_input = [self.model.y[i]]  

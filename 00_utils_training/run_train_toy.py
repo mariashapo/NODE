@@ -137,6 +137,7 @@ class TrainerToy:
         self.params = params_model['params']
         self.pre_initialize = params_model.get('pre_initialize', True)
         self.reg_norm = params_model.get('reg_norm', False)
+        self.skip_collocation = params_model.get('skip_collocation', np.inf)
 
     def train_pyomo(self, params_model, params_solver = None):
         
@@ -156,7 +157,8 @@ class TrainerToy:
                         time_invariant = self.time_invar,
                         w_init_method = self.w_init_method, 
                         params = self.params,
-                        reg_norm = self.reg_norm
+                        reg_norm = self.reg_norm,
+                        skip_collocation = self.skip_collocation
                         )
         
         self.model.build_model()

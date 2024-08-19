@@ -5,8 +5,6 @@ import matplotlib.pyplot as plt
 import sys
 import os
 
-from collocation import compute_weights, lagrange_derivative
-
 path_ = os.path.abspath(os.path.join('..', '00_utils'))
 if path_ not in sys.path:
     sys.path.append(path_)
@@ -18,6 +16,11 @@ if path_ not in sys.path:
 # preprocessing
 import preprocess
 DataPreprocessor = preprocess.DataPreprocessor
+
+# generation of collocation points
+import collocation_obj
+Collocation = collocation_obj.Collocation
+#from collocation import compute_weights, lagrange_derivative - old version
 
 # ode solvers
 import ode_solver_pyomo_opt
@@ -34,31 +37,39 @@ class Trainer:
         self.n_days, self.m = params_data['n_days'], params_data['m']
         self.encoding = params_data['encoding']
         
+        self.spacing = params_data.get('spacing', 'chebyshev')
+        self.prev_hour = params_data.get('prev_hour', True)
+        self.prev_week = params_data.get('prev_week', True)
+        self.prev_year = params_data.get('prev_year', True)
+        
+        
         self.layer_sizes = params_model['layer_sizes']
         self.penalty = params_model['penalty']
         
         self.params_solver = params_solver
-        
         self.params_ode = params_ode
         
     def train(self):
         data_loader = DataPreprocessor(self.file_path, start_date = self.start_date, 
                                        number_of_points = self.n_points, n_days = self.n_days, m = self.m, 
-                                       feature_encoding = self.encoding, split = self.split)
+                                       feature_encoding = self.encoding, split = self.split, 
+                                       prev_hour = self.prev_hour, prev_week = self.prev_week, prev_year = self.prev_year,
+                                       spacing = self.spacing)
         
         data_subsample = data_loader.load_data()
         df_train, df_test = data_loader.preprocess_data(data_subsample)
+        Ds_train, Ds_test = data_loader.derivative_matrix() 
         
         ys = np.atleast_2d(df_train['y']).T
         ts = np.array(df_train['t'])
         Xs = np.atleast_2d(df_train.drop(columns=['y', 't']))
 
-        w = compute_weights(df_train['t'])
-        Ds = np.array(lagrange_derivative(df_train['t'], w))
+        # w = compute_weights(df_train['t'])
+        # Ds = np.array(lagrange_derivative(df_train['t'], w))
         
         ode_model = NeuralODEPyomo(y_observed = ys, 
                         t = ts, 
-                        first_derivative_matrix = Ds, 
+                        first_derivative_matrix = Ds_train, 
                         extra_input = Xs, 
                         y_init = ys,
                         layer_sizes = self.layer_sizes, act_func = "tanh", 
@@ -97,7 +108,7 @@ class Trainer:
         
         initial_state = ys[0][0]
         direct_solver = DirectODESolver(np.array(ts), self.layer_sizes, trained_weights_biases, initial_state, 
-                                        D = Ds, 
+                                        D = Ds_train, 
                                         time_invariant=True, extra_input=np.array(Xs), params = self.params_ode)
         direct_solver.build_model()
         solver_info = direct_solver.solve_model()
@@ -120,8 +131,9 @@ class Trainer:
         ys_test = np.atleast_2d(df_test['y']).T
         ts_test = np.array(df_test['t'])
         Xs_test = np.atleast_2d(df_test.drop(columns=['y', 't']))
-        w_test = compute_weights(df_test['t'])
-        Ds_test = np.array(lagrange_derivative(df_test['t'].values, w_test))
+        
+        #w_test = compute_weights(df_test['t'])
+        #Ds_test = np.array(lagrange_derivative(df_test['t'].values, w_test))
         
         # odeint prediction
         y_pred_test = ode_model.neural_ode(ys_test[0], ts_test, (Xs_test, ts_test))
@@ -147,7 +159,6 @@ class Trainer:
         solver_info = direct_solver.solve_model()
         y_solution_test = direct_solver.extract_solution() 
         
-        #experiment_results['mae_coll_ode_test'] = np.mean(np.abs(np.squeeze(y_solution_test) - np.squeeze(ys_test)))
         experiment_results['mse_coll_ode_test'] = np.mean(np.square(np.squeeze(y_solution_test) - np.squeeze(ys_test)))
         
         plt.figure(figsize=(20, 10))
