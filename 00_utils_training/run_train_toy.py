@@ -38,7 +38,8 @@ class TrainerToy:
         self.start_time = params_data['start_time']
         self.end_time = params_data['end_time']
         self.spacing_type = params_data['spacing_type']
-        self.init_state = params_data['initial_state']        
+        self.init_state = params_data['initial_state']
+        self.detailed = params_data.get('detailed', False)        
         
         m = model_type
         if m in ['pyomo', 'jax_diffrax', 'pytorch']:
@@ -176,15 +177,23 @@ class TrainerToy:
         mse_train = np.mean((self.y - odeint_pred)**2)
         mse_test = np.mean((self.y_test - odeint_pred_test)**2)
         
-        results = {
-            'time_elapsed': self.time_elapsed,
-            'direct_model_pred': direct_model_pred,
-            'odeint_pred': odeint_pred,
-            'odeint_pred_test': odeint_pred_test,
-            'mse_train': mse_train,
-            'mse_test': mse_test,
-            'termination': self.termination
-        }
+        if self.detailed:
+            results = {
+                'time_elapsed': self.time_elapsed,
+                'direct_model_pred': direct_model_pred,
+                'odeint_pred': odeint_pred,
+                'odeint_pred_test': odeint_pred_test,
+                'mse_train': mse_train,
+                'mse_test': mse_test,
+                'termination': self.termination
+            }
+        else:
+            results = {
+                'time_elapsed': self.time_elapsed,
+                'mse_train': mse_train,
+                'mse_test': mse_test,
+                'termination': self.termination
+            }
         
         return results
 
@@ -201,6 +210,7 @@ class TrainerToy:
         self.dt0 = params_model.get('dt0', 1e-3)
         self.pretrain_model = params_model.get('pretrain', False)
         self.verbose = params_model.get('verbose', True)
+        self.log = params_model.get('log', False)
         # if pretrain is True, it should be passed as a list of 
         # the fractions of the data to be used for pre-training
         # [0.1, 0.5, 1]
@@ -217,21 +227,33 @@ class TrainerToy:
         
         if self.init_state.ndim != 1:
             raise ValueError("Initial state for diffrax models must be a 1D array")
-        
+        self.losses = []
         if self.pretrain_model:
+            if self.log:
+                start_time = time.time()
+                self.time_elapsed = []
             for frac in self.pretrain_model:
                 k = int(frac*len(self.t)) # calculate the number of data points to include
-                self.state = self.model.train(self.state, self.t[:k], 
+                self.state, losses_ = self.model.train(self.state, self.t[:k], 
                                               self.y_noisy[:k], self.init_state,
                                               num_epochs = self.max_iter,
-                                              verbose = self.verbose)
+                                              verbose = self.verbose,
+                                              log = self.log)
+                self.losses.append(losses_)
+                
+                if self.log:
+                    self.time_elapsed.append(time.time() - start_time)
         else:
-            self.state = self.model.train(self.state, self.t, 
+            self.state, losses_ = self.model.train(self.state, self.t, 
                                           self.y_noisy, self.init_state,
                                           num_epochs = self.max_iter,
-                                          verbose = self.verbose)
-                
-        self.time_elapsed = time.time() - start_time
+                                          verbose = self.verbose,
+                                          log = self.log)
+            self.losses.append(losses_)
+        
+        if not self.log or not self.pretrain_model:        
+            self.time_elapsed = time.time() - start_time
+            
         
     def extract_results_diffrax(self):
         odeint_pred = self.model.neural_ode(self.state.params, self.init_state, self.t, self.state)

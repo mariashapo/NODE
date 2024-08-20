@@ -88,7 +88,7 @@ class NeuralODE(nn.Module):
         state = state.apply_gradients(grads=grads)
         return state, loss
 
-    def train(self, state, t, observed_data, y0, num_epochs=np.inf, termination_loss=0, extra_args=None, verbose=True):
+    def train(self, state, t, observed_data, y0, num_epochs=np.inf, termination_loss=0, extra_args=None, verbose=True, log=False):
         self.term_loss = termination_loss
         self.max_iter = num_epochs
         
@@ -96,16 +96,21 @@ class NeuralODE(nn.Module):
         def train_step_jit(state, t, observed_data, y0, extra_args):
             return self.train_step(state, t, observed_data, y0, extra_args)
 
+        losses = []
+        
         epoch = 0
         while True:
             epoch += 1
             state, loss = train_step_jit(state, t, observed_data, y0, extra_args)
+            if log:
+                losses.append(loss.item())
+            
             if epoch % 100 == 0:
                 if verbose:
                     print(f'Epoch {epoch}, Loss: {loss}')
             if loss < self.term_loss or epoch > self.max_iter:
                 break
-        return state
+        return state, losses
 
     def neural_ode(self, params, y0, t, state, extra_args=None): 
         def func(t, y, args):
@@ -161,3 +166,5 @@ def debug_print(value, transform=lambda x: x):
         print(transform(x))
         return x  
     return host_callback.id_tap(print_func, value)
+
+

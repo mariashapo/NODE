@@ -13,9 +13,6 @@ import os
 import pickle
 import warnings
 
-# to do: develop a strategy to only train with a portion of collocation constraints:
-# th simplest methodology is to drop every n-th constraint
-
 class NeuralODEPyomo:
     def __init__(self, y_observed, t, first_derivative_matrix, layer_sizes, 
                  time_invariant = True, extra_input = None, 
@@ -199,6 +196,8 @@ class NeuralODEPyomo:
                 hidden = [1 / (1 + pyo.exp(-h) + epsilon) for h in hidden]
             elif self.act_func == "softplus":
                 hidden = [pyo.log(1 + pyo.exp(h) + epsilon) for h in hidden]
+            else:
+                raise ValueError("Unsupported activation function.")
                 
             outputs = np.dot(m.W2, hidden) + m.b2
         
@@ -220,6 +219,8 @@ class NeuralODEPyomo:
                 hidden2 = [1 / (1 + pyo.exp(-h)) for h in hidden2]
             elif self.act_func == "softplus":
                 hidden2 = [pyo.log(1 + pyo.exp(h)) for h in hidden2]
+            else:
+                raise ValueError("Unsupported activation function.")
             
             outputs = np.dot(m.W3, hidden2) + m.b3
         else:
