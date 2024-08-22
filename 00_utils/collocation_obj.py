@@ -33,12 +33,19 @@ class Collocation:
             self.nodes = self.legendre_nodes(self.n, self.a, self.b, self.spacing_type)
         
         # old method for gauss_legendre nodes   
-        elif self.spacing_type == "gauss_legendre_old":
-            if unscaled:
-                self.nodes = self.gauss_legendre_nodes(self.n)
-            else:
-                nodes = self.gauss_legendre_nodes(self.n)
-                self.nodes = Collocation.scale_nodes(nodes, self.a, self.b)
+        elif self.spacing_type in ["gauss_legendre_leg", "gauss_legendre_radau_leg"]:
+            if 'gauss_legendre_leg':
+                if unscaled:
+                    self.nodes = self.gauss_legendre_nodes(self.n)
+                else:
+                    nodes = self.gauss_legendre_nodes(self.n)
+                    self.nodes = Collocation.scale_nodes(nodes, self.a, self.b)
+            elif 'gauss_legendre_radau_leg':
+                if unscaled:
+                    self.nodes = self.gauss_legendre_nodes(self.n)
+                else:
+                    nodes = self.gauss_legendre_nodes(self.n)
+                    self.nodes = Collocation.scale_nodes(nodes, self.a, self.b)
                 
         else:
             raise ValueError("Unsupported spacing type. Use 'chebyshev', 'gauss_legendre', 'gauss_radau', 'gauss_lobatto'.")
@@ -55,16 +62,19 @@ class Collocation:
                 self.compute_nodes()
             self.D = Collocation.derivative_matrix_barycentric_simplfied(self.nodes)
             
-        elif self.spacing_type == "gauss_legendre_old":
+        elif self.spacing_type in ["gauss_legendre_leg", "gauss_legendre_radau_leg"]:
             # compute unscaled and leave the scaling until after the differentiation matrix is computed
             if nodes is not None:
                 # these nodes should be unscaled
                 self.nodes = nodes
             else:
-                self.compute_nodes(unscaled = True)
-            self.D = self.scaled_derivative_matrix_gauss_legendre(
-                self.nodes, self.a, self.b
-                )
+                if self.spacing_type == "gauss_legendre_leg":
+                    self.nodes = self.gauss_legendre_nodes(self.n)
+                    self.D = self.scaled_derivative_matrix_gauss_legendre(self.nodes, self.a, self.b)
+                elif self.spacing_type == "gauss_legendre_radau_leg":
+                    self.include_init = True
+                    self.nodes = self.gauss_legendre_nodes(self.n)
+                    self.D = self.scaled_derivative_matrix_gauss_legendre(self.nodes, self.a, self.b)
             if nodes is None:
                 self.compute_nodes()
             else:
@@ -206,7 +216,21 @@ class Collocation:
         
         return derivative_matrix
 
-    # --------------------------------- Gauss Legendre Differential Matrix ---------------------------------  
+    # --------------------------------- Gauss Legendre Differential Matrix (Legendre Basis Function) ---------------------------------  
+    
+    def scaled_derivative_matrix_gauss_legendre(self, nodes, a, b):
+        # compute unscaled
+        if self.spacing_type == "gauss_legendre_leg":
+            d_matrix = Collocation.derivative_matrix_gauss_legendre(nodes)
+        elif self.spacing_type == "gauss_legendre_radau_leg":
+            d_matrix = Collocation.derivative_matrix_gauss_radau_legendre(nodes)
+        
+        # scale differentiation matrix
+        scaling_factor = 2 / (b - a)
+        scaled_d_matrix = d_matrix * scaling_factor
+        
+        return scaled_d_matrix
+    
     
     @staticmethod
     def legendre_poly_deriv(nodes):
@@ -223,7 +247,6 @@ class Collocation:
         Pn_minus_1 = legendre(n-1)(nodes) if n > 1 else np.zeros_like(nodes)
         # nodes**1 -1 becomes zero if nodes = -1 or nodes = 1
         return n / (nodes**2 - 1) * (nodes * Pn - Pn_minus_1)
-
         
     @staticmethod    
     def derivative_matrix_gauss_legendre(nodes):
@@ -271,10 +294,15 @@ class Collocation:
         for i in range(N):
             for j in range(N):
                 if i != j:
-                    LNi = Collocation.legendre_polynomial(N - 1, nodes[i])
-                    LNj = Collocation.legendre_polynomial(N - 1, nodes[j])
+                    LN_1i = Collocation.legendre_polynomial(N - 1, nodes[i])
+                    LN_1j = Collocation.legendre_polynomial(N - 1, nodes[j])
+                    try:
+                        D[i, j] = (LN_1i / LN_1j) * ((1 - nodes[j]) / (1 - nodes[i])) * (1 / (nodes[i] - nodes[j]))
+                    except Exception as e:
+                        print(f"Error encountered with i: {i}, j: {j}, nodes[i]: {nodes[i]}, nodes[j]: {nodes[j]}")
+                        print(f"LN_1i: {LN_1i}, LN_1j: {LN_1j}")
+                        print(f"Error details: {e}")
 
-                    D[i, j] = (LNi / LNj) * ((1 - nodes[j])/(1 - nodes[i])) * (1 / (nodes[i] - nodes[j]))
 
         for i in range(N):
             if i == 0:
@@ -296,7 +324,7 @@ class Collocation:
 
                     D[i, j] = (LNi / LNj) * (1 / (nodes[i] - nodes[j]))
 
-        # Calculate diagonal elements based on the off-diagonal computed values
+        # calculate diagonal elements based on the off-diagonal computed values
         for i in range(N):
             if i == 0:
                 D[i, i] = - (N * (N - 1)) / 4
@@ -306,16 +334,6 @@ class Collocation:
                 D[i, i] = -np.sum(D[i, :])
 
         return D
-    
-    def scaled_derivative_matrix_gauss_legendre(self, nodes, a, b):
-        # compute unscaled
-        d_matrix = Collocation.derivative_matrix_gauss_legendre(nodes)
-        
-        # scale differentiation matrix
-        scaling_factor = 2 / (b - a)
-        scaled_d_matrix = d_matrix * scaling_factor
-        
-        return scaled_d_matrix
     
     
     

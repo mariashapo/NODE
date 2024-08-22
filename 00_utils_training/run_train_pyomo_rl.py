@@ -4,6 +4,7 @@ import jax.numpy as jnp
 import matplotlib.pyplot as plt
 import sys
 import os
+import shutil
 
 path_ = os.path.abspath(os.path.join('..', '00_utils'))
 if path_ not in sys.path:
@@ -30,7 +31,7 @@ import nn_pyomo_base
 NeuralODEPyomo = nn_pyomo_base.NeuralODEPyomo
 
 class Trainer:
-    def __init__(self, params_data, params_model, params_solver, params_ode = None):
+    def __init__(self, params_results, params_data, params_model, params_solver, params_ode = None):
         self.file_path = params_data['file_path']
         self.start_date = params_data['start_date']
         self.n_points, self.split = params_data['n_points'], params_data['split']
@@ -42,12 +43,29 @@ class Trainer:
         self.prev_week = params_data.get('prev_week', True)
         self.prev_year = params_data.get('prev_year', True)
         
-        
         self.layer_sizes = params_model['layer_sizes']
         self.penalty = params_model['penalty']
         
         self.params_solver = params_solver
         self.params_ode = params_ode
+        
+        self.plot_directory = '../00_plots/pyomo'
+        self.plot_collocation = params_results['plot_collocation']
+        self.plot_odeint = params_results['plot_odeint']
+    
+    def clear_directory(self):
+        """ Clear all files in the folder without deleting the folder itself. """
+        folder_path = self.plot_directory
+        for filename in os.listdir(folder_path):
+            file_path = os.path.join(folder_path, filename)
+            try:
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.unlink(file_path) 
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path) 
+            except Exception as e:
+                print('Failed to delete %s. Reason: %s' % (file_path, e))
+                
         
     def train(self):
         data_loader = DataPreprocessor(self.file_path, start_date = self.start_date, 
@@ -63,9 +81,6 @@ class Trainer:
         ys = np.atleast_2d(df_train['y']).T
         ts = np.array(df_train['t'])
         Xs = np.atleast_2d(df_train.drop(columns=['y', 't']))
-
-        # w = compute_weights(df_train['t'])
-        # Ds = np.array(lagrange_derivative(df_train['t'], w))
         
         ode_model = NeuralODEPyomo(y_observed = ys, 
                         t = ts, 
@@ -90,18 +105,18 @@ class Trainer:
         # ---------------------------------------------------- ODEINT PREDICTION ------------------------------------------------
         y_pred = ode_model.neural_ode(ys[0], ts, (Xs, ts))
         
-        #experiment_results['mae_odeint'] = np.mean(np.abs(np.squeeze(y_pred) - np.squeeze(ys)))
         experiment_results['mse_odeint'] = np.mean(np.square(np.squeeze(y_pred) - np.squeeze(ys)))
         
-        plt.figure(figsize=(20, 10))
-        plt.plot(ts, ys, label='True Data', alpha = 1)
-        plt.plot(ts, u_model, label='True Data', alpha = 1)
-        plt.scatter(ts, y_pred, label='Model Prediction (Train) - Odeint', alpha = 0.7)
-        plt.title(f"Sequential ODE solver Result; Time Elapsed: {result['solver_time']}")
-        plt.legend(loc ="lower right")
-        plt.grid(True)
-        plt.savefig(f'../00_plots/pyomo/ode_solver_train_{self.start_date}.png', format='png')  
-        plt.close() 
+        if self.plot_odeint:
+            plt.figure(figsize=(20, 10))
+            plt.plot(ts, ys, label='True Data', alpha = 1)
+            plt.plot(ts, u_model, label='True Data', alpha = 1)
+            plt.scatter(ts, y_pred, label='Model Prediction (Train) - Odeint', alpha = 0.7)
+            plt.title(f"Sequential ODE solver Result; Time Elapsed: {result['solver_time']}")
+            plt.legend(loc ="lower right")
+            plt.grid(True)
+            plt.savefig(f'{self.plot_directory}/ode_solver_train_{self.start_date}.png', format='png')  
+            plt.close() 
         
         # -------------------------------------------- COLLOCATION PREDICTION (TRAIN) ---------------------------------------------- 
         trained_weights_biases = ode_model.extract_weights()
@@ -114,41 +129,26 @@ class Trainer:
         solver_info = direct_solver.solve_model()
         y_solution = direct_solver.extract_solution()     
         
-        #experiment_results['mae_coll_ode'] = np.mean(np.abs(np.squeeze(y_solution) - np.squeeze(ys)))
+        # experiment_results['mae_coll_ode'] = np.mean(np.abs(np.squeeze(y_solution) - np.squeeze(ys)))
         experiment_results['mse_coll_ode'] = np.mean(np.square(np.squeeze(y_solution) - np.squeeze(ys)))
-        
-        plt.figure(figsize=(20, 10))
-        plt.plot(ts, ys, label='True Data', alpha = 1)
-        plt.plot(ts, u_model, label='True Data', alpha = 1)
-        plt.plot(ts, y_solution, label='Model Prediction (Train) - Collocation-based ODE', alpha = 0.7)
-        plt.title(f"Collocation-based ODE solver Result; Time Elapsed: {result['solver_time']}")
-        plt.legend(loc ="lower right")
-        plt.grid(True)
-        plt.savefig(f'../00_plots/pyomo/collocation_solver_train_{self.start_date}.png', format='png')  
-        plt.close() 
         
         # ---------------------------------------- ODEINT & COLLOCATION PREDICTION (TEST) ----------------------------------------- 
         ys_test = np.atleast_2d(df_test['y']).T
         ts_test = np.array(df_test['t'])
         Xs_test = np.atleast_2d(df_test.drop(columns=['y', 't']))
         
-        #w_test = compute_weights(df_test['t'])
-        #Ds_test = np.array(lagrange_derivative(df_test['t'].values, w_test))
-        
-        # odeint prediction
         y_pred_test = ode_model.neural_ode(ys_test[0], ts_test, (Xs_test, ts_test))
         
-        #experiment_results['mae_odeint_test'] = np.mean(np.abs(np.squeeze(y_pred_test) - np.squeeze(ys_test)))
         experiment_results['mse_odeint_test'] = np.mean(np.square(np.squeeze(y_pred_test) - np.squeeze(ys_test)))
-        
-        plt.figure(figsize=(20, 10))
-        plt.plot(ts_test, ys_test)
-        plt.plot(ts_test, y_pred_test, label='Model Prediction (Test) -  Odeint', alpha = 0.7)
-        plt.title(f"Odeint ODE solver Result (Test); Time Elapsed: {result['solver_time']}")
-        plt.legend(loc ="lower right")
-        plt.grid(True)
-        plt.savefig(f'../00_plots/pyomo/ode_solver_test_{self.start_date}.png', format='png')  
-        plt.close() 
+        if self.plot_odeint:
+            plt.figure(figsize=(10, 6))
+            plt.plot(ts_test, ys_test)
+            plt.plot(ts_test, y_pred_test, label='Model Prediction (Test) -  Odeint', alpha = 0.7)
+            plt.title(f"Collocation-based training & sequential predictions: True Data vs Model Prediction (Test)")
+            plt.legend(loc ="lower right")
+            plt.grid(True)
+            plt.savefig(f'{self.plot_directory}/ode_solver_test_{self.start_date}.png', format='png')  
+            plt.close() 
         
         y0_test = ys_test[0][0]
         direct_solver = DirectODESolver(ts_test, self.layer_sizes, trained_weights_biases, y0_test, 
@@ -161,14 +161,18 @@ class Trainer:
         
         experiment_results['mse_coll_ode_test'] = np.mean(np.square(np.squeeze(y_solution_test) - np.squeeze(ys_test)))
         
-        plt.figure(figsize=(20, 10))
-        plt.plot(ts_test, ys_test)
-        plt.plot(ts_test, y_solution_test, label='Model Prediction (Test) -  Collocation-based ODE', alpha = 0.7)
-        plt.title(f"Collocation-based ODE solver Result (Test); Time Elapsed: {result['solver_time']}")
-        plt.legend(loc ="lower right")
-        plt.grid(True)
-        plt.savefig(f'../00_plots/pyomo/collocation_solver_test_{self.start_date}.png', format='png')  
-        plt.close() 
+        if self.plot_collocation:
+            plt.figure(figsize=(10, 6))
+            plt.plot(ts, ys, label='True Data', alpha = 0.9, color = 'green')
+            plt.plot(ts_test, ys_test, alpha = 0.9, color = 'green')
+            # plt.plot(ts, u_model, label='True Data', alpha = 1)
+            plt.plot(ts, y_solution, 'o', color='blue', label='Model Prediction (Train) - collocation-based ODE', alpha = 0.6)
+            plt.plot(ts_test, y_solution_test, 'o', color='#FF8C10', label='Model Prediction (Test) -  collocation-based ODE', alpha = 0.6)
+            plt.title(f"Collocation-based training & sequential predictions: True Data vs Model Prediction")
+            plt.legend(loc ="lower right")
+            plt.grid(True)
+            plt.savefig(f'{self.plot_directory}/collocation_solver_train_{self.start_date}.png', format='png')  
+            plt.close() 
                 
         return experiment_results
     

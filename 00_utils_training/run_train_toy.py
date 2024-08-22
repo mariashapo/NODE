@@ -7,6 +7,9 @@ import time
 import matplotlib.pyplot as plt
 import torch
 
+# to import activation functions
+from flax import linen as nn 
+
 from jax import random
 
 path_ = os.path.abspath(os.path.join('..', '00_utils'))
@@ -211,15 +214,32 @@ class TrainerToy:
         self.pretrain_model = params_model.get('pretrain', False)
         self.verbose = params_model.get('verbose', True)
         self.log = params_model.get('log', False)
-        # if pretrain is True, it should be passed as a list of 
-        # the fractions of the data to be used for pre-training
-        # [0.1, 0.5, 1]
+        self.split_time = params_model.get('split_time', False)
+        self.act_func = params_model.get('act_func', 'tanh')
         
+        if self.log:
+            self.log = {
+                't': self.t,
+                'y': self.y,
+                'y_init': self.init_state,
+                'extra_args': None
+            }
+        
+        if self.act_func == 'tanh':
+            self.act_func = jax.nn.tanh
+        elif self.act_func == 'relu':
+            self.act_func = jax.nn.relu
+        elif self.act_func == 'sigmoid':
+            self.act_func = jax.nn.sigmoid
+        else:
+            raise ValueError(f"Unsupported activation function provided: {self.act_func}")
+        
+
     def train_diffrax(self, params_model):
         self.prepare_train_params_diffrax(params_model)
         
         rng = random.PRNGKey(42)
-        self.model = JaxDiffModel(self.layer_widths, self.time_invar)
+        self.model = JaxDiffModel(self.layer_widths, self.time_invar, act_func = self.act_func)
         # initialize the training state
         self.state = self.model.create_train_state(rng, self.lr, self.lambda_reg, self.rtol, self.atol, self.dt0)
         
@@ -229,19 +249,19 @@ class TrainerToy:
             raise ValueError("Initial state for diffrax models must be a 1D array")
         self.losses = []
         if self.pretrain_model:
-            if self.log:
+            if self.log or self.split_time:
                 start_time = time.time()
                 self.time_elapsed = []
-            for frac in self.pretrain_model:
+            for i, frac in enumerate(self.pretrain_model):
                 k = int(frac*len(self.t)) # calculate the number of data points to include
                 self.state, losses_ = self.model.train(self.state, self.t[:k], 
                                               self.y_noisy[:k], self.init_state,
-                                              num_epochs = self.max_iter,
+                                              num_epochs = self.max_iter[i],
                                               verbose = self.verbose,
                                               log = self.log)
                 self.losses.append(losses_)
                 
-                if self.log:
+                if self.log or self.split_time:
                     self.time_elapsed.append(time.time() - start_time)
         else:
             self.state, losses_ = self.model.train(self.state, self.t, 
@@ -251,7 +271,7 @@ class TrainerToy:
                                           log = self.log)
             self.losses.append(losses_)
         
-        if not self.log or not self.pretrain_model:        
+        if not (self.log or self.split_time) or not self.pretrain_model:        
             self.time_elapsed = time.time() - start_time
             
         
@@ -263,13 +283,20 @@ class TrainerToy:
         mse_train = np.mean((self.y - odeint_pred)**2)
         mse_test = np.mean((self.y_test - odeint_pred_test)**2)
         
-        results = {
-            'time_elapsed': self.time_elapsed,
-            'odeint_pred': odeint_pred,
-            'odeint_pred_test': odeint_pred_test,
-            'mse_train': mse_train,
-            'mse_test': mse_test
-        }
+        if self.detailed:
+            results = {
+                'time_elapsed': self.time_elapsed,
+                'odeint_pred': odeint_pred,
+                'odeint_pred_test': odeint_pred_test,
+                'mse_train': mse_train,
+                'mse_test': mse_test
+            }
+        else:
+            results = {
+                'time_elapsed': self.time_elapsed,
+                'mse_train': mse_train,
+                'mse_test': mse_test
+            }
         
         return results
     

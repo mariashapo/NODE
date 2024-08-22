@@ -17,12 +17,13 @@ class NeuralODE(nn.Module):
     loss: int = 0
     max_iter: int = np.inf
     regularizer: float = 1e-5
+    act_func: callable = nn.tanh
 
     @nn.compact
     def __call__(self, x):
         for width in self.layer_widths[:-1]:
             x = nn.Dense(width, kernel_init=initializers.lecun_normal())(x)
-            x = nn.tanh(x)
+            x = self.act_func(x)
         x = nn.Dense(self.layer_widths[-1], kernel_init=initializers.lecun_normal())(x)
         return x
 
@@ -72,8 +73,8 @@ class NeuralODE(nn.Module):
             y0=y0,
             args=args,
             stepsize_controller=stepsize_controller,
-            saveat=saveat,
-            adjoint=dfx.RecursiveCheckpointAdjoint(checkpoints=100) 
+            saveat=saveat
+            #, adjoint=dfx.RecursiveCheckpointAdjoint(checkpoints=100) 
         )
 
         pred_solution = solution.ys
@@ -88,7 +89,8 @@ class NeuralODE(nn.Module):
         state = state.apply_gradients(grads=grads)
         return state, loss
 
-    def train(self, state, t, observed_data, y0, num_epochs=np.inf, termination_loss=0, extra_args=None, verbose=True, log=False):
+    def train(self, state, t, observed_data, y0, num_epochs=np.inf, termination_loss=0, extra_args=None, verbose=True, 
+              log=False):
         self.term_loss = termination_loss
         self.max_iter = num_epochs
         
@@ -102,14 +104,22 @@ class NeuralODE(nn.Module):
         while True:
             epoch += 1
             state, loss = train_step_jit(state, t, observed_data, y0, extra_args)
-            if log:
-                losses.append(loss.item())
-            
+                      
+            if log and epoch % 10 == 0:
+                if jnp.squeeze(observed_data).shape[0] != log['t'].shape[0]:
+                    k = jnp.squeeze(observed_data).shape[0]
+                    pred = self.neural_ode(state.params, log['y_init'], log['t'][:k], state)
+                    losses.append(jnp.mean(jnp.square(pred - log['y'][:k])))
+                else:
+                    pred = self.neural_ode(state.params, log['y_init'], log['t'], state)
+                    losses.append(np.mean(np.square(pred - log['y'])))
+
             if epoch % 100 == 0:
                 if verbose:
                     print(f'Epoch {epoch}, Loss: {loss}')
             if loss < self.term_loss or epoch > self.max_iter:
                 break
+            
         return state, losses
 
     def neural_ode(self, params, y0, t, state, extra_args=None): 
