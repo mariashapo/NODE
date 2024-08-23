@@ -1,0 +1,6 @@
+
+
+
+Initial model attempts; 
+Unlikely to have many useful information for the report;
+Some work on reusing the predictions for further predictions

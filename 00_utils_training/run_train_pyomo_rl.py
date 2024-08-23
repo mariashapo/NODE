@@ -97,6 +97,7 @@ class Trainer:
         ode_model.build_model()
         result = ode_model.solve_model()
         u_model = ode_model.extract_solution().T
+        self.termination = result['termination_condition']
         
         experiment_results = {}
         experiment_results['result'] = result
@@ -106,17 +107,6 @@ class Trainer:
         y_pred = ode_model.neural_ode(ys[0], ts, (Xs, ts))
         
         experiment_results['mse_odeint'] = np.mean(np.square(np.squeeze(y_pred) - np.squeeze(ys)))
-        
-        if self.plot_odeint:
-            plt.figure(figsize=(20, 10))
-            plt.plot(ts, ys, label='True Data', alpha = 1)
-            plt.plot(ts, u_model, label='True Data', alpha = 1)
-            plt.scatter(ts, y_pred, label='Model Prediction (Train) - Odeint', alpha = 0.7)
-            plt.title(f"Sequential ODE solver Result; Time Elapsed: {result['solver_time']}")
-            plt.legend(loc ="lower right")
-            plt.grid(True)
-            plt.savefig(f'{self.plot_directory}/ode_solver_train_{self.start_date}.png', format='png')  
-            plt.close() 
         
         # -------------------------------------------- COLLOCATION PREDICTION (TRAIN) ---------------------------------------------- 
         trained_weights_biases = ode_model.extract_weights()
@@ -128,7 +118,6 @@ class Trainer:
         direct_solver.build_model()
         solver_info = direct_solver.solve_model()
         y_solution = direct_solver.extract_solution()     
-        
         # experiment_results['mae_coll_ode'] = np.mean(np.abs(np.squeeze(y_solution) - np.squeeze(ys)))
         experiment_results['mse_coll_ode'] = np.mean(np.square(np.squeeze(y_solution) - np.squeeze(ys)))
         
@@ -142,8 +131,10 @@ class Trainer:
         experiment_results['mse_odeint_test'] = np.mean(np.square(np.squeeze(y_pred_test) - np.squeeze(ys_test)))
         if self.plot_odeint:
             plt.figure(figsize=(10, 6))
-            plt.plot(ts_test, ys_test)
-            plt.plot(ts_test, y_pred_test, label='Model Prediction (Test) -  Odeint', alpha = 0.7)
+            plt.plot(ts, ys, label='True Data', alpha = 1, color = 'green', ls = '--')
+            plt.plot(ts_test, ys_test, alpha = 1, color = 'green', ls = '--')
+            plt.plot(ts_test, y_pred_test, color='blue', label='Model Prediction (Test) -  Odeint', alpha = 1)
+            plt.plot(ts, y_pred, color='#FF8C10', label='Model Prediction (Train) - Odeint', alpha = 1)
             plt.title(f"Collocation-based training & sequential predictions: True Data vs Model Prediction (Test)")
             plt.legend(loc ="lower right")
             plt.grid(True)
@@ -163,12 +154,11 @@ class Trainer:
         
         if self.plot_collocation:
             plt.figure(figsize=(10, 6))
-            plt.plot(ts, ys, label='True Data', alpha = 0.9, color = 'green')
-            plt.plot(ts_test, ys_test, alpha = 0.9, color = 'green')
-            # plt.plot(ts, u_model, label='True Data', alpha = 1)
-            plt.plot(ts, y_solution, 'o', color='blue', label='Model Prediction (Train) - collocation-based ODE', alpha = 0.6)
-            plt.plot(ts_test, y_solution_test, 'o', color='#FF8C10', label='Model Prediction (Test) -  collocation-based ODE', alpha = 0.6)
-            plt.title(f"Collocation-based training & sequential predictions: True Data vs Model Prediction")
+            plt.plot(ts, ys, label='True Data', ls = '--', alpha = 1, color = 'green')
+            plt.plot(ts_test, ys_test, ls = '--', color = 'green')
+            plt.plot(ts, y_solution, color='blue', label='Model Prediction (Train) - collocation-based ODE', alpha = 1)
+            plt.plot(ts_test, y_solution_test, color='#FF8C10', label='Model Prediction (Test) -  collocation-based ODE', alpha = 1)
+            plt.title(f"Collocation-based training & collocation-based predictions: True Data vs Model Prediction")
             plt.legend(loc ="lower right")
             plt.grid(True)
             plt.savefig(f'{self.plot_directory}/collocation_solver_train_{self.start_date}.png', format='png')  

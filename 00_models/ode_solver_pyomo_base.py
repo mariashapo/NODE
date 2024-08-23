@@ -100,7 +100,7 @@ class DirectODESolver:
             'message': message
         }
         
-        print(solver_info)
+        #print(solver_info)
         return solver_info
     
     def extract_solution(self):
