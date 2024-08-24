@@ -66,6 +66,9 @@ class ExperimentRunner:
         
         importlib.reload(run_train_pyomo_rl)
         self.Trainer = run_train_pyomo_rl.Trainer
+        
+        if 'param_combinations' in self.extra_inputs.keys():
+            self.param_combinations = self.extra_inputs['param_combinations']
     
     def initialize_inputs(self):
         if 'params_model' in self.extra_inputs.keys():

@@ -15,7 +15,7 @@ class NeuralODEPyomoADMM:
 
     # --------------------------------------------- CLASS INITIALIZATION ------------------------------------------- #
     def __init__(self, y_observed, t, first_derivative_matrix, layer_sizes, time_invariant=True, extra_input=None, rho = 1.0,
-                 penalty_lambda_reg=0.01, penalty_lambda_smooth=0.0, act_func="tanh", w_init_method="random", params=None, y_init=None):
+                 penalty_lambda_reg=0.01, penalty_lambda_smooth=0.0, act_func="tanh", w_init_method="random", params=None, y_init=None, test_data = None):
 
         # class parameters
         self.initialize_data_params(y_observed, t, extra_input, y_init, first_derivative_matrix)
@@ -28,6 +28,13 @@ class NeuralODEPyomoADMM:
         # model initialization
         self.model1, self.model2 = ConcreteModel(), ConcreteModel()
         self.create_submodels()
+        
+        if test_data is not None:
+            self.test_data = test_data
+            self.test_ys = test_data['y']
+            self.test_ts = test_data['t']
+            self.test_Xs = test_data['X']
+            self.test_Ds = test_data['D']
 
     def initialize_data_params(self, y_observed, t, extra_input, y_init, first_derivative_matrix):
         self.midpoint = len(t) // 2
@@ -234,7 +241,7 @@ class NeuralODEPyomoADMM:
         if not hasattr(self, 'admm_info'):
             self.admm_info = {'primal_residual': [], 'mae_collocation': [], 'mse_collocation': [], 
                               'mae_diffrax': [], 'mse_diffrax': [], 
-                              'iter': [], 'time_elapsed': []}
+                              'iter': [], 'time_elapsed': [], 'mse_collocation_test': []}
             
         self.admm_info['primal_residual'].append(self.compute_primal_residual())
         
@@ -255,8 +262,18 @@ class NeuralODEPyomoADMM:
         observed = np.squeeze(np.concatenate([self.y_observed1, self.y_observed2]))
         if solution.shape != observed.shape:
             raise ValueError("Solution and observed data do not have the same shape.")
-        mae_collocation = np.mean(np.abs(solution - observed))
         mse_collocation = np.mean((solution - observed)**2)
+        
+        # collocation-based predictions TEST
+        if self.test_data is not None:
+            y_solution_test = self.node_collocation_pred(y0 = self.test_ys[0]
+                                       , t = self.test_ts
+                                       , D = self.test_Ds
+                                       , extra_input = self.test_Xs
+                                       )
+    
+            mse_collocation_test = np.mean((y_solution_test - self.test_ys)**2)
+            self.admm_info['mse_collocation_test'].append(mse_collocation_test)
         
         # diffax predictions
         y_solution_1 = self.node_diffrax_pred(y0 = jnp.array(self.y_observed1[0])
@@ -270,16 +287,27 @@ class NeuralODEPyomoADMM:
                             )
         
         solution = np.squeeze(np.concatenate([y_solution_1, y_solution_2]))
-        mae_diffrax = np.mean(np.abs(solution - observed))
         mse_diffrax = np.mean((solution - observed)**2)
-        
-        self.admm_info['mae_collocation'].append(mae_collocation)
+
         self.admm_info['mse_collocation'].append(mse_collocation)
-        self.admm_info['mae_diffrax'].append(mae_diffrax)
         self.admm_info['mse_diffrax'].append(mse_diffrax)
         self.admm_info['iter'].append(self.iter)
         self.admm_info['time_elapsed'].append(time_elapsed)
+   
         
+    def eval_predict(self, y, t, D, extra_input=None):
+        results = {}        
+        # collocation-based predictions
+        y_pred = self.node_collocation_pred(y0 = y[0]
+                                   , t = t
+                                   , D = D
+                                   , extra_input = extra_input
+                                   )
+        
+        mse_collocation = np.mean((y_pred - y)**2)
+        results['mse_collocation'] = mse_collocation        
+        return results
+              
     # --------------------------------------------- ADMM UPDATES ---------------------------------------------- # 
     def update_dual_variables(self):
         self.dual_W1 += 0.5 * (self.to_array(self.model1.W1) - self.W1_consensus + self.to_array(self.model2.W1) - self.W1_consensus)
