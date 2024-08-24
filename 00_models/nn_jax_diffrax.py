@@ -89,8 +89,8 @@ class NeuralODE(nn.Module):
         state = state.apply_gradients(grads=grads)
         return state, loss
 
-    def train(self, state, t, observed_data, y0, num_epochs=np.inf, termination_loss=0, extra_args=None, verbose=True, 
-              log=False):
+    def train(self, state, t, observed_data, y0, num_epochs=np.inf, termination_loss=0, extra_args=None, 
+              verbose=True, log=False):
         self.term_loss = termination_loss
         self.max_iter = num_epochs
         
@@ -106,12 +106,15 @@ class NeuralODE(nn.Module):
             state, loss = train_step_jit(state, t, observed_data, y0, extra_args)
                       
             if log and epoch % 10 == 0:
+                
                 if jnp.squeeze(observed_data).shape[0] != log['t'].shape[0]:
-                    k = jnp.squeeze(observed_data).shape[0]
-                    pred = self.neural_ode(state.params, log['y_init'], log['t'][:k], state)
-                    losses.append(jnp.mean(jnp.square(pred - log['y'][:k])))
+                    pass 
+                    # to accurately compute loss duuring pre-training
+                    """k = jnp.squeeze(observed_data).shape[0]
+                    pred = self.neural_ode(state.params, log['y_init'], log['t'][:k], state, log['extra_args'])
+                    losses.append(jnp.mean(jnp.square(pred - log['y'][:k])))"""
                 else:
-                    pred = self.neural_ode(state.params, log['y_init'], log['t'], state)
+                    pred = self.neural_ode(state.params, log['y_init'], log['t'], state, log['extra_args'])
                     losses.append(np.mean(np.square(pred - log['y'])))
 
             if epoch % 100 == 0:

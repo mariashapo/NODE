@@ -44,9 +44,6 @@ class ExperimentRunner:
         self.opt_aim = optimization_aim
         self.extra_inputs = extra_inputs
         
-        self.param_combinations = self.define_param_combinations()
-        self.metrics = self.initialize_metrics()
-        
         # generate default parameters for data, solver and ode
         # if not provided by the user
         
@@ -60,6 +57,13 @@ class ExperimentRunner:
         self.params_results['plot_odeint'] = self.extra_inputs.get('plot_odeint', False)
         
         self.params_model = {'layer_sizes': self.ls, 'penalty': self.penalty}
+        
+        if optimization_aim == 'convergence':
+            self.convergence_step = self.extra_inputs.get('convergence_steps', 5)
+        
+        self.param_combinations = self.define_param_combinations()
+        self.metrics = self.initialize_metrics()
+        
         importlib.reload(run_train_pyomo_rl)
         self.Trainer = run_train_pyomo_rl.Trainer
     
@@ -123,30 +127,43 @@ class ExperimentRunner:
         """
         if self.opt_aim == 'regularization':
             param_combinations = [0, 1e-7, 1e-5, 1e-3, 0.01, 0.1]
+            
         elif self.opt_aim == 'tolerance':
             param_combinations = [1, 1e-1, 1e-2, 1e-4, 1e-6, 1e-8]
+            
         elif self.opt_aim == 'tolerance_mix':
             tol = [1e-4, 1e-6, 1e-8]
             tol_inf_and_viol = [1e-2, 1e-4]
             #tol_dual_inf = [10, 1, 1e-1]
             bound_relax_factor = [0.1, 1e-4, 1e-8]
             param_combinations = list(itertools.product(tol, tol_inf_and_viol, tol_inf_and_viol, bound_relax_factor))
+            
         elif self.opt_aim == 'reg_tol':
             penalty_values = [0, 1e-7, 1e-5, 1e-3, 0.01, 0.1]
             tol_list = [1, 1e-1, 1e-2, 1e-4, 1e-6, 1e-8]
             param_combinations = list(itertools.product(penalty_values, tol_list))
+            
         elif self.opt_aim == 'input_features':
             param_combinations = self.extra_inputs
             if param_combinations == None:
                 raise ValueError("extra_inputs must be provided for input_features optimization")
+            
         elif self.opt_aim == 'collocation_method':
             param_combinations = ["chebyshev", "gauss_legendre", "gauss_radau", "gauss_lobatto"]
+            
         elif self.opt_aim == 'convergence':
             iters = np.array([i for i in range(1, 100)])
-            param_combinations = iters*5
-            self.optimal = False
+            iters *= self.convergence_step
+            param_combinations = np.concatenate((np.array([1]), iters))
+            self.optimal = {d:False for d in self.date_sequences}
+            
         elif self.opt_aim == 'default':
             param_combinations = [1]
+            
+        elif self.opt_aim == 'network_size':
+            sizes = [[6, 16, 1], [6, 32, 1], [6, 64, 1], [6, 128, 1]]
+            reg = [1e-7, 1e-5]
+            param_combinations = list(itertools.product(sizes, reg))
         else:
             raise ValueError("optimization_aim not recognized")
         
@@ -156,34 +173,44 @@ class ExperimentRunner:
     def update_prams(self, param_comb):
         if self.opt_aim == 'regularization':
             self.penalty = param_comb
+            
         elif self.opt_aim == 'tolerance':
             self.params_solver['tol'] = param_comb
+            
         elif self.opt_aim == 'tolerance_mix':
             self.params_solver['tol'] = param_comb[0]
             self.params_solver['constr_viol_tol'] = param_comb[1]
             self.params_solver['dual_inf_tol'] = param_comb[2]
             self.params_solver['bound_relax_factor'] = param_comb[3]
+            
         elif self.opt_aim == 'reg_tol':
             self.penalty = param_comb[0]
             self.params_solver['tol'] = param_comb[1]
             self.params_solver['constr_viol_tol'] = param_comb[1]
+            
         elif self.opt_aim == 'input_features':
             self.params_data['prev_hour'] = param_comb['prev_hour']
             self.params_data['prev_week'] = param_comb['prev_week']
             self.params_data['prev_year'] = param_comb['prev_year']
             self.params_data['m'] = param_comb['m']
             self.params_data['ls'] = param_comb['ls']
+            
         elif self.opt_aim == 'collocation_method':
             self.params_data['spacing'] = param_comb
+            
         elif self.opt_aim == 'convergence':
             self.params_solver['max_iter'] = param_comb
-            if self.sequence_len != 1:
-                raise ValueError("sequence_len must be 1 for convergence optimization")
+            
+        elif self.opt_aim == 'network_size':
+            self.ls = param_comb[0]
+            self.penalty = param_comb[1]
             
         elif self.opt_aim == 'default':
             pass
         else:
             raise ValueError("optimization_aim not recognized")
+        
+        self.params_model = {'layer_sizes': self.ls, 'penalty': self.penalty}
         
     @staticmethod
     def generate_dates(start_date, sequence_len = 5, frequency = 2):
@@ -231,14 +258,14 @@ class ExperimentRunner:
         iter = 1
         for param_comb in self.param_combinations:
             
-            if self.opt_aim == 'convergence' and self.optimal:
-                break
-            
             self.update_prams(param_comb) # update parametes based on the optimization aim
             self.initialize_metrics()
             
             for date in self.date_sequences:
                 self.update_date(date, param_comb, file, iter)
+                
+                if self.opt_aim == 'convergence' and self.optimal[date]:
+                    break
                 
                 try:
                     trainer = self.Trainer(self.params_results, self.params_data, self.params_model, self.params_solver, self.params_ode)
@@ -247,14 +274,18 @@ class ExperimentRunner:
                     experiment_results = trainer.train()
                     print(f"message: {trainer.termination}")
                     if self.opt_aim == 'convergence' and 'optimal' in trainer.termination:
-                        print(f"Optimal solution found in iteration {param_comb}")
-                        self.optimal = True
+                        print(f"Optimal solution for {date} found in iteration {param_comb}")
+                        self.optimal[date] = True
                 except Exception as e:
                     print(f"Failed to complete training: {e}")
                     continue
                 
                 try:
-                    self.results_full[(param_comb, date)] = experiment_results
+                    if self.opt_aim == 'network_size':
+                        key_name = (str(param_comb[0]), param_comb[1], date)
+                        self.results_full[key_name] = experiment_results
+                    else:
+                        self.results_full[(param_comb, date)] = experiment_results
                 except Exception as e:
                     print(f"Failed to extract results: {e}")
                     continue                
@@ -269,7 +300,11 @@ class ExperimentRunner:
             if self.opt_aim != 'convergence':    
                 # no need to compute averages when recording training losses
                 try:
-                    self.results_avg[param_comb] = ExperimentRunner.compute_averages(self.metrics)
+                    if self.opt_aim == 'network_size':
+                        key_name = (str(param_comb[0]), param_comb[1], date)
+                        self.results_avg[key_name] = ExperimentRunner.compute_averages(self.metrics)
+                    else:
+                        self.results_avg[param_comb] = ExperimentRunner.compute_averages(self.metrics)
                 except Exception as e:
                     print(f"Failed to compute averages: {e}")
                     continue

@@ -41,9 +41,6 @@ class ExperimentRunner:
         self.opt_aim = optimization_aim
         self.extra_inputs = extra_inputs
         
-        self.param_combinations = self.define_param_combinations()
-        self.metrics = self.initialize_metrics()
-        
         self.params_data = self.extra_inputs.get('params_data', ExperimentRunner.default_data_params(start_date))
         self.params_model = self.extra_inputs.get('params_model', ExperimentRunner.default_model_params())
         
@@ -59,7 +56,17 @@ class ExperimentRunner:
         self.results_avg = {}
         
         self.params_results = {}
-        self.params_results['plot'] = self.extra_inputs.get('plot', True) 
+        if 'params_results' in self.extra_inputs.keys():
+            self.params_results['plot'] = self.extra_inputs['params_results'].get('plot', True)
+            self.params_results['log'] = self.extra_inputs['params_results'].get('log', False)
+            self.params_results['split_time'] = self.extra_inputs['params_results'].get('split_time', False)
+        else:
+            self.params_results['plot'] = True
+            self.params_results['log'] = False
+            self.params_results['split_time'] = False
+        
+        self.param_combinations = self.define_param_combinations()
+        self.metrics = self.initialize_metrics()
         
         # reload the training module
         importlib.reload(run_train_diffrax_rl)
@@ -91,6 +98,17 @@ class ExperimentRunner:
                 raise ValueError("extra_inputs must be provided for input_features optimization")
         elif self.opt_aim == 'default':
             param_combinations = [1]
+        elif self.opt_aim == 'network_size':
+            in_layer = 6
+            layer_sizes = [[in_layer, 16, 1], [in_layer, 32, 1], [in_layer, 64, 1], [in_layer, 128, 1],
+                           [in_layer, 16, 16, 1], [in_layer, 32, 32, 1]]
+            regularization = [0, 1e-7, 1e-5]
+            num_epochs = [5000, 7500, 10000]
+            param_combinations = list(itertools.product(layer_sizes, regularization, num_epochs))
+        elif self.opt_aim == 'convergence':
+            param_combinations = [1]
+            if not self.params_results['log']:
+                raise ValueError("log must be set to True for convergence optimization")
         else:
             raise ValueError("optimization_aim not recognized")
         
@@ -106,6 +124,17 @@ class ExperimentRunner:
             self.params_data['prev_year'] = param_comb['prev_year']
             self.params_data['m'] = param_comb['m']
             self.params_data['ls'] = param_comb['ls']
+        elif self.opt_aim == 'convergence':
+            pass
+        elif self.opt_aim == 'network_size':
+            self.params_model['layer_sizes'] = param_comb[0]
+            self.params_model['penalty'] = param_comb[1]
+            
+            if len(self.params_model['num_epochs']) > 1:
+                self.params_model['num_epochs'][-1] = param_comb[2]
+            else:
+                self.params_model['num_epochs'] = param_comb[2]
+                
         elif self.opt_aim == 'default':
             pass
         else:
@@ -141,6 +170,15 @@ class ExperimentRunner:
         date_sequences_str = [date.strftime('%Y-%m-%d') for date in date_sequences]
         return date_sequences_str
 
+    @staticmethod
+    def convert_lists_in_tuple(param_tuple):
+        """
+        Converts all list elements in a tuple to string representations,
+        keeping all other elements unchanged.
+        """
+        
+        return tuple(str(item) if isinstance(item, list) else item for item in param_tuple)
+        
     def update_date(self, date, param_comb, file, iter):
         self.params_data['start_date'] = date
         print(f"Running iteration {iter} with parameters: {param_comb}")
@@ -151,9 +189,12 @@ class ExperimentRunner:
             pass
         file = open('results_diffrax.txt', 'a')
         iter = 1
-        self.initialize_metrics()
         
+        if self.params_results['log']:
+            self.losses = []
+            
         for param_comb in self.param_combinations:
+            self.initialize_metrics()
             self.update_params(param_comb)
             
             for date in self.date_sequences:
@@ -169,6 +210,8 @@ class ExperimentRunner:
                     file.write(f"Error in iteration {iter}: {e}\n")
                     continue
                 
+                param_comb = ExperimentRunner.convert_lists_in_tuple(param_comb)
+                
                 try:
                     self.results_full[(param_comb, date)] = experiment_results
                 except Exception as e:
@@ -176,6 +219,8 @@ class ExperimentRunner:
                     file.write(f"Error in iteration {iter}: {e}\n")
                     continue
                 
+                if self.params_results['log']:
+                    self.losses.append(trainer.losses)
 
                 self.collect_metrics(trainer.experiment_results)
                 file.write(f"param_comb: {param_comb}, date: {date}, results: {experiment_results}\n")
@@ -184,7 +229,8 @@ class ExperimentRunner:
                 iter += 1
         
             try:
-                self.results_avg = ExperimentRunner.compute_averages(self.metrics)
+                if self.opt_aim != 'convergence':
+                    self.results_avg[param_comb] = ExperimentRunner.compute_averages(self.metrics)
             except Exception as e:
                 print(f"Failed to compute averages: {e}")
                 continue

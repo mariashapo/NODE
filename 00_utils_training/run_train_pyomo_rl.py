@@ -110,7 +110,7 @@ class Trainer:
         
         # -------------------------------------------- COLLOCATION PREDICTION (TRAIN) ---------------------------------------------- 
         trained_weights_biases = ode_model.extract_weights()
-        
+            
         initial_state = ys[0][0]
         direct_solver = DirectODESolver(np.array(ts), self.layer_sizes, trained_weights_biases, initial_state, 
                                         D = Ds_train, 

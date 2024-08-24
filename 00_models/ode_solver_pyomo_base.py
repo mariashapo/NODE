@@ -2,9 +2,6 @@ import numpy as np
 import pyomo.environ as pyo
 from pyomo.environ import ConcreteModel, Var, Constraint, ConstraintList, Objective, SolverFactory, value, RangeSet
 
-# To do:
-# Rewrite this solver to work with discrete t points and using D matrix
-
 class DirectODESolver:
     def __init__(self, t, layer_sizes, trained_weights_biases, initial_state, D, 
                  act_func="tanh", time_invariant=True, extra_input=None,
@@ -23,6 +20,10 @@ class DirectODESolver:
         self.W2 = trained_weights_biases['W2']
         self.b1 = trained_weights_biases['b1']
         self.b2 = trained_weights_biases['b2']
+        
+        if len(layer_sizes) == 4:
+            self.W3 = trained_weights_biases['W3']
+            self.b3 = trained_weights_biases['b3']
         
         # first_derivative_matrix
         self.D = D
@@ -62,24 +63,41 @@ class DirectODESolver:
             return 1 + 1e6 * m.slack
         
         self.model.obj = Objective(rule=_objective, sense=pyo.minimize)
-        
-    def nn_output(self, nn_input):
 
+    def nn_output(self, nn_input):
         if len(self.layer_sizes) == 3:
             hidden = np.dot(self.W1, nn_input) + self.b1
             epsilon = 1e-10
             if self.act_func == "tanh":
-                hidden = [pyo.tanh(h) for h in hidden]
+                hidden = np.tanh(hidden)
             elif self.act_func == "sigmoid":
-                hidden = [1 / (1 + pyo.exp(-h) + epsilon) for h in hidden]
+                hidden = 1 / (1 + np.exp(-hidden) + epsilon) 
             elif self.act_func == "softplus":
-                hidden = [pyo.log(1 + pyo.exp(h) + epsilon) for h in hidden]
+                hidden = np.log(1 + np.exp(hidden) + epsilon) 
                 
             outputs = np.dot(self.W2, hidden) + self.b2
-        else:
-            raise ValueError("Only 2 hidden layers are supported")
-        
+        elif len(self.layer_sizes) == 4:
+            hidden1 = np.dot(self.W1, nn_input) + self.b1
+            epsilon = 1e-10
+            if self.act_func == "tanh":
+                hidden1 = np.tanh(hidden1)
+            elif self.act_func == "sigmoid":
+                hidden1 = 1 / (1 + np.exp(-hidden1) + epsilon)
+            elif self.act_func == "softplus":
+                hidden1 = np.log(1 + np.exp(hidden1) + epsilon)
+
+            hidden2 = np.dot(self.W2, hidden1) + self.b2
+            if self.act_func == "tanh":
+                hidden2 = np.tanh(hidden2)
+            elif self.act_func == "sigmoid":
+                hidden2 = 1 / (1 + np.exp(-hidden2) + epsilon)
+            elif self.act_func == "softplus":
+                hidden2 = np.log(1 + np.exp(hidden2) + epsilon)
+
+            outputs = np.dot(self.W3, hidden2) + self.b3
+
         return outputs
+
 
     def solve_model(self):
         # solve the model

@@ -106,4 +106,3 @@ class DirectODESolver:
         y_values = np.array([value(self.model.y[i]) for i in range(self.N)])
         return y_values
 
-

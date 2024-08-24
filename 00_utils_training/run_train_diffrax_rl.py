@@ -49,9 +49,12 @@ class Trainer:
         # output parameters
         self.plot_directory = '../00_plots/diffrax'
         self.plot = params_results['plot']
+        self.log = params_results.get('log', False)
+        self.split_time = params_results.get('split_time', False)
         
         self.rng = random.PRNGKey(42)
         self.experiment_results = {}
+
         
     def clear_directory(self):
         """ Clear all files in the folder without deleting the folder itself. """
@@ -84,30 +87,55 @@ class Trainer:
         extra_args = (Xs, ts)
         y0 = jnp.array(ys[0])
         
+        if self.log:
+            self.log = {
+                't': ts,
+                'y': ys,
+                'y_init': ys[0],
+                'extra_args': extra_args
+            }
+        
         # prepare model
         node_model = NeuralODE_JAX(self.layer_sizes, time_invariant=True)
         state = node_model.create_train_state(self.rng, self.learning_rate, self.penalty)
         
         start_time = time.time()
         
+        self.losses = [] 
+        self.time_elapsed = []
+        
         if not self.pretrain:
             self.pretrain = [1]
             self.num_epochs = [self.num_epochs]
           
         for i, pretrain in enumerate(self.pretrain):
+            
+            if self.pretrain != [1] and (self.log or self.split_time):
+                # if we are pretraining, and want to log 
+                # the time & losses for each pretrain separately
+                start_time = time.time()
+                
             n = int(len(ts)* pretrain)
             state, losses = node_model.train(state, ts[:n] 
                                     , ys[:n], y0
                                     , num_epochs = self.num_epochs[i]
-                                    , extra_args = extra_args[:n]
-                                    )
-        end_time = time.time()        
+                                    , extra_args = extra_args[:n],
+                                    log = self.log)
+            
+            
+            self.losses.append(losses)
+            
+            if self.pretrain != [1] and (self.log or self.split_time):
+                self.time_elapsed.append(time.time() - start_time)
+        
+        if self.pretrain == [1] or not (self.log or self.split_time):    
+            self.time_elapsed = time.time() - start_time        
         
         # ---------------------------------------------------- PREDICTION ------------------------------------------------
         y_train_pred = node_model.neural_ode(state.params, y0, ts, state, extra_args)
         
         self.experiment_results = {}
-        self.experiment_results['times_elapsed'] = end_time - start_time
+        self.experiment_results['times_elapsed'] = self.time_elapsed
         self.experiment_results['mse_diffrax'] = np.mean(np.square(np.squeeze(y_train_pred) - np.squeeze(ys)))
         
         ys_test = jnp.atleast_2d(jnp.array(df_test['y'])).T
