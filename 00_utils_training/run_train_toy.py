@@ -6,6 +6,7 @@ import os
 import time
 import matplotlib.pyplot as plt
 import torch
+import importlib
 
 # to import activation functions
 from flax import linen as nn 
@@ -23,14 +24,18 @@ if path_ not in sys.path:
     sys.path.append(path_)
 
 from data_generation import generate_ode_data
-# pyomo
-from nn_pyomo_base import NeuralODEPyomo as PyomoModel 
 from non_parametric_collocation import collocate_data
 from collocation_obj import Collocation
-# jax-diffrax
-from nn_jax_diffrax import NeuralODE as JaxDiffModel
-# pytorch
-from nn_pytorch import NeuralODE as PytorchModel
+
+def reload_module(module_name, class_name):
+    module = importlib.import_module(module_name)
+    importlib.reload(module)
+    return getattr(module, class_name)
+
+PyomoModel = reload_module('nn_pyomo_base', 'NeuralODEPyomo')
+JaxDiffModel = reload_module('nn_jax_diffrax', 'NeuralODE')
+PytorchModel = reload_module('nn_pytorch', 'NeuralODE')
+
 
 class TrainerToy:
     def __init__(self, params_data, model_type):
@@ -119,9 +124,9 @@ class TrainerToy:
         if self.model_type == 'pyomo':
             self.train_pyomo(params_model, params_solver)
         elif self.model_type == 'jax_diffrax':
-            self.train_diffrax(params_model)
+            self.train_diffrax(params_model, params_solver)
         elif self.model_type == 'pytorch':
-            self.train_pytorch(params_model)
+            self.train_pytorch(params_model, params_solver)
             
     def extract_results(self):
         if self.model_type == 'pyomo':
@@ -200,6 +205,9 @@ class TrainerToy:
         
         return results
 
+    def extract_pyomo_weights(self):
+        return self.model.extract_weights()
+    
     #----------------------------------------------------------------DIFFRAX TRAINING---------------------------------------------------
     def prepare_train_params_diffrax(self, params_model):
         self.layer_widths = params_model['layer_widths']
@@ -222,7 +230,12 @@ class TrainerToy:
                 't': self.t,
                 'y': self.y,
                 'y_init': self.init_state,
-                'extra_args': None
+                'extra_args': None,
+                'epoch_recording_step' : self.log,
+                't_test': self.t_test,
+                'y_test': self.y_test,
+                'y_init_test': self.init_state_test,
+                'extra_args_test': None
             }
         
         if self.act_func == 'tanh':
@@ -235,19 +248,20 @@ class TrainerToy:
             raise ValueError(f"Unsupported activation function provided: {self.act_func}")
         
 
-    def train_diffrax(self, params_model):
+    def train_diffrax(self, params_model, custom_params):
         self.prepare_train_params_diffrax(params_model)
         
         rng = random.PRNGKey(42)
         self.model = JaxDiffModel(self.layer_widths, self.time_invar, act_func = self.act_func)
         # initialize the training state
-        self.state = self.model.create_train_state(rng, self.lr, self.lambda_reg, self.rtol, self.atol, self.dt0)
+        self.state = self.model.create_train_state(rng, self.lr, self.lambda_reg, self.rtol, self.atol, self.dt0, custom_params)
         
         start_time = time.time()
         
         if self.init_state.ndim != 1:
             raise ValueError("Initial state for diffrax models must be a 1D array")
         self.losses = []
+        
         if self.pretrain_model:
             if self.log or self.split_time:
                 start_time = time.time()
@@ -275,7 +289,7 @@ class TrainerToy:
             self.time_elapsed = time.time() - start_time
             
         
-    def extract_results_diffrax(self):
+    def extract_results_diffrax(self, detailed = False):
         odeint_pred = self.model.neural_ode(self.state.params, self.init_state, self.t, self.state)
         odeint_pred_test = self.model.neural_ode(
             self.state.params, self.init_state_test, self.t_test, self.state)
@@ -283,7 +297,7 @@ class TrainerToy:
         mse_train = np.mean((self.y - odeint_pred)**2)
         mse_test = np.mean((self.y_test - odeint_pred_test)**2)
         
-        if self.detailed:
+        if self.detailed or detailed:
             results = {
                 'time_elapsed': self.time_elapsed,
                 'odeint_pred': odeint_pred,
@@ -313,27 +327,38 @@ class TrainerToy:
         self.dt0 = params_model.get('dt0', 1e-3)
         self.pretrain_model = params_model.get('pretrain', False)
         self.verbose = params_model.get('verbose', True)
+        self.log = params_model.get('log', False)
+        self.split_time = params_model.get('split_time', False)
         
-    def train_pytorch(self, params_model):
+    def train_pytorch(self, params_model, custom_params):
         self.prepare_train_params_pytorch(params_model)
         
-        self.model = PytorchModel(self.layer_widths, self.lr)
-        # ode_model.train_model(t[:k], y_noisy[:k], y0, num_epochs = 1000)
+        # Initialize the model
+        self.model = PytorchModel(self.layer_widths, self.lr, custom_weights = custom_params)
         
+        # Convert data to appropriate tensor format
         self.t = torch.tensor(self.t, dtype=torch.float32)
         self.y_noisy = torch.tensor(self.y_noisy, dtype=torch.float32)
         self.init_state = torch.tensor(self.init_state, dtype=torch.float32)
         
         if self.pretrain_model:
-            for frac in self.pretrain_model:
-                k = int(frac*len(self.t))
-                self.model.train_model(self.t[:k], self.y_noisy[:k], self.init_state, 
-                                 num_epochs = self.max_iter,
-                                 rtol = self.rtol, atol = self.atol)
+            start_time = time.time()
+            self.time_elapsed = []
+            for i, frac in enumerate(self.pretrain_model):
+                k = int(frac * len(self.t))
+                self.model.train_model(self.t[:k], self.y_noisy[:k], self.init_state,
+                                    num_epochs=self.max_iter[i],
+                                    rtol=self.rtol, atol=self.atol)
+                if self.log or self.split_time:
+                    self.time_elapsed.append(time.time() - start_time)
+                    start_time = time.time()  # Reset start time for next segment
         else:
-            self.model.train_model(self.t, self.y_noisy, self.init_state, 
-                         num_epochs = self.max_iter, 
-                         rtol = self.rtol, atol = self.atol)
+            start_time = time.time()
+            self.model.train_model(self.t, self.y_noisy, self.init_state,
+                                num_epochs=self.max_iter,
+                                rtol=self.rtol, atol=self.atol)
+            self.time_elapsed = time.time() - start_time
+            
             
     def extract_results_pytorch(self):
         odeint_pred = self.model.predict(self.t, self.init_state)
@@ -344,11 +369,74 @@ class TrainerToy:
         mse_train = np.mean((self.y - odeint_pred.numpy())**2)
         mse_test = np.mean((self.y_test - odeint_pred_test.numpy())**2)
         
-        results = {
-            'odeint_pred': odeint_pred,
-            'odeint_pred_test': odeint_pred_test,
-            'mse_train': mse_train,
-            'mse_test': mse_test
-        }
+        if self.detailed:
+            results = {
+                'time_elapsed': self.time_elapsed,
+                'odeint_pred': odeint_pred,
+                'odeint_pred_test': odeint_pred_test,
+                'mse_train': mse_train,
+                'mse_test': mse_test
+            }
+        else:
+            results = {
+                'time_elapsed': self.time_elapsed,
+                'mse_train': mse_train,
+                'mse_test': mse_test
+            }
         
         return results
+    
+    # default parameters for toy datasets
+    @staticmethod
+    def load_trainer(type_, spacing_type="chebyshev", model_type = "pyomo", detailed = False):
+        data_params_ho = {
+            'N': 200,
+            'noise_level': 0.2,
+            'ode_type': "harmonic_oscillator",
+            'data_param': {"omega_squared": 2},
+            'start_time': 0,
+            'end_time': 10,
+            'spacing_type': spacing_type,
+            'initial_state': np.array([0.0, 1.0]),
+            'detailed': detailed
+        }
+
+        data_params_vdp = {
+            'N': 200,
+            'noise_level': 0.1,
+            'ode_type': "van_der_pol",
+            'data_param': {"mu": 1, "omega": 1},
+            'start_time': 0,
+            'end_time': 15,
+            'spacing_type': spacing_type,
+            'initial_state': np.array([0.0, 1.0]),
+            'detailed' : detailed
+        }
+
+        data_params_do = {
+            'N': 200,
+            'noise_level': 0.1,
+            'ode_type': "damped_oscillation",
+            'data_param': {"damping_factor": 0.1, "omega_squared": 1},
+            'start_time': 0,
+            'end_time': 10,
+            'spacing_type': spacing_type,
+            'initial_state': np.array([0.0, 1.0]),
+            'detailed' : detailed
+        }
+
+        if type_ == "ho":
+            p_ = data_params_ho
+        elif type_ == "vdp":
+            p_ = data_params_vdp
+        elif type_ == "do":
+            p_ = data_params_do
+        else:
+            raise ValueError(f"Invalid type {type_}")
+
+        if (model_type != 'pyomo' and model_type != 'jax_diffrax' and model_type != 'pytorch'):
+            raise ValueError(f"model_type should be pyomo or jax_diffrax")
+            
+        trainer = TrainerToy(p_, model_type = model_type)
+        trainer.prepare_inputs()
+        return trainer

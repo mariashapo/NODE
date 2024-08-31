@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import importlib
 import ast
+import jax.numpy as jnp
+from jaxlib import xla_extension as jax_types
 
 class Graphs:
     @staticmethod
@@ -37,7 +39,7 @@ class Graphs:
         
     @staticmethod
     def plot_single_boxplot(data, labels, title, ylabel, color='blue', label = 'Data Label',
-                            x_label = 'Model Size Configuration'):
+                            x_label = 'Model Size Configuration', y_log = True):
         n_groups = len(data)
         positions = [i + 1 for i in range(n_groups)]
         
@@ -47,7 +49,8 @@ class Graphs:
         plt.title(title)
         plt.xlabel(x_label)
         plt.ylabel(ylabel)
-        plt.yscale('log')
+        if y_log:
+            plt.yscale('log')
         
         plt.xticks(ticks=positions, labels=labels)
         
@@ -100,11 +103,21 @@ class Results:
         return df
     
     @staticmethod
+    def to_numpy(array):
+        """Converts JAX array to NumPy array if necessary."""
+        if isinstance(array, jnp.ndarray):
+            return np.array(array)
+        return array
+    
+    @staticmethod
     def group_into_lists(df, group_col, value_col):
         """
         Groups a DataFrame into lists.
         """
-        grouped = df.groupby(group_col).agg(list)[value_col]
+        df_copy = df.copy()
+        # check if jax types are present in the DataFrame
+        df_copy = df_copy.map(Results.to_numpy)
+        grouped = df_copy.groupby(group_col).agg(list)[value_col]
         return grouped
     
     @staticmethod
@@ -148,6 +161,33 @@ class Results:
         return df
     
     @staticmethod
+    def collect_data_toy(results):
+        flattened_data = []
+
+        for key, metrics in results.items():
+            entry = {}
+            if not isinstance(key, tuple):
+                key = [key]
+            for i, param in enumerate(key, start=1):
+                entry[f'param{i}'] = param
+
+            entry.update(metrics)
+
+            flattened_data.append(entry)
+
+        df = pd.DataFrame(flattened_data)
+        return df    
+    
+    @staticmethod
+    def series_to_lists(col):
+        """
+        Stacks columns of a DataFrame into lists.
+        To be used for plotting (boxplots, etc.)
+        """
+        l = [i.item() for i in col]
+        return l
+    
+    @staticmethod
     def columns_to_lists(df):
         """
         Stacks columns of a DataFrame into lists.
@@ -159,6 +199,8 @@ class Results:
     @staticmethod
     def prep_for_boxplots(df, col_x, col_y):
         df_grouped = Results.group_into_lists(df, col_x, col_y)
+        if not isinstance(df_grouped, pd.DataFrame):
+            df_grouped = pd.DataFrame(df_grouped)
         df_box_plot = Results.columns_to_lists(df_grouped)
         df_box_plot.update({'x_labels': df_grouped.index.tolist()})
         return pd.DataFrame(df_box_plot)
@@ -197,3 +239,11 @@ def reload_module(module_name, class_name):
     module = importlib.import_module(module_name)
     importlib.reload(module)
     return getattr(module, class_name)
+
+def convert_lists_in_tuple(param_tuple):
+    """
+    Converts all list elements in a tuple to string representations,
+    keeping all other elements unchanged.
+    """
+    
+    return tuple(str(item) if isinstance(item, list) else item for item in param_tuple)

@@ -11,6 +11,8 @@ from jax import random
 import flax.linen.initializers as initializers
 import diffrax as dfx
 
+rng = jax.random.PRNGKey(42)
+
 class NeuralODE(nn.Module):
     layer_widths: list
     time_invariant: bool = True
@@ -21,19 +23,24 @@ class NeuralODE(nn.Module):
 
     @nn.compact
     def __call__(self, x):
-        for width in self.layer_widths[:-1]:
-            x = nn.Dense(width, kernel_init=initializers.lecun_normal())(x)
+        for width in self.layer_widths[1:-1]:
+            x = nn.Dense(width, kernel_init=initializers.glorot_normal())(x)
             x = self.act_func(x)
-        x = nn.Dense(self.layer_widths[-1], kernel_init=initializers.lecun_normal())(x)
+        x = nn.Dense(self.layer_widths[-1], kernel_init=initializers.glorot_normal())(x)
         return x
 
-    def create_train_state(self, rng, learning_rate, regularizer=1e-5, rtol = 1e-3, atol = 1e-6, dt0 = 1e-3):
+    def create_train_state(self, rng, learning_rate, regularizer=1e-5, rtol = 1e-3, atol = 1e-6, dt0 = 1e-3, custom_params = None):
         self.regularizer = regularizer
         self.rtol = rtol
         self.atol = atol
         self.dt0 = dt0
         
-        params = self.init(rng, jnp.ones((self.layer_widths[0],)))['params']
+        if custom_params is not None:
+            params = custom_params
+        else:
+            input_size = self.layer_widths[0] 
+            params = self.init(rng, jnp.ones((input_size,)))['params']
+            
         tx = optax.adam(learning_rate)
         return train_state.TrainState.create(apply_fn=self.apply, params=params, tx=tx)
 
@@ -91,6 +98,7 @@ class NeuralODE(nn.Module):
 
     def train(self, state, t, observed_data, y0, num_epochs=np.inf, termination_loss=0, extra_args=None, 
               verbose=True, log=False):
+        
         self.term_loss = termination_loss
         self.max_iter = num_epochs
         
@@ -99,31 +107,32 @@ class NeuralODE(nn.Module):
             return self.train_step(state, t, observed_data, y0, extra_args)
 
         losses = []
+        losses_test = []
         
         epoch = 0
         while True:
             epoch += 1
             state, loss = train_step_jit(state, t, observed_data, y0, extra_args)
                       
-            if log and epoch % 10 == 0:
+            if log and epoch % log['epoch_recording_step'] == 0:
                 
                 if jnp.squeeze(observed_data).shape[0] != log['t'].shape[0]:
                     pass 
-                    # to accurately compute loss duuring pre-training
-                    """k = jnp.squeeze(observed_data).shape[0]
-                    pred = self.neural_ode(state.params, log['y_init'], log['t'][:k], state, log['extra_args'])
-                    losses.append(jnp.mean(jnp.square(pred - log['y'][:k])))"""
                 else:
                     pred = self.neural_ode(state.params, log['y_init'], log['t'], state, log['extra_args'])
+                    pred_test = self.neural_ode(state.params, log['y_init_test'], log['t_test'], state, log['extra_args_test'])
                     losses.append(np.mean(np.square(pred - log['y'])))
+                    losses_test.append(np.mean(np.square(pred_test - log['y_test'])))
 
             if epoch % 100 == 0:
                 if verbose:
                     print(f'Epoch {epoch}, Loss: {loss}')
             if loss < self.term_loss or epoch > self.max_iter:
                 break
-            
-        return state, losses
+        
+        self.state = state   
+        self.losses = (losses, losses_test)    
+        return state, self.losses
 
     def neural_ode(self, params, y0, t, state, extra_args=None): 
         def func(t, y, args):

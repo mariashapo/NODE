@@ -88,11 +88,13 @@ class Trainer:
         y0 = jnp.array(ys[0])
         
         if self.log:
+            step = self.log
             self.log = {
                 't': ts,
                 'y': ys,
                 'y_init': ys[0],
-                'extra_args': extra_args
+                'extra_args': extra_args,
+                'epoch_recording_step' : step
             }
         
         # prepare model

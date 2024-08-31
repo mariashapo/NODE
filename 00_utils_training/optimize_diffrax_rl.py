@@ -210,7 +210,8 @@ class ExperimentRunner:
                     file.write(f"Error in iteration {iter}: {e}\n")
                     continue
                 
-                param_comb = ExperimentRunner.convert_lists_in_tuple(param_comb)
+                if isinstance(param_comb, tuple):
+                    param_comb = ExperimentRunner.convert_lists_in_tuple(param_comb)
                 
                 try:
                     self.results_full[(param_comb, date)] = experiment_results

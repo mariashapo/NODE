@@ -10,19 +10,27 @@ from scipy.interpolate import interp1d
 import warnings
 
 class NeuralODE(nn.Module):
-    def __init__(self, layer_widths, learning_rate, time_invariant = True):
+    def __init__(self, layer_widths, learning_rate, custom_weights=None, time_invariant=True):
         super(NeuralODE, self).__init__()
-        # construct the neural network layers
         layers = []
+        self.layer_widths = layer_widths
+
         for i in range(len(layer_widths) - 1):
-            layers.append(nn.Linear(layer_widths[i], layer_widths[i + 1]))
+            layer = nn.Linear(layer_widths[i], layer_widths[i + 1])
+            # Initialize weights if custom weights are provided
+            if custom_weights and i < len(custom_weights):
+                weight, bias = custom_weights[i]
+                layer.weight.data = torch.from_numpy(weight).float()
+                layer.bias.data = torch.from_numpy(bias).float()
+            layers.append(layer)
             if i < len(layer_widths) - 2:
                 layers.append(nn.Tanh())
-                
+        
         self.network = nn.Sequential(*layers)
         self.optimizer = Adam(self.parameters(), lr=learning_rate, weight_decay=1e-5)
         self.criterion = torch.nn.MSELoss()
         self.time_invariant = time_invariant
+
                 
     def create_interpolators(self):
         self.extra_intputs_checks()

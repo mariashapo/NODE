@@ -165,8 +165,9 @@ class ExperimentRunner:
             
         elif self.opt_aim == 'network_size':
             sizes = [[6, 16, 1], [6, 32, 1], [6, 64, 1], [6, 128, 1]]
-            reg = [1e-7, 1e-5]
-            param_combinations = list(itertools.product(sizes, reg))
+            reg = [1e-7, 1e-6, 1e-5]
+            tol = [1e-8, 1e-6, 1e-4]
+            param_combinations = list(itertools.product(sizes, reg, tol))
         else:
             raise ValueError("optimization_aim not recognized")
         
@@ -207,6 +208,7 @@ class ExperimentRunner:
         elif self.opt_aim == 'network_size':
             self.ls = param_comb[0]
             self.penalty = param_comb[1]
+            self.params_solver['tol'] = param_comb[2]
             
         elif self.opt_aim == 'default':
             pass
@@ -252,6 +254,15 @@ class ExperimentRunner:
         self.params_data['start_date'] = date
         print(f"Running iteration {iter} with parameters: {param_comb}")
         file.write(f"Running iteration {iter} with parameters: {param_comb}\n")
+        
+    @staticmethod
+    def convert_lists_in_tuple(param_tuple):
+        """
+        Converts all list elements in a tuple to string representations,
+        keeping all other elements unchanged.
+        """
+        
+        return tuple(str(item) if isinstance(item, list) else item for item in param_tuple)
     
     def run(self):
         with open('results.txt', 'w'):
@@ -284,11 +295,8 @@ class ExperimentRunner:
                     continue
                 
                 try:
-                    if self.opt_aim == 'network_size':
-                        key_name = (str(param_comb[0]), param_comb[1], date)
-                        self.results_full[key_name] = experiment_results
-                    else:
-                        self.results_full[(param_comb, date)] = experiment_results
+                    param_comb = ExperimentRunner.convert_lists_in_tuple(param_comb)
+                    self.results_full[(param_comb, date)] = experiment_results
                 except Exception as e:
                     print(f"Failed to extract results: {e}")
                     continue                

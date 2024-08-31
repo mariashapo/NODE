@@ -162,10 +162,10 @@ class NeuralODEPyomoADMM:
     def create_objective(self, model, y_observed, t):
         def _objective(m):
             data_fit = sum((m.y[i] - y_observed[i])**2 for i in range(len(t)))
-            reg_smooth = sum((m.y[i] - m.y[i + 1])**2 for i in range(len(t) - 1))
+            # reg_smooth = sum((m.y[i] - m.y[i + 1])**2 for i in range(len(t) - 1)) 
             reg = self.compute_regularization_term(m)
             admm_penalty = self.compute_admm_penalty(m) if self.iter >= 1 else 0
-            return data_fit + self.penalty_lambda_reg * reg + self.penalty_lambda_smooth * reg_smooth + admm_penalty
+            return data_fit + self.penalty_lambda_reg * reg + admm_penalty   #+ self.penalty_lambda_smooth * reg_smooth
         return _objective
     
     # --------------------------------------------- MODEL OUTPUT ---------------------------------------------- # 
