@@ -7,19 +7,19 @@ from scipy.ndimage import gaussian_filter1d
 
 import sys
 import os
+import importlib
 
 path_ = os.path.abspath(os.path.join('..', '00_utils'))
 if path_ not in sys.path:
     sys.path.append(path_)
 
-import collocation_obj
-Collocation = collocation_obj.Collocation
+def reload_module(module_name, class_name):
+    module = importlib.import_module(module_name)
+    importlib.reload(module)
+    return getattr(module, class_name)
 
-# TO DO :
+Collocation = reload_module('collocation_obj', 'Collocation')
 
-# currently the data is loaded twice for ADMM, this does not make sense
-# -> implement a DataPreprocessor class that loads data with the spacing in between data points specified
-# ---> should it be spacing or just 2 separate start dates?
 
 class DataPreprocessor:
     def __init__(self, file_path, start_date, number_of_points, n_days, m, 
@@ -169,6 +169,7 @@ class DataPreprocessor:
             t_train = np.linspace(t_train.min(), t_train.max(), num_nodes)
             t_test = np.linspace(t_test.min(), t_test.max(), num_nodes_test)
         else:
+            Collocation = reload_module('collocation_obj', 'Collocation')
             collocation_train = Collocation(num_nodes, t_train.min(), t_train.max(), self.spacing)
             t_train = collocation_train.compute_nodes()
             self.collocation_train = collocation_train

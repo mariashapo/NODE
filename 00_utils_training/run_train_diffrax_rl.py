@@ -27,7 +27,7 @@ NeuralODE_JAX = nn_jax_diffrax.NeuralODE
 
 
 class Trainer:
-    def __init__(self, params_results, params_data, params_model):
+    def __init__(self, params_results, params_data, params_model, trained_wb = None):
         # data loading parameters
         self.file_path = params_data['file_path']
         self.start_date = params_data['start_date']
@@ -51,6 +51,8 @@ class Trainer:
         self.plot = params_results['plot']
         self.log = params_results.get('log', False)
         self.split_time = params_results.get('split_time', False)
+        
+        self.trained_wb = trained_wb
         
         self.rng = random.PRNGKey(42)
         self.experiment_results = {}
@@ -87,6 +89,13 @@ class Trainer:
         extra_args = (Xs, ts)
         y0 = jnp.array(ys[0])
         
+        ys_test = jnp.atleast_2d(jnp.array(df_test['y'])).T
+        ts_test = jnp.array(df_test['t'])
+        Xs_test = jnp.array(df_test.drop(columns=['y', 't']))
+        extra_args_test = (Xs_test, ts_test)
+        y0_test = jnp.array(ys_test[0])
+        
+        
         if self.log:
             step = self.log
             self.log = {
@@ -94,12 +103,17 @@ class Trainer:
                 'y': ys,
                 'y_init': ys[0],
                 'extra_args': extra_args,
-                'epoch_recording_step' : step
+                'epoch_recording_step' : step,
+                't_test': ts_test,
+                'y_test': ys_test,
+                'y_init_test': ys_test[0],
+                'extra_args_test': extra_args_test,
             }
         
         # prepare model
         node_model = NeuralODE_JAX(self.layer_sizes, time_invariant=True)
-        state = node_model.create_train_state(self.rng, self.learning_rate, self.penalty)
+        state = node_model.create_train_state(self.rng, self.learning_rate, self.penalty, 
+                                              rtol = 1e-3, atol = 1e-6, dt0 = 1e-3, custom_params = self.trained_wb)
         
         start_time = time.time()
         
@@ -139,12 +153,6 @@ class Trainer:
         self.experiment_results = {}
         self.experiment_results['times_elapsed'] = self.time_elapsed
         self.experiment_results['mse_diffrax'] = np.mean(np.square(np.squeeze(y_train_pred) - np.squeeze(ys)))
-        
-        ys_test = jnp.atleast_2d(jnp.array(df_test['y'])).T
-        ts_test = jnp.array(df_test['t'])
-        Xs_test = jnp.array(df_test.drop(columns=['y', 't']))
-        extra_args_test = (Xs_test, ts_test)
-        y0_test = jnp.array(ys_test[0])
         
         y_test_pred = node_model.neural_ode(state.params, y0_test, ts_test, state, extra_args_test)      
         

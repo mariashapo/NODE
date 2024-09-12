@@ -68,6 +68,8 @@ class ExperimentRunner:
         self.param_combinations = self.define_param_combinations()
         self.metrics = self.initialize_metrics()
         
+        self.trained_wb = self.extra_inputs.get('trained_wb', None)
+        
         # reload the training module
         importlib.reload(run_train_diffrax_rl)
         self.Trainer = run_train_diffrax_rl.Trainer
@@ -107,8 +109,8 @@ class ExperimentRunner:
             param_combinations = list(itertools.product(layer_sizes, regularization, num_epochs))
         elif self.opt_aim == 'convergence':
             param_combinations = [1]
-            if not self.params_results['log']:
-                raise ValueError("log must be set to True for convergence optimization")
+        elif self.opt_aim == 'learning_rate':
+            param_combinations = [1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5]
         else:
             raise ValueError("optimization_aim not recognized")
         
@@ -137,6 +139,10 @@ class ExperimentRunner:
                 
         elif self.opt_aim == 'default':
             pass
+        
+        elif self.opt_aim == 'learning_rate':
+            self.params_model['learning_rate'] = param_comb
+        
         else:
             raise ValueError("optimization_aim not recognized")
   
@@ -201,7 +207,7 @@ class ExperimentRunner:
                 self.update_date(date, param_comb, file, iter)
                 
                 try:
-                    trainer = self.Trainer(self.params_results, self.params_data, self.params_model)
+                    trainer = self.Trainer(self.params_results, self.params_data, self.params_model, self.trained_wb)
                     if iter == 1:
                         trainer.clear_directory()
                     experiment_results = trainer.train()
@@ -220,7 +226,7 @@ class ExperimentRunner:
                     file.write(f"Error in iteration {iter}: {e}\n")
                     continue
                 
-                if self.params_results['log']:
+                if self.params_results['log'] > 0:
                     self.losses.append(trainer.losses)
 
                 self.collect_metrics(trainer.experiment_results)
@@ -235,10 +241,11 @@ class ExperimentRunner:
             except Exception as e:
                 print(f"Failed to compute averages: {e}")
                 continue
+        if self.params_results['log'] > 0 :
+            self.results_full['training_losses'] = self.losses
         
         file.close()
-    
-        
+          
     def save_results(self, description):
         formatted_time = time.strftime('%Y-%m-%d_%H-%M-%S')
         path = f'results/{description}_{formatted_time}_full.pkl'
@@ -246,7 +253,26 @@ class ExperimentRunner:
             pickle.dump(self.results_full, file)
         print(f"Results saved to {path}")
         
-        path = f'results/{description}_{formatted_time}_avg.pkl'
-        with open(path, 'wb') as file:
-            pickle.dump(self.results_avg, file)
-        print(f"Results saved to {path}")
+        if self.opt_aim != 'convergence':
+            path = f'results/{description}_{formatted_time}_avg.pkl'
+            with open(path, 'wb') as file:
+                pickle.dump(self.results_avg, file)
+            print(f"Results saved to {path}")
+            
+    @staticmethod
+    def format_weights_from_pyomo(wb_trained):
+        """
+        Format the weights from the Pyomo model to a dictionary with the same format as the JAX model.
+        """
+        custom_params = {
+            'Dense_0': {
+                'kernel': jnp.array(wb_trained['W1']).T,
+                'bias': jnp.array(wb_trained['b1'])
+            },
+            'Dense_1': {
+                'kernel': jnp.array(wb_trained['W2']).T,
+                'bias': jnp.array(wb_trained['b2'])
+            }
+        }
+
+        return custom_params

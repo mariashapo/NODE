@@ -193,9 +193,9 @@ class NeuralODEPyomo:
             if self.act_func == "tanh":
                 hidden = [pyo.tanh(h) for h in hidden]
             elif self.act_func == "sigmoid":
-                hidden = [1 / (1 + pyo.exp(-h) + epsilon) for h in hidden]
+                hidden = [1 / (1 + pyo.exp(-h)) for h in hidden]
             elif self.act_func == "softplus":
-                hidden = [pyo.log(1 + pyo.exp(h) + epsilon) for h in hidden]
+                hidden = [pyo.log(1 + pyo.exp(h)) for h in hidden]
             else:
                 raise ValueError("Unsupported activation function.")
                 

@@ -48,7 +48,6 @@ class TrainerToy:
         self.spacing_type = params_data['spacing_type']
         self.init_state = params_data['initial_state']
         self.detailed = params_data.get('detailed', False)        
-        
         m = model_type
         if m in ['pyomo', 'jax_diffrax', 'pytorch']:
             self.model_type = m
@@ -176,7 +175,7 @@ class TrainerToy:
         self.termination = result['termination_condition']
         print(result)
         
-    def extract_results_pyomo(self):
+    def extract_results_pyomo(self, detailed = False):
         direct_model_pred = self.model.extract_solution()
         # regenerate train data
         odeint_pred = self.model.neural_ode(self.init_state, self.t)
@@ -185,7 +184,7 @@ class TrainerToy:
         mse_train = np.mean((self.y - odeint_pred)**2)
         mse_test = np.mean((self.y_test - odeint_pred_test)**2)
         
-        if self.detailed:
+        if self.detailed or detailed:
             results = {
                 'time_elapsed': self.time_elapsed,
                 'direct_model_pred': direct_model_pred,
@@ -277,6 +276,7 @@ class TrainerToy:
                 
                 if self.log or self.split_time:
                     self.time_elapsed.append(time.time() - start_time)
+                    start_time = time.time()  # Reset start time for next segment
         else:
             self.state, losses_ = self.model.train(self.state, self.t, 
                                           self.y_noisy, self.init_state,
@@ -330,6 +330,19 @@ class TrainerToy:
         self.log = params_model.get('log', False)
         self.split_time = params_model.get('split_time', False)
         
+        if self.log:
+            self.log = {
+                't': torch.tensor(self.t, dtype=torch.float32), 
+                'y': torch.tensor(self.y, dtype=torch.float32),
+                'y_init': torch.tensor(self.init_state, dtype=torch.float32),
+                'extra_args': None,
+                'epoch_recording_step' : self.log,
+                't_test': torch.tensor(self.t_test, dtype=torch.float32),
+                'y_test':  torch.tensor(self.y_test, dtype=torch.float32),
+                'y_init_test': torch.tensor(self.init_state_test, dtype=torch.float32),
+                'extra_args_test': None
+            }
+        
     def train_pytorch(self, params_model, custom_params):
         self.prepare_train_params_pytorch(params_model)
         
@@ -341,26 +354,36 @@ class TrainerToy:
         self.y_noisy = torch.tensor(self.y_noisy, dtype=torch.float32)
         self.init_state = torch.tensor(self.init_state, dtype=torch.float32)
         
+        start_time = time.time()
+        self.losses = []
+        
         if self.pretrain_model:
-            start_time = time.time()
-            self.time_elapsed = []
+            if self.log or self.split_time:
+                start_time = time.time()
+                self.time_elapsed = []
+                
             for i, frac in enumerate(self.pretrain_model):
                 k = int(frac * len(self.t))
-                self.model.train_model(self.t[:k], self.y_noisy[:k], self.init_state,
+                losses_ = self.model.train_model(self.t[:k], self.y_noisy[:k], self.init_state,
                                     num_epochs=self.max_iter[i],
-                                    rtol=self.rtol, atol=self.atol)
+                                    rtol=self.rtol, atol=self.atol, log = self.log)
+                self.losses.append(losses_)
+                
                 if self.log or self.split_time:
                     self.time_elapsed.append(time.time() - start_time)
                     start_time = time.time()  # Reset start time for next segment
         else:
-            start_time = time.time()
-            self.model.train_model(self.t, self.y_noisy, self.init_state,
+            losses_ = self.model.train_model(self.t, self.y_noisy, self.init_state,
                                 num_epochs=self.max_iter,
-                                rtol=self.rtol, atol=self.atol)
+                                rtol=self.rtol, atol=self.atol, log = self.log)
+            
+            self.losses.append(losses_)
+            
+        if not (self.log or self.split_time) or not self.pretrain_model:     
             self.time_elapsed = time.time() - start_time
             
             
-    def extract_results_pytorch(self):
+    def extract_results_pytorch(self, detailed = False):
         odeint_pred = self.model.predict(self.t, self.init_state)
         self.t_test = torch.tensor(self.t_test, dtype=torch.float32)
         self.init_state_test = torch.tensor(self.init_state_test, dtype=torch.float32)
@@ -369,7 +392,7 @@ class TrainerToy:
         mse_train = np.mean((self.y - odeint_pred.numpy())**2)
         mse_test = np.mean((self.y_test - odeint_pred_test.numpy())**2)
         
-        if self.detailed:
+        if self.detailed or detailed:
             results = {
                 'time_elapsed': self.time_elapsed,
                 'odeint_pred': odeint_pred,

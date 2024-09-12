@@ -96,7 +96,7 @@ class NeuralODE(nn.Module):
         state = state.apply_gradients(grads=grads)
         return state, loss
 
-    def train(self, state, t, observed_data, y0, num_epochs=np.inf, termination_loss=0, extra_args=None, 
+    def train(self, state, t, observed_data, y0, num_epochs=np.inf, termination_loss=0, termination_time=0, extra_args=None, 
               verbose=True, log=False):
         
         self.term_loss = termination_loss

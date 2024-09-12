@@ -62,7 +62,126 @@ class Graphs:
         plt.show()
 
 
+
+class Graphs_training:
+    def __init__(self):
+        self.regular_pre_time = None
+        self.pyomo_pre_time = None
+        self.regular_pre_time_pt = None
+        self.pyomo_pre_time_pt = None
+    
+    def set_pretraining_time(self, pretraining_time, type):
+        
+        if type == 'regular':
+            self.regular_pre_time = pretraining_time
+        elif type == 'pyomo':
+            self.pyomo_pre_time = pretraining_time
+        elif type == 'pt_regular':
+            self.regular_pre_time_pt = pretraining_time
+        elif type == 'pt_pyomo':
+            self.pyomo_pre_time_pt = pretraining_time
+        else:
+            raise ValueError(f"Unknown pre-training type '{type}'.")
+    
+    @staticmethod
+    def plot_training_losses(df, title, ylabel, x_label='Epochs', y_log=True):
+        plt.figure(figsize=(10, 6))
+        for i, row in df.iterrows():
+            plt.plot(row['training_loss'], label=row.name)
+        
+        plt.title(title)
+        plt.xlabel(x_label)
+        plt.ylabel(ylabel)
+        if y_log:
+            plt.yscale('log')
+        
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+
+        
+    @staticmethod
+    def extract_training_loss(df, loss_col='training_loss', index_col='pretraining'):
+        """
+        Ensure 'training_loss' and 'pretraining' columns are present in the DataFrame.
+        """
+        def extract_training_loss_row(row):
+        # check if the 'training_loss' is not empty and has the required index
+            if isinstance(row[loss_col], list) and len(row[loss_col]) > row['index']:
+                return row[loss_col][row['index']]
+                # if no pre-training 0th index is the full training
+                # if there is pre-training 0th index is the pre-training and 1st index is the full training
+            return None  
+
+        df['index'] = df[index_col].astype(int)  # Convert True/False to 1/0
+
+        df[loss_col] = df.apply(extract_training_loss_row, axis=1)
+        # drop temporary index
+        df.drop(columns=['index'], inplace=True)
+        return df
+    
+    @staticmethod
+    def split_train_test_losses(df):
+        """
+        Splits the training and testing losses into separate columns.
+        """
+        # ensure both training and testing losses are extracted from the original data structure
+        df['training_loss'], df['testing_loss'] = zip(*df['training_loss'].apply(lambda x: (x[0], x[1]) if len(x) > 1 else (None, None)))
+
+        return df
+    
+    @staticmethod
+    def prepare_timings_general(df):
+        """
+        Prepares the timings for plotting.
+        """
+        n_epochs = df['training_loss'].apply(len)
+        
+        # calculate time per epoch; use element-wise division
+        t_per_epoch = df['time_elapsed'] / n_epochs
+        
+        # calculate times for each row using the previously calculated n_epochs and t_per_epoch
+        df['times'] = df.apply(lambda row: np.arange(n_epochs.loc[row.name]) * t_per_epoch.loc[row.name], axis=1)    
+        
+        return df
+    
+    def prepare_timings(self, df):
+        """
+        Prepares the timings for plotting.
+        """
+        n_epochs = df['training_loss'].apply(len)
+        
+        # calculate time per epoch; use element-wise division
+        t_per_epoch = df['time_elapsed'] / n_epochs
+        
+        # calculate times for each row using the previously calculated n_epochs and t_per_epoch
+        df['times'] = df.apply(lambda row: np.arange(n_epochs.loc[row.name]) * t_per_epoch.loc[row.name], axis=1)    
+        
+        if self.regular_pre_time:
+            map_regular = (df.type == 'jd') & (df.pretraining == True)
+            df.loc[map_regular, 'times'] = df.loc[map_regular, 'times'] + self.regular_pre_time
+        
+        if self.pyomo_pre_time:
+            map_pyomo = (df.type == 'jd') & (df.pyomo_pretraining == True)
+            df.loc[map_pyomo, 'times'] = df.loc[map_pyomo, 'times'] + self.pyomo_pre_time
+        
+        if self.regular_pre_time_pt:
+            map_regular_pt = (df.type == 'pt') & (df.pretraining == True)
+            df.loc[map_regular_pt, 'times'] = df.loc[map_regular_pt, 'times'] + self.regular_pre_time_pt
+            
+        if self.pyomo_pre_time_pt:
+            map_pyomo_pt = (df.type == 'pt') & (df.pyomo_pretraining == True)
+            df.loc[map_pyomo_pt, 'times'] = df.loc[map_pyomo_pt, 'times'] + self.pyomo_pre_time_pt
+        
+        return df
+
 class Results:
+    @staticmethod
+    def load_results(file_path):
+        with open(file_path, 'rb') as f:
+            results = pickle.load(f)
+        return results
+    
     @staticmethod
     def key_sample(data, n = 0):
         """
@@ -121,45 +240,51 @@ class Results:
         return grouped
     
     @staticmethod
-    def collect_data(results):
+    def collect_data(results, custom_names=None):
         """
         Collects data from results dictionary and returns a DataFrame.
-        Keys are set as index.
-        Values are lists of values for each key.
-        """
-        keys = [k[0] for k in results.keys()]
-        keys = list(set(keys))
+        Optionally allows passing custom names for both data keys and DataFrame columns.
 
+        Parameters:
+        - results: dict, the input dictionary containing the data.
+        - custom_names: dict, optional, a dictionary mapping original keys to custom column names.
+
+        Returns:
+        - pd.DataFrame, the resulting DataFrame with the collected data.
+        """
+
+        # Default keys and their corresponding column names in the results dictionary
+        if not custom_names:
+            custom_names = {
+                'times_elapsed': 'Times_Elapsed',
+                'mse_odeint': 'MSE_odeint',
+                'mse_coll_ode': 'MSE_collocation',
+                'mse_odeint_test': 'MSE_odeint_test',
+                'mse_coll_ode_test': 'MSE_collocation_test'
+            }
+
+        keys = list(set(k[0] for k in results.keys()))
+
+        # Function to initialize a dictionary with the unique keys
         def init_di():
             return {key: [] for key in keys}
 
-        times_elapsed = init_di()
-        mse_odeint = init_di()
-        mse_coll_ode = init_di()
-        mse_odeint_test = init_di()
-        mse_coll_ode_test = init_di()
+        # Initialize the data dictionary dynamically using the custom column names
+        data_dict = {custom_name: init_di() for custom_name in custom_names.values()}
 
+        # Populate the data dictionary with values from results
         for key in keys:
             for k, v in results.items():
                 if k[0] == key:
-                    times_elapsed[key].append(v['times_elapsed'])
-                    mse_odeint[key].append(v['mse_odeint'])
-                    mse_coll_ode[key].append(v['mse_coll_ode'])
-                    mse_odeint_test[key].append(v['mse_odeint_test'])
-                    mse_coll_ode_test[key].append(v['mse_coll_ode_test'])
+                    for original_key, column_name in custom_names.items():
+                        data_dict[column_name][key].append(v[original_key])
 
-        data = {
-            'Times_Elapsed': times_elapsed,
-            'MSE_odeint': mse_odeint,
-            'MSE_collocation': mse_coll_ode,
-            'MSE_odeint_test': mse_odeint_test,
-            'MSE_collocation_test': mse_coll_ode_test
-        }
-        
-        df = pd.DataFrame(data, index=keys)
+        # Create the DataFrame using the populated data dictionary
+        df = pd.DataFrame(data_dict, index=keys)
         df.sort_index(inplace=True)
+
         return df
-    
+            
     @staticmethod
     def collect_data_toy(results):
         flattened_data = []
@@ -227,7 +352,6 @@ class Results:
         filtered_df.drop(columns=['label_copy'], inplace=True)
 
         return filtered_df
-    
     
 def has_nested_tuple(t):
     for item in t:

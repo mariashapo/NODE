@@ -1,0 +1,20 @@
+Running iteration 1 with parameters: 1
+param_comb: 1, date: 2015-01-10, results: {'times_elapsed': 69.90831899642944, 'mse_diffrax': 0.005137052143962068, 'mse_diffrax_test': 0.02288656045668636}
+Running iteration 2 with parameters: 1
+param_comb: 1, date: 2015-02-14, results: {'times_elapsed': 66.37283706665039, 'mse_diffrax': 0.0025683878191534205, 'mse_diffrax_test': 0.13522462796219692}
+Running iteration 3 with parameters: 1
+param_comb: 1, date: 2015-03-21, results: {'times_elapsed': 66.607097864151, 'mse_diffrax': 0.0026380955808814367, 'mse_diffrax_test': 0.10189827331736653}
+Running iteration 4 with parameters: 1
+param_comb: 1, date: 2015-04-25, results: {'times_elapsed': 63.45415115356445, 'mse_diffrax': 0.003620198223359603, 'mse_diffrax_test': 0.09799932704751281}
+Running iteration 5 with parameters: 1
+param_comb: 1, date: 2015-05-30, results: {'times_elapsed': 63.403225898742676, 'mse_diffrax': 0.005368852094218741, 'mse_diffrax_test': 0.7067526679128949}
+Running iteration 6 with parameters: 1
+param_comb: 1, date: 2015-07-04, results: {'times_elapsed': 68.20788407325745, 'mse_diffrax': 0.005587107727777961, 'mse_diffrax_test': 0.2767641464256416}
+Running iteration 7 with parameters: 1
+param_comb: 1, date: 2015-08-08, results: {'times_elapsed': 63.91644096374512, 'mse_diffrax': 0.0030201920129607628, 'mse_diffrax_test': 0.36237559640924355}
+Running iteration 8 with parameters: 1
+param_comb: 1, date: 2015-09-12, results: {'times_elapsed': 67.30452299118042, 'mse_diffrax': 0.0028529143993314067, 'mse_diffrax_test': 0.26024380159698846}
+Running iteration 9 with parameters: 1
+param_comb: 1, date: 2015-10-17, results: {'times_elapsed': 65.26762080192566, 'mse_diffrax': 0.002837904584717879, 'mse_diffrax_test': 0.7327250746084846}
+Running iteration 10 with parameters: 1
+param_comb: 1, date: 2015-11-21, results: {'times_elapsed': 55.97678780555725, 'mse_diffrax': 0.003039218305772612, 'mse_diffrax_test': 0.4295656607265927}

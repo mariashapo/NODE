@@ -56,8 +56,6 @@ class ExperimentRunner:
         self.params_results['plot_collocation'] = self.extra_inputs.get('plot_collocation', True)
         self.params_results['plot_odeint'] = self.extra_inputs.get('plot_odeint', False)
         
-        self.params_model = {'layer_sizes': self.ls, 'penalty': self.penalty}
-        
         if optimization_aim == 'convergence':
             self.convergence_step = self.extra_inputs.get('convergence_steps', 5)
         
@@ -74,6 +72,7 @@ class ExperimentRunner:
         if 'params_model' in self.extra_inputs.keys():
             self.ls = self.extra_inputs['params_model'].get('layer_sizes', [6, 32, 1])
             self.penalty = self.extra_inputs['params_model'].get('penalty', 1e-5)
+            self.w_init_method = self.extra_inputs['params_model'].get('w_init_method', 'xavier')
         else:
             print('Using default parameters for model')
             self.ls = [6, 32, 1]
@@ -137,7 +136,6 @@ class ExperimentRunner:
         elif self.opt_aim == 'tolerance_mix':
             tol = [1e-4, 1e-6, 1e-8]
             tol_inf_and_viol = [1e-2, 1e-4]
-            #tol_dual_inf = [10, 1, 1e-1]
             bound_relax_factor = [0.1, 1e-4, 1e-8]
             param_combinations = list(itertools.product(tol, tol_inf_and_viol, tol_inf_and_viol, bound_relax_factor))
             
@@ -215,7 +213,7 @@ class ExperimentRunner:
         else:
             raise ValueError("optimization_aim not recognized")
         
-        self.params_model = {'layer_sizes': self.ls, 'penalty': self.penalty}
+        self.params_model = {'layer_sizes': self.ls, 'penalty': self.penalty, 'w_init_method': self.w_init_method}
         
     @staticmethod
     def generate_dates(start_date, sequence_len = 5, frequency = 2):
@@ -282,12 +280,18 @@ class ExperimentRunner:
                     break
                 
                 try:
-                    trainer = self.Trainer(self.params_results, self.params_data, self.params_model, self.params_solver, self.params_ode)
+                    if iter != 1:
+                        # caching previous computed derivate matrix
+                        Ds_train = self.trainer.Ds_train
+                        Ds_test = self.trainer.Ds_test
+                    else:
+                        Ds_train, Ds_test = None, None    
+                    self.trainer = self.Trainer(self.params_results, self.params_data, self.params_model, self.params_solver, self.params_ode, Ds_train = Ds_train, Ds_test = Ds_test)
                     if iter == 1:
-                        trainer.clear_directory()
-                    experiment_results = trainer.train()
-                    print(f"message: {trainer.termination}")
-                    if self.opt_aim == 'convergence' and 'optimal' in trainer.termination:
+                        self.trainer.clear_directory()
+                    experiment_results = self.trainer.train()
+                    print(f"message: {self.trainer.termination}")
+                    if self.opt_aim == 'convergence' and 'optimal' in self.trainer.termination:
                         print(f"Optimal solution for {date} found in iteration {param_comb}")
                         self.optimal[date] = True
                 except Exception as e:
@@ -295,7 +299,8 @@ class ExperimentRunner:
                     continue
                 
                 try:
-                    param_comb = ExperimentRunner.convert_lists_in_tuple(param_comb)
+                    if isinstance(param_comb, tuple):
+                        param_comb = ExperimentRunner.convert_lists_in_tuple(param_comb)
                     self.results_full[(param_comb, date)] = experiment_results
                 except Exception as e:
                     print(f"Failed to extract results: {e}")
@@ -321,7 +326,13 @@ class ExperimentRunner:
                     continue
             
         file.close()
-            
+    
+    def run_on_prediction(self):
+        pass
+    
+    def save_trained_weights(self, description):
+        self.trainer.save_trained_weights(description)
+           
     def save_results(self, description):
         formatted_time = time.strftime('%Y-%m-%d_%H-%M-%S')
         path = f'results/{description}_{formatted_time}_full.pkl'

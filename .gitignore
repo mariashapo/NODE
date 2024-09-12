@@ -5,6 +5,7 @@ material
 data
 *.csv
 */*.csv
-*/*.txt
+data.txt
 */*.json
 *.png
+00_archive

@@ -9,6 +9,7 @@ from scipy.special import roots_jacobi
 
 jax.config.update("jax_enable_x64", True)
 
+
 class Collocation:
     def __init__(self, n, a = -1, b = 1, spacing_type = "chebyshev", include_init = False):
         """
@@ -24,7 +25,7 @@ class Collocation:
         self.include_init = include_init
     
     def compute_nodes(self, unscaled = False):
-        if self.spacing_type == "chebyshev":
+        if self.spacing_type == "chebyshev" or self.spacing_type == "chebyshev_v2":
             # the differential matrix  for chebyshev nodes is computed using the scaled nodes
             # hence, no need for the unscaled nodes
             self.nodes = Collocation.chebyshev_nodes_second_kind(self.n, self.a, self.b)
@@ -53,14 +54,18 @@ class Collocation:
         return self.nodes
         
     def compute_derivative_matrix(self, nodes = None):
-        if self.spacing_type in ['chebyshev', 'gauss_legendre', 'gauss_radau', 'gauss_lobatto']:
+        if self.spacing_type in ['chebyshev', 'chebyshev_v2', 'gauss_legendre', 'gauss_radau', 'gauss_lobatto']:
             # chebyshev nodes are already scaled
             if nodes is not None:
                 # nodes can be provided or computed
                 self.nodes = nodes
             else:
                 self.compute_nodes()
-            self.D = Collocation.derivative_matrix_barycentric_simplfied(self.nodes)
+            #self.D = Collocation.derivative_matrix_barycentric_simplfied(self.nodes)
+            if self.spacing_type == "chebyshev":
+                self.D = Collocation.derivative_matrix_barycentric_v1(self.nodes)
+            else:
+                self.D = Collocation.derivative_matrix_barycentric_v2(self.nodes)
             
         elif self.spacing_type in ["gauss_legendre_leg", "gauss_legendre_radau_leg"]:
             # compute unscaled and leave the scaling until after the differentiation matrix is computed
@@ -150,6 +155,28 @@ class Collocation:
         return np.sort(nodes)    
     
     # --------------------------------- Barycentric Form --------------------------------- 
+    
+    @staticmethod
+    def derivative_matrix_barycentric_v2(nodes):
+        # simpler version of the derivative matrix calculation based on:
+        # https://scicomp.stackexchange.com/questions/32918/need-an-example-legendre-gauss-radau-pseudospectral-differentiation-matrix-or-ma
+        
+        node_differences = nodes[:, jnp.newaxis] - nodes
+        # prevent division by zero 
+        node_differences = node_differences.at[jnp.diag_indices_from(node_differences)].set(1)
+        product_of_differences = jnp.prod(node_differences, axis=1)
+        derivative_matrix = product_of_differences[:, jnp.newaxis] / (product_of_differences * node_differences)
+        diagonal_adjustments = 1 - jnp.sum(derivative_matrix, axis=1)
+        derivative_matrix = derivative_matrix.at[jnp.diag_indices_from(derivative_matrix)].set(diagonal_adjustments)
+        
+        return derivative_matrix
+    
+    @staticmethod
+    def derivative_matrix_barycentric_v1(nodes):
+        weights = Collocation.compute_lagrange_weights(nodes)
+        D = Collocation.lagrange_derivative(nodes, weights)
+        return D
+    
     @staticmethod
     def compute_lagrange_weights(nodes):
         """
@@ -172,49 +199,53 @@ class Collocation:
             weights = weights.at[j].set(1.0 / product)
 
         return weights
-        
+    
     @staticmethod
-    def derivative_matrix_barycentric(nodes):
+    def lagrange_derivative_vectorized(xi, weights):
+        xi = jnp.array(xi, dtype=jnp.float64)
+        weights = jnp.array(weights, dtype=jnp.float64)
+        n = len(xi)
+        
+        xi_diff = xi[:, None] - xi[None, :]  # shape (n, n)
+        xi_diff = jnp.where(xi_diff == 0, 1e-20, xi_diff)  # Avoid division by zero, use small number
+        
+        D = jnp.where(xi_diff != 1e-20, weights[None, :] / weights[:, None] / xi_diff, 0)
+        
+        # Explicitly zero out diagonal before sum
+        D = D.at[jnp.arange(n), jnp.arange(n)].set(0)
+        
+        # Use more accurate summation if necessary
+        diagonal_values = -jnp.sum(D, axis=1)
+        D = D.at[jnp.arange(n), jnp.arange(n)].set(diagonal_values)
+
+        return D
+    
+    @staticmethod
+    def lagrange_derivative(xi, weights):
         """
         Compute the derivatives of the Lagrange basis polynomials at the nodes xi.
 
         Parameters:
-        nodes (array_like): The nodes at which the Lagrange basis polynomials are defined.
+        xi (array_like): The nodes at which the Lagrange basis polynomials are defined.
         weights (array_like): The weights for each node in the array of nodes xi.
 
         Returns:
         array_like: The derivative matrix of the Lagrange basis polynomials at the nodes xi.
         """
-        weights = Collocation.compute_lagrange_weights(nodes)
-        
-        n = len(nodes)
+        n = len(xi)
         D = jnp.zeros((n, n))
 
         for i in range(n):
             for j in range(n):
                 if i != j:
-                    D = D.at[i, j].set(weights[j] / weights[i] / (nodes[i] - nodes[j]))
+                    D = D.at[i, j].set(weights[j] / weights[i] / (xi[i] - xi[j]))
 
         # Diagonal elements = the negative sum of the off-diagonal elements in the same row
         for i in range(n):
             D = D.at[i, i].set(-jnp.sum(D[i, :i]) - jnp.sum(D[i, i+1:]))
-        
+
         return D
-    
-    @staticmethod
-    def derivative_matrix_barycentric_simplfied(nodes):
-        # simpler version of the derivative matrix calculation based on:
-        # https://scicomp.stackexchange.com/questions/32918/need-an-example-legendre-gauss-radau-pseudospectral-differentiation-matrix-or-ma
-        
-        node_differences = nodes[:, jnp.newaxis] - nodes
-        # prevent division by zero 
-        node_differences = node_differences.at[jnp.diag_indices_from(node_differences)].set(1)
-        product_of_differences = jnp.prod(node_differences, axis=1)
-        derivative_matrix = product_of_differences[:, jnp.newaxis] / (product_of_differences * node_differences)
-        diagonal_adjustments = 1 - jnp.sum(derivative_matrix, axis=1)
-        derivative_matrix = derivative_matrix.at[jnp.diag_indices_from(derivative_matrix)].set(diagonal_adjustments)
-        
-        return derivative_matrix
+
 
     # --------------------------------- Gauss Legendre Differential Matrix (Legendre Basis Function) ---------------------------------  
     
