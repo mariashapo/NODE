@@ -67,7 +67,7 @@ cd NODE
 2. **Set Up the Environment**
 Create a new conda environment using the provided `environment.yml` file:
 ```bash
-conda env create -f environment.yml
+conda env create -f environment.yml node
 conda activate node
 ```
 
