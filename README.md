@@ -54,3 +54,22 @@ NODE/
 │   └── train_pyomo_admm_rl.ipynb       # Training entry point for ADMM Pyomo model
 .
 ```
+
+## Running the Code
+
+1. **Clone the Repository**
+Clone the repository to your local machine using:
+```bash
+git clone https://github.com/mariashapo/NODE
+cd NODE
+```
+
+2. **Set Up the Environment**
+Create a new conda environment using the provided `environment.yml` file:
+```bash
+conda env create -f environment.yml
+conda activate node
+```
+
+3. **Run the Experiments**
+Navigate to the desired experiment folder (e.g., `02_experiments_real_life`) and run the entry point notebooks `00_train_diffrax.ipynb`, `00_train_pyomo.ipynb`, or `00_train_pytorch.ipynb`.
