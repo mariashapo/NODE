@@ -11,6 +11,7 @@ By leveraging spectral methods and incorporating interpolation techniques, this 
 - **Real-World Application:** Tests the methodology on real-life data, assessing its effectiveness in practical scenarios.
 
 ## Key Files
+```bash
 NODE/
 │
 ├── README.md          
@@ -28,3 +29,4 @@ NODE/
 │   ├── preprocessing.py                # Data preprocessing for real-world data
 │   └── non_parametric_collocation.py   # Least 
 
+```
