@@ -1,1 +1,2 @@
 Running iteration 1 with parameters: 1
+param_comb: 1, date: 2015-01-15, results: {'result': {'solver_time': 8.435554027557373, 'termination_condition': <TerminationCondition.optimal: 'optimal'>, 'message': 'Ipopt 3.14.16\\x3a Optimal Solution Found'}, 'times_elapsed': 8.435554027557373, 'mse_odeint': 0.008492861742993279, 'mse_coll_ode': 0.009278817948574486, 'mse_odeint_test': 0.15129431465648754, 'mse_coll_ode_test': 0.1550189248474055}

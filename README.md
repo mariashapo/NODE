@@ -73,3 +73,31 @@ conda activate node
 
 3. **Run the Experiments**
 Navigate to the desired experiment folder (e.g., `02_experiments_real_life`) and run the entry point notebooks `00_train_diffrax.ipynb`, `00_train_pyomo.ipynb`, or `00_train_pytorch.ipynb`.
+
+Sample parameters for the Pyomo model:
+```python
+tol = 1e-6
+start_date = '2015-01-15'
+extra_input = {}
+extra_input['params_data'] = {'file_path': '../00_data/df_train.csv', 'start_date': start_date, 
+                'n_points': 300, 'split': 200, 'n_days': 1, 'm': 1, 
+                'prev_hour': False, 'prev_week': True, 'prev_year': True, 
+                'spacing': 'gauss_radau',
+                'encoding': {'settlement_date': 't', 'temperature': 'var1', 'hour': 'var2', 'nd': 'y'},}
+
+extra_input['params_sequence'] = {'sequence_len': 1, 'frequency': 35}
+extra_input['params_model'] = {'layer_sizes': [7, 32, 1], 'penalty': 1e-5, 'w_init_method': 'xavier'}
+extra_input['params_solver'] = { 
+                        "tol":tol, 
+                        "dual_inf_tol": 0.1, 
+                        "compl_inf_tol": tol,
+                        "constr_viol_tol": 1e-8, 
+                        'warm_start_init_point': 'yes',
+                        "halt_on_ampl_error" : 'yes',
+                        "print_level": 5, "max_iter": 3000,
+                        "bound_relax_factor": 1e-8
+                        }
+
+extra_input['plot_collocation'] = True
+extra_input['plot_odeint'] = True
+```
