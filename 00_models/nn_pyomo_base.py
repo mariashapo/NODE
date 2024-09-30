@@ -159,9 +159,11 @@ class NeuralODEPyomo:
                 if self.constraint == "l2":
                     self.model.ode.add((nn_y1 - dy1_dt)**2 == 0)
                     self.model.ode.add((nn_y2 - dy2_dt)**2 == 0)
+                    
                 elif self.constraint == "l1":
                     self.model.ode.add((nn_y1 == dy1_dt))
                     self.model.ode.add((nn_y2 == dy2_dt))
+    
     
         def _objective(m):
             if M == 1:
@@ -189,7 +191,7 @@ class NeuralODEPyomo:
         # print('nn_output')
         if len(self.layer_sizes) == 3:
             hidden = np.dot(m.W1, nn_input) + m.b1
-            epsilon = 1e-10
+            # epsilon = 1e-10
             if self.act_func == "tanh":
                 hidden = [pyo.tanh(h) for h in hidden]
             elif self.act_func == "sigmoid":
@@ -404,6 +406,7 @@ class NeuralODEPyomo:
     
     def func_regular(self, y, t, args):
             input = jnp.atleast_1d(y)
+            
             if not self.time_invariant:
                 input = jnp.append(input, t)
             if args is not None:
@@ -420,6 +423,7 @@ class NeuralODEPyomo:
                             input = jnp.append(input, extra_input)                   
             else: # if a single value, simply append it
                 input = jnp.append(input, extra_inputs)
+                
             result = self.predict(input)
             return result
     

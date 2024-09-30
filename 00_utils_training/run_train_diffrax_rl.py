@@ -180,3 +180,18 @@ class Trainer:
             plt.close() 
             
         return self.experiment_results
+    
+    @staticmethod
+    def reload_and_get_attribute(module, attribute_name):
+        """
+        Reloads the specified module and retrieves a specified attribute from it.
+
+        Args:
+        module: A module object that needs to be reloaded.
+        attribute_name: The name of the attribute to retrieve from the module.
+
+        Returns:
+        The attribute from the reloaded module.
+        """
+        reloaded_module = importlib.reload(module)
+        return getattr(reloaded_module, attribute_name)

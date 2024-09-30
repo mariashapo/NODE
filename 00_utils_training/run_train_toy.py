@@ -207,6 +207,9 @@ class TrainerToy:
     def extract_pyomo_weights(self):
         return self.model.extract_weights()
     
+    def extract_pyomo_solution(self):
+        return self.model.extract_solution()
+    
     #----------------------------------------------------------------DIFFRAX TRAINING---------------------------------------------------
     def prepare_train_params_diffrax(self, params_model):
         self.layer_widths = params_model['layer_widths']
