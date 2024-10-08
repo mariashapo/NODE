@@ -107,6 +107,12 @@ class NeuralODEPyomoADMM:
         model.b1 = Var(range(layer1), initialize=lambda m, i: self.initialize_biases(layer1)[i], bounds=weight_bounds)
         model.W2 = Var(range(output_size), range(layer1), initialize=lambda m, i, j: self.initialize_weights((output_size, layer1))[i, j], bounds=weight_bounds)
         model.b2 = Var(range(output_size), initialize=lambda m, i: self.initialize_biases(output_size)[i], bounds=weight_bounds)
+        
+        model.dual_W1 = np.zeros((layer1, input_size))
+        model.dual_b1 = np.zeros(layer1)
+        model.dual_W2 = np.zeros((output_size, layer1))
+        model.dual_b2 = np.zeros(output_size)
+        
     
     def initialize_weights(self, shape):
         if self.w_init_method == 'random':
@@ -191,10 +197,10 @@ class NeuralODEPyomoADMM:
     def compute_admm_penalty(self, m):
         layer1, input_size, output_size = self.layer_sizes[1], self.layer_sizes[0], self.layer_sizes[2]
         admm_penalty = (self.rho / 2) * (
-            sum((m.W1[i, j] - self.W1_consensus[i, j] + self.dual_W1[i, j] / self.rho)**2 for i in range(layer1) for j in range(input_size)) +
-            sum((m.b1[i] - self.b1_consensus[i] + self.dual_b1[i] / self.rho)**2 for i in range(layer1)) +
-            sum((m.W2[i, j] - self.W2_consensus[i, j] + self.dual_W2[i, j] / self.rho)**2 for i in range(output_size) for j in range(layer1)) +
-            sum((m.b2[i] - self.b2_consensus[i] + self.dual_b2[i] / self.rho)**2 for i in range(output_size))
+            sum((m.W1[i, j] - self.W1_consensus[i, j] + m.dual_W1[i, j] / self.rho)**2 for i in range(layer1) for j in range(input_size)) +
+            sum((m.b1[i] - self.b1_consensus[i] + m.dual_b1[i] / self.rho)**2 for i in range(layer1)) +
+            sum((m.W2[i, j] - self.W2_consensus[i, j] + m.dual_W2[i, j] / self.rho)**2 for i in range(output_size) for j in range(layer1)) +
+            sum((m.b2[i] - self.b2_consensus[i] + m.dual_b2[i] / self.rho)**2 for i in range(output_size))
         )
         return admm_penalty
     
@@ -312,10 +318,18 @@ class NeuralODEPyomoADMM:
               
     # --------------------------------------------- ADMM UPDATES ---------------------------------------------- # 
     def update_dual_variables(self):
-        self.dual_W1 += 0.5 * (self.to_array(self.model1.W1) - self.W1_consensus + self.to_array(self.model2.W1) - self.W1_consensus)
-        self.dual_b1 += 0.5 * (self.to_vector(self.model1.b1) - self.b1_consensus + self.to_vector(self.model2.b1) - self.b1_consensus)
-        self.dual_W2 += 0.5 * (self.to_array(self.model1.W2) - self.W2_consensus + self.to_array(self.model2.W2) - self.W2_consensus)
-        self.dual_b2 += 0.5 * (self.to_vector(self.model1.b2) - self.b2_consensus + self.to_vector(self.model2.b2) - self.b2_consensus)
+        # Update dual variables for model1
+        self.model1.dual_W1 += self.to_array(self.model1.W1) - self.W1_consensus
+        self.model1.dual_b1 += self.to_vector(self.model1.b1) - self.b1_consensus
+        self.model1.dual_W2 += self.to_array(self.model1.W2) - self.W2_consensus
+        self.model1.dual_b2 += self.to_vector(self.model1.b2) - self.b2_consensus
+
+        # Update dual variables for model2
+        self.model2.dual_W1 += self.to_array(self.model2.W1) - self.W1_consensus
+        self.model2.dual_b1 += self.to_vector(self.model2.b1) - self.b1_consensus
+        self.model2.dual_W2 += self.to_array(self.model2.W2) - self.W2_consensus
+        self.model2.dual_b2 += self.to_vector(self.model2.b2) - self.b2_consensus
+
 
     def update_consensus_variables(self):
         self.W1_consensus = (self.to_array(self.model1.W1) + self.to_array(self.model2.W1)) / 2
