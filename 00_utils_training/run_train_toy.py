@@ -63,9 +63,7 @@ class TrainerToy:
         self.t, self.y, self.y_noisy, true_derivative = generate_ode_data(
             self.N, self.noise_level, self.ode_type, self.data_param, 
             min(self.nodes), max(self.nodes), 
-            initial_state = self.init_state, 
-            t = self.nodes
-            )
+            initial_state = self.init_state, t = self.nodes)
         
         self.true_derivative = true_derivative
         

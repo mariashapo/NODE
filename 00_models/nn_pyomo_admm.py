@@ -351,6 +351,7 @@ class NeuralODEPyomoADMM:
         model2_vars = self.get_model_vars(self.model2)
         primal_residuals = [np.linalg.norm(model1_vars[var] - getattr(self, f"{var}_consensus")) + np.linalg.norm(model2_vars[var] - getattr(self, f"{var}_consensus"))
                             for var in ['W1', 'b1', 'W2', 'b2']]
+        
         return sum(primal_residuals)
     
     def get_model_vars(self, model):
