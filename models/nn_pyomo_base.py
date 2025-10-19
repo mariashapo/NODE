@@ -20,10 +20,11 @@ class NeuralODEPyomo:
                  act_func="tanh", w_init_method="random", 
                  params = None, y_init = None, constraint = "l1",
                  y_collocation = None, reg_norm = False, 
-                 skip_collocation = np.inf):
+                 skip_collocation = np.inf, seed = None):
         
-        print('current_16_08')
-        np.random.seed(42)
+        seed = 42 if seed is None else seed
+        print(f'seed {seed}')
+        np.random.seed(seed)
         self.y_observed = y_observed
         self.t = t
         self.first_derivative_matrix = first_derivative_matrix

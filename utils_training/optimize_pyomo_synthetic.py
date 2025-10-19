@@ -9,17 +9,10 @@ import os
 import importlib
 import logging
 
-def append_path(path):
-    if path not in sys.path:
-        sys.path.append(path)
-        
-append_path(os.path.abspath(os.path.join('..', '00_utils')))
-append_path(os.path.abspath(os.path.join('..', '00_utils_training')))
-append_path(os.path.abspath(os.path.join('..', '00_models')))
 
 logging.basicConfig(level=logging.ERROR, filename='error_log.txt')
 
-import run_train_toy
+from utils_training.run_train_toy import TrainerToy
 
 class ExperimentRunner:
     def __init__(self, config_file):
@@ -39,8 +32,6 @@ class ExperimentRunner:
         """ 
         Load the trainer with the specified data type and spacing type from 'run_train_toy'.
         """
-        # reload the module and get the class
-        TrainerToy = reload_and_get_attribute(run_train_toy, 'TrainerToy')
         # default data parameters
         data_params_ho = {
             'N': 200,
@@ -91,7 +82,7 @@ class ExperimentRunner:
         trainer.prepare_inputs()
         return trainer
         
-    def run(self, optimization_type):
+    def run(self, optimization_type, seed = None):
         """
         - Load the trainer with the specified 'data type' and 'spacing type', (self.trainer).
         - Obtain the parameter combinations for the specified optimization type.
@@ -107,7 +98,7 @@ class ExperimentRunner:
         
         self.data_params = self.config['data']
         self.trainer = self.load_trainer(self.data_params['data_type'], self.data_params['spacing_type'])
-        results = {}
+        self.results = {}
 
         # generate the parameter combinations to loop over for the optimization type
         param_combinations = self.get_param_combinations(optimization_type)
@@ -121,25 +112,25 @@ class ExperimentRunner:
             if skip_combination:
                 continue
             try:
-                self.trainer.train_pyomo(self.params_model)
+                self.trainer.train_pyomo(self.params_model, seed)
                 if optimization_type == 'training_convergence' and 'optimal' in self.trainer.termination:
                     print(f"Optimal solution found at/before iteration {param_comb}")
                     self.tested_params.append((param_comb[0], param_comb[1]))
             except Exception as e:
-                results[param_comb] = {'time_elapsed': np.nan, 'mse_train': np.nan, 'mse_test': np.nan}
+                self.results[param_comb] = {'time_elapsed': np.nan, 'mse_train': np.nan, 'mse_test': np.nan}
                 logging.error(f"Failed to complete training: {e}")
                 continue
 
             try:
-                self.extract_results(self.trainer, param_comb, optimization_type, results)
+                self.extract_results(self.trainer, param_comb, optimization_type, self.results)
             except Exception as e:
-                results[param_comb] = {'time_elapsed': np.nan, 'mse_train': np.nan, 'mse_test': np.nan}
+                self.results[param_comb] = {'time_elapsed': np.nan, 'mse_train': np.nan, 'mse_test': np.nan}
                 logging.error(f"Failed to extract results: {e}")
 
             print(f"Iteration: {i} / {total_iter}")
             i += 1
 
-        return results, self.trainer
+        return self.results, self.trainer
 
     def get_param_combinations(self, optimization_type):
         """

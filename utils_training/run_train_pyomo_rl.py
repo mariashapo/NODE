@@ -18,9 +18,9 @@ def reload_module(module_name, class_name):
     importlib.reload(module)
     return getattr(module, class_name)
         
-append_path(os.path.abspath(os.path.join('..', '00_utils')))
-append_path(os.path.abspath(os.path.join('..', '00_utils_training')))
-append_path(os.path.abspath(os.path.join('..', '00_models')))
+append_path(os.path.abspath(os.path.join('..', 'utils')))
+append_path(os.path.abspath(os.path.join('..', 'utils_training')))
+append_path(os.path.abspath(os.path.join('..', 'models')))
 
 # preprocessing
 DataPreprocessor = reload_module('preprocess', 'DataPreprocessor')

@@ -9,11 +9,11 @@ import shutil
 import importlib
 import time
 
-path_ = os.path.abspath(os.path.join('..', '00_utils'))
+path_ = os.path.abspath(os.path.join('..', 'utils'))
 if path_ not in sys.path:
     sys.path.append(path_)
 
-path_ = os.path.abspath(os.path.join('..', '00_models'))
+path_ = os.path.abspath(os.path.join('..', 'models'))
 if path_ not in sys.path:
     sys.path.append(path_)
 

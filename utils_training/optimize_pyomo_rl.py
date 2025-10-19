@@ -13,15 +13,15 @@ import importlib
 import pickle
 import itertools
 
-path_ = os.path.abspath(os.path.join('..', '00_utils'))
+path_ = os.path.abspath(os.path.join('..', 'utils'))
 if path_ not in sys.path:
     sys.path.append(path_)
 
-path_ = os.path.abspath(os.path.join('..', '00_models'))
+path_ = os.path.abspath(os.path.join('..', 'models'))
 if path_ not in sys.path:
     sys.path.append(path_)
 
-path_ = os.path.abspath(os.path.join('..', '00_utils_training'))
+path_ = os.path.abspath(os.path.join('..', 'utils_training'))
 if path_ not in sys.path:
     sys.path.append(path_)
 

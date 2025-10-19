@@ -13,28 +13,12 @@ from flax import linen as nn
 
 from jax import random
 
-path_ = os.path.abspath(os.path.join('..', '00_utils'))
-
-if path_ not in sys.path:
-    sys.path.append(path_)
-    
-path_ = os.path.abspath(os.path.join('..', '00_models'))
-
-if path_ not in sys.path:
-    sys.path.append(path_)
-
-from data_generation import generate_ode_data
-from non_parametric_collocation import collocate_data
-from collocation_obj import Collocation
-
-def reload_module(module_name, class_name):
-    module = importlib.import_module(module_name)
-    importlib.reload(module)
-    return getattr(module, class_name)
-
-PyomoModel = reload_module('nn_pyomo_base', 'NeuralODEPyomo')
-JaxDiffModel = reload_module('nn_jax_diffrax', 'NeuralODE')
-PytorchModel = reload_module('nn_pytorch', 'NeuralODE')
+from utils.data_generation import generate_ode_data
+from utils.non_parametric_collocation import collocate_data
+from utils.collocation_obj import Collocation
+from models.nn_pyomo_base import NeuralODEPyomo as PyomoModel
+from models.nn_jax_diffrax import NeuralODE as JaxDiffModel
+from models.nn_pytorch import NeuralODE as PytorchModel
 
 
 class TrainerToy:
@@ -145,7 +129,7 @@ class TrainerToy:
         self.reg_norm = params_model.get('reg_norm', False)
         self.skip_collocation = params_model.get('skip_collocation', np.inf)
 
-    def train_pyomo(self, params_model, params_solver = None):
+    def train_pyomo(self, params_model, seed):
         
         self.prepare_train_params_pyomo(params_model)
         
@@ -164,7 +148,8 @@ class TrainerToy:
                         w_init_method = self.w_init_method, 
                         params = self.params,
                         reg_norm = self.reg_norm,
-                        skip_collocation = self.skip_collocation
+                        skip_collocation = self.skip_collocation,
+                        seed = seed
                         )
         
         self.model.build_model()

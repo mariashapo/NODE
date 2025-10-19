@@ -20,15 +20,15 @@ import sys
 import os
 import importlib
 
-p_ = os.path.abspath(os.path.join('..', '00_utils'))
+p_ = os.path.abspath(os.path.join('..', 'utils'))
 if p_ not in sys.path:
     sys.path.append(p_)
     
-p_ = os.path.abspath(os.path.join('..', '00_models'))
+p_ = os.path.abspath(os.path.join('..', 'models'))
 if p_ not in sys.path:
     sys.path.append(p_)
     
-p_ = os.path.abspath(os.path.join('..', '00_utils_training'))
+p_ = os.path.abspath(os.path.join('..', 'utils_training'))
 if p_ not in sys.path:
     sys.path.append(p_)
 

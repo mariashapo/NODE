@@ -16,13 +16,13 @@ def set_seed(seed):
     np.random.seed(seed)    # Numpy module.
     torch.manual_seed(seed) # PyTorch to ensure reproducibility for CPU
 
-    # if using CUDA (PyTorch)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed(seed)
-        torch.cuda.manual_seed_all(seed)  # if you are using multi-GPU.
-        # Below two ensure consistency, but might slow down your code
-        torch.backends.cudnn.deterministic = True
-        torch.backends.cudnn.benchmark = False
+    # # if using CUDA (PyTorch)
+    # if torch.cuda.is_available():
+    #     torch.cuda.manual_seed(seed)
+    #     torch.cuda.manual_seed_all(seed)  # if you are using multi-GPU.
+    #     # Below two ensure consistency, but might slow down your code
+    #     torch.backends.cudnn.deterministic = True
+    #     torch.backends.cudnn.benchmark = False
 
 class NeuralODE(nn.Module):
     def __init__(self, layer_widths, learning_rate, weight_decay = 1e-5, custom_weights=None, time_invariant=True):

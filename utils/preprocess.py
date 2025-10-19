@@ -9,7 +9,7 @@ import sys
 import os
 import importlib
 
-path_ = os.path.abspath(os.path.join('..', '00_utils'))
+path_ = os.path.abspath(os.path.join('..', 'utils'))
 if path_ not in sys.path:
     sys.path.append(path_)
 

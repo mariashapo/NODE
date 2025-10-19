@@ -21,7 +21,7 @@
     "    if path not in sys.path:\n",
     "        sys.path.append(path)\n",
     "        \n",
-    "append_path(os.path.abspath(os.path.join('..', '00_utils_training')))\n",
+    "append_path(os.path.abspath(os.path.join('..', 'utils_training')))\n",
     "\n",
     "import optimize_pyomo_synthetic\n",
     "from optimize_pyomo_synthetic import reload_and_get_attribute\n",
@@ -47,7 +47,7 @@
      "name": "stderr",
      "output_type": "stream",
      "text": [
-      "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/00_utils/non_parametric_collocation.py:95: UserWarning: Data transposed to match expected dimensions.\n",
+      "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/utils/non_parametric_collocation.py:95: UserWarning: Data transposed to match expected dimensions.\n",
       "  warnings.warn(\"Data transposed to match expected dimensions.\")\n"
      ]
     },
@@ -62,7 +62,7 @@
      "name": "stderr",
      "output_type": "stream",
      "text": [
-      "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/00_models/nn_pyomo_base.py:86: UserWarning: y_init should be structured such that each row represents a new time point.\n",
+      "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/models/nn_pyomo_base.py:86: UserWarning: y_init should be structured such that each row represents a new time point.\n",
       "  warnings.warn(\"y_init should be structured such that each row represents a new time point.\")\n"
      ]
     },
