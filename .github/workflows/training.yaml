@@ -23,7 +23,7 @@ jobs:
         shell: "bash -l {0}"
         run: |
           python -m pip install -U pip setuptools wheel
-          python -m pip install -e '.[pyomo,analysis,utils]'
+          python -m pip install -e '.[pyomo,analysis,utils,torch,jax-cpu,optim]'
 
       - name: Run training
         shell: "bash -l {0}"
