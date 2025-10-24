@@ -103,19 +103,20 @@ class ExperimentRunner:
         # generate the parameter combinations to loop over for the optimization type
         param_combinations = self.get_param_combinations(optimization_type)
         total_iter = len(param_combinations)
-        i = 1
+        i = i_since_convergence = 1
 
         # loop over the parameter combinations
         for param_comb in param_combinations:
-            skip_combination = self.update_params_model(param_comb, optimization_type)
+            skip_combination = self.update_params_model(param_comb, optimization_type, i_since_convergence)
             
             if skip_combination:
                 continue
             try:
                 self.trainer.train_pyomo(self.params_model, seed)
-                if optimization_type == 'training_convergence' and 'optimal' in self.trainer.termination:
+                if (optimization_type in ['training_convergence']) and 'optimal' in self.trainer.termination:
                     print(f"Optimal solution found at/before iteration {param_comb}")
                     self.tested_params.append((param_comb[0], param_comb[1]))
+                    i_since_convergence = 1
             except Exception as e:
                 self.results[param_comb] = {'time_elapsed': np.nan, 'mse_train': np.nan, 'mse_test': np.nan}
                 logging.error(f"Failed to complete training: {e}")
@@ -128,6 +129,7 @@ class ExperimentRunner:
                 logging.error(f"Failed to extract results: {e}")
 
             print(f"Iteration: {i} / {total_iter}")
+            i_since_convergence += 1
             i += 1
 
         return self.results, self.trainer
@@ -165,6 +167,23 @@ class ExperimentRunner:
             pre_initialize = [opt_config['pre_initialize']]
             l_range = range(opt_config['l_range'][0], opt_config['l_range'][1])
             param_combinations = list(itertools.product(data, pre_initialize, l_range))
+            
+        elif optimization_type == 'training_convergence_wall_time':
+            data = opt_config['data']
+            pre_initialize = [opt_config['pre_initialize']]
+
+            t_start, t_end = opt_config['t_range']
+            n_steps = opt_config['n_steps']
+
+            # Nonlinear spacing — more dense near t_start
+            exponent = 2.0  # >1 means denser near t_start
+            base = np.linspace(0, 1, n_steps)
+            wall_times = t_start + (t_end - t_start) * base**exponent
+            wall_times = [round(float(t), 5) for t in wall_times]
+
+            # Combine into param tuples
+            param_combinations = list(itertools.product(data, pre_initialize, wall_times))
+
 
         elif optimization_type == 'network_size_grid_search':
             lw_list = opt_config['lw_list']
@@ -189,7 +208,7 @@ class ExperimentRunner:
             raise ValueError(f"Invalid optimization type {optimization_type}")
         return param_combinations
 
-    def update_params_model(self, param_comb, optimization_type):
+    def update_params_model(self, param_comb, optimization_type, param_iteration):
         """
         Updates self.params_model with the specified parameter combination for the optimization type.
         """
@@ -215,6 +234,18 @@ class ExperimentRunner:
             self.params_model['params']['max_iter'] = max_iter
 
             if max_iter == 1:
+                self.trainer = self.load_trainer(data)
+                self.params_model['pre_initialize'] = pre_init
+                self.tested_params = []
+
+            if (data, pre_init) in self.tested_params:
+                skip_combination = True
+                
+        elif optimization_type == 'training_convergence_wall_time':
+            data, pre_init, max_time = param_comb
+            self.params_model['params']['max_wall_time'] = max_time
+
+            if param_iteration == 1:
                 self.trainer = self.load_trainer(data)
                 self.params_model['pre_initialize'] = pre_init
                 self.tested_params = []

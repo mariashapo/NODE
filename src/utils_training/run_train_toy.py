@@ -175,7 +175,8 @@ class TrainerToy:
                 'odeint_pred_test': odeint_pred_test,
                 'mse_train': mse_train,
                 'mse_test': mse_test,
-                'termination': self.termination
+                'termination': self.termination,
+                'seed': self.seed
             }
         else:
             results = {

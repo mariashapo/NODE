@@ -106,3 +106,6 @@ extra_input['params_solver'] = {
 extra_input['plot_collocation'] = True
 extra_input['plot_odeint'] = True
 ```
+
+
+python -m training_convergnce_studies.training_convergence

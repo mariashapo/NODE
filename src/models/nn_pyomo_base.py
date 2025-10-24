@@ -22,9 +22,9 @@ class NeuralODEPyomo:
                  y_collocation = None, reg_norm = False, 
                  skip_collocation = np.inf, seed = None):
         
-        seed = 42 if seed is None else seed
+        self.seed = 42 if seed is None else seed
         print(f'seed {seed}')
-        np.random.seed(seed)
+        np.random.seed(self.seed)
         self.y_observed = y_observed
         self.t = t
         self.first_derivative_matrix = first_derivative_matrix

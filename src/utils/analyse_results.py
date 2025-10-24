@@ -8,6 +8,8 @@ import importlib
 import ast
 import jax.numpy as jnp
 from jaxlib import xla_extension as jax_types
+import math
+
 
 class Graphs:
     @staticmethod
@@ -61,9 +63,7 @@ class Graphs:
         plt.grid(True)
         plt.show()
 
-
-
-class Graphs_training:
+class GraphsTraining:
     def __init__(self):
         self.regular_pre_time = None
         self.pyomo_pre_time = None
@@ -242,8 +242,7 @@ class Results:
     @staticmethod
     def collect_data(results, custom_names=None):
         """
-        Collects data from results dictionary and returns a DataFrame.
-        Optionally allows passing custom names for both data keys and DataFrame columns.
+        Collects data from results dictionary and returns a DataFrame. Optionally allows passing custom names for both data keys and DataFrame columns.
 
         Parameters:
         - results: dict, the input dictionary containing the data.
@@ -286,22 +285,52 @@ class Results:
         return df
             
     @staticmethod
-    def collect_data_toy(results):
+    def collect_data_into_df(results, key_list = None):
+        """Simplified method for synthetic data collection.
+        
+        key_list (list) : optionally specify the column names for the key entries.  
+        """
         flattened_data = []
 
         for key, metrics in results.items():
             entry = {}
             if not isinstance(key, tuple):
                 key = [key]
-            for i, param in enumerate(key, start=1):
-                entry[f'param{i}'] = param
+            if key_list is not None and len(key_list) != len(key):
+                raise ValueError(f"If providing key_list, make sure the lengths match.")
+            for i, param in enumerate(key):
+                # each parameter from the key tuple is saved into the dataframe
+                if key_list is None:
+                    entry[f'param{i+1}'] = param # save as a generic parameter
+                else:
+                    entry[key_list[i]] = param
 
+            # the dictionary values are then appended
             entry.update(metrics)
 
+            # add each entry as a row
             flattened_data.append(entry)
 
         df = pd.DataFrame(flattened_data)
+        
+        numeric_cols = [col for col in df.columns if "mse" in col.lower() or "time" in col.lower()] # a bit of hardcoding in-here
+        df[numeric_cols] = df[numeric_cols].astype("float")
         return df    
+    
+    
+    @staticmethod
+    def flatten_convergence_data(results_li : list, key_list = None) -> pd.DataFrame:
+        """Flatten a list of convergence data dictionaries into a dataframe."""
+        dfs_li = []
+        for i, result in enumerate(results_li):
+            df = Results.collect_data_into_df(result, key_list)
+            if "seed" not in df.columns:
+                df["seed"] = i
+            dfs_li.append(df)
+            
+        full_df = pd.concat(dfs_li)
+        return full_df
+        
     
     @staticmethod
     def series_to_lists(col):
@@ -334,7 +363,6 @@ class Results:
     def filter_by_labels(source_df, reference_df, label_column='x_labels'):
         """
         Filters rows of source_df to only those where the label_column values are in reference_df.
-
         """
         source_df = source_df.copy()
         if label_column not in source_df.columns or label_column not in reference_df.columns:
@@ -352,6 +380,70 @@ class Results:
         filtered_df.drop(columns=['label_copy'], inplace=True)
 
         return filtered_df
+ 
+ 
+class ConvergenceCI:
+    @staticmethod
+    def _step_interp(x_src, y_src, x_grid):
+        """Right-continuous step interpolation."""
+        y = np.empty_like(x_grid, dtype=float)
+        j = 0
+        for i, xg in enumerate(x_grid):
+            while j + 1 < len(x_src) and x_src[j + 1] <= xg:
+                j += 1
+            y[i] = y_src[j if xg >= x_src[0] else 0]
+        return y
+
+    @staticmethod
+    def time_ci(df, *, system, pretrain, x_col='time_elapsed', y_col='mse_train',
+                seed_col='seed', grid_points=200, tmax_quantile=0.95,
+                ci='t', alpha=0.05):
+        """
+        df: tidy DataFrame from Results.flatten_convergence_list, concatenated across seeds
+        Returns: (x_grid, mean, lo, hi, Y) where Y has shape (n_seeds, len(x_grid))
+        """
+        sel = df[(df['system']==system) & (df['pretrain']==pretrain)]
+        if sel.empty:
+            raise ValueError("No rows match (system, pretrain).")
+
+        curves = []
+        tmax = []
+        for s, g in sel.groupby(seed_col):
+            x = g[x_col].to_numpy()
+            y = g[y_col].to_numpy()
+            if x.size == 0: 
+                continue
+            curves.append((s, x, y))
+            tmax.append(x[-1])
+
+        if not curves:
+            raise ValueError("No curves after grouping by seed.")
+
+        T95 = float(np.quantile(np.array(tmax), tmax_quantile))
+        x_grid = np.linspace(0.0, T95, grid_points)
+
+        Y = np.stack([ConvergenceCI._step_interp(x, y, x_grid) for _, x, y in curves], axis=0)
+        n = Y.shape[0]
+        mean = Y.mean(axis=0)
+        std  = Y.std(axis=0, ddof=1) if n > 1 else np.zeros_like(mean)
+
+        if ci == 't':
+            # normal approx for n≥15; slightly conservative for n≈10
+            z = 1.96 if n >= 15 else 2.13 if n >= 10 else 2.57
+            half = z * std / math.sqrt(max(n,1))
+            lo, hi = mean - half, mean + half
+        elif ci == 'bootstrap':
+            B = min(10000, max(2000, 500*n))
+            rng = np.random.default_rng(0)
+            lo = np.empty_like(mean); hi = np.empty_like(mean)
+            for j in range(Y.shape[1]):
+                col = Y[:, j]
+                means = col[rng.integers(0, n, size=(B,))].mean(axis=0)
+                lo[j], hi[j] = np.quantile(means, [alpha/2, 1-alpha/2])
+        else:
+            raise ValueError("ci must be 't' or 'bootstrap'.")
+
+        return x_grid, mean, lo, hi, Y
     
 def has_nested_tuple(t):
     for item in t:

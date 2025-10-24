@@ -1,11 +1,15 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=69", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "myrepo"
 version = "0.0.1"
+requires-python = ">=3.9,<3.10"
 
 [tool.setuptools]
-package-dir = { "utils" = "utils", "utils_training" = "utils_training", "models" = "models" }
-packages = ["utils", "utils_training", "models"]
+package-dir = { "" = "src" }   # <-- tell setuptools code lives in src/
+
+[tool.setuptools.packages.find]
+where = ["src"]                 # <-- search only inside src/
+include = ["utils*", "utils_training*", "models*", "training_convergnce_studies*"]
