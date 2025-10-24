@@ -62,6 +62,7 @@ jax-cpu = [
   "optax>=0.2.2",
   "chex>=0.1.86",
   "jaxtyping>=0.2.31",
+  "flax>=0.8.4",  
 ]
 
 # Optional compiled/solver libs — only if you really need them
