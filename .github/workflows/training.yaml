@@ -1,4 +1,4 @@
-name: Pyomo training (single job)
+name: Pyomo training HO (single job)
 
 on:
   workflow_dispatch: {}
