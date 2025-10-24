@@ -10,6 +10,7 @@ src/models/ode_solver_pyomo_opt.py
 src/myrepo.egg-info/PKG-INFO
 src/myrepo.egg-info/SOURCES.txt
 src/myrepo.egg-info/dependency_links.txt
+src/myrepo.egg-info/requires.txt
 src/myrepo.egg-info/top_level.txt
 src/training_convergnce_studies/training_convergence.py
 src/utils/__init__.py
