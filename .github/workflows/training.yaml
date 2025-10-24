@@ -23,10 +23,6 @@ jobs:
         shell: "bash -l {0}"
         run: python -m pip install -e .
 
-      - name: Sanity check IPOPT
-        shell: "bash -l {0}"
-        run: python -c "from pyomo.opt import SolverFactory; print('IPOPT available:', bool(SolverFactory(\"ipopt\")))"
-
       - name: Run training
         shell: "bash -l {0}"
         run: |
