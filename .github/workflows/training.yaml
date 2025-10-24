@@ -20,24 +20,24 @@ jobs:
           cache-downloads: true
 
       - name: Install project (editable + extras)
-        shell: bash -l {0}
+        shell: "bash -l {0}"
         run: |
           python -m pip install -U pip setuptools wheel
           python -m pip install -e '.[pyomo,analysis,utils]'
 
       - name: Sanity check IPOPT
-        shell: bash -l {0}
+        shell: "bash -l {0}"
         run: |
           python - <<'PY'
-import shutil, pyomo.environ as pyo
-from pyomo.opt import SolverFactory
-print("which ipopt:", shutil.which("ipopt"))
-opt = SolverFactory("ipopt")
-print("IPOPT available:", opt.available(False))
-PY
+          import shutil, pyomo.environ as pyo
+          from pyomo.opt import SolverFactory
+          print("which ipopt:", shutil.which("ipopt"))
+          opt = SolverFactory("ipopt")
+          print("IPOPT available:", opt.available(False))
+          PY
 
       - name: Run training
-        shell: bash -l {0}
+        shell: "bash -l {0}"
         run: |
           mkdir -p results/pyomo
           python -m training_convergnce_studies.training_convergence \
