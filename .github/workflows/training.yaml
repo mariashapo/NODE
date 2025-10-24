@@ -27,7 +27,7 @@ jobs:
         shell: "bash -l {0}"
         run: |
           mkdir -p results/pyomo
-          python run_training.py --config config.json --exp training_convergence_wall_time --n_seeds 1
+          python -m training_convergnce_studies.training_convergence.py --config config.json --exp training_convergence_wall_time --n_seeds 1
 
       - name: Upload results artifact
         uses: actions/upload-artifact@v4
