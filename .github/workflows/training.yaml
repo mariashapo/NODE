@@ -1,15 +1,15 @@
-name: Pyomo training (CPU)
+name: Pyomo training (single job)
 
 on:
-  workflow_dispatch: {}   # manual trigger
+  workflow_dispatch: {}   # run manually from the Actions tab
 
 jobs:
   train:
     runs-on: ubuntu-latest
-    timeout-minutes: 360  # 6h job cap on GH-hosted
+    timeout-minutes: 360
 
     steps:
-      - name: Checkout
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Set up Micromamba
@@ -21,8 +21,7 @@ jobs:
 
       - name: Install project (editable)
         shell: bash -l {0}
-        run: |
-          python -m pip install -e .
+        run: python -m pip install -e .
 
       - name: Sanity check IPOPT
         shell: bash -l {0}
@@ -32,12 +31,13 @@ from pyomo.opt import SolverFactory
 print("IPOPT available:", bool(SolverFactory('ipopt')))
 PY
 
-      - name: Run training (1 seed)
+      - name: Run training
         shell: bash -l {0}
         run: |
-          python run_training.py --config config.json --exp training_convergence_wall_time --n_seeds 1 --outdir results/pyomo
+          mkdir -p results/pyomo
+          python run_training.py --config config.json --exp training_convergence_wall_time --n_seeds 1
 
-      - name: Upload results
+      - name: Upload results artifact
         uses: actions/upload-artifact@v4
         with:
           name: pyomo-results
