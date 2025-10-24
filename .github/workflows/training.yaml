@@ -1,7 +1,7 @@
-name: Pyomo training HO (single job)
+name: Pyomo Training HO (Single Job)
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
 
 jobs:
   train:
@@ -9,7 +9,7 @@ jobs:
     timeout-minutes: 360
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Micromamba
@@ -20,14 +20,13 @@ jobs:
           cache-downloads: true
 
       - name: Install project (editable + extras)
-        shell: "bash -l {0}"
+        shell: bash -l {0}
         run: |
           python -m pip install -U pip setuptools wheel
-          # install your package with the extras you need for this job
           python -m pip install -e '.[pyomo,analysis,utils]'
 
-      - name: (Optional) Sanity check IPOPT
-        shell: "bash -l {0}"
+      - name: Sanity check IPOPT
+        shell: bash -l {0}
         run: |
           python - <<'PY'
 import shutil, pyomo.environ as pyo
@@ -38,11 +37,13 @@ print("IPOPT available:", opt.available(False))
 PY
 
       - name: Run training
-        shell: "bash -l {0}"
+        shell: bash -l {0}
         run: |
           mkdir -p results/pyomo
-          # Run your module (no .py when using -m)
-          python -m training_convergnce_studies.training_convergence --config config.json --exp training_convergence_wall_time --n_seeds 1
+          python -m training_convergnce_studies.training_convergence \
+            --config config.json \
+            --exp training_convergence_wall_time \
+            --n_seeds 1
 
       - name: Upload results artifact
         uses: actions/upload-artifact@v4
