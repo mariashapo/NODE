@@ -256,11 +256,14 @@ class NeuralODEPyomo:
         
         return solver_info
     
-    def solve_model(self):
+    def solve_model(self, redirect_logs = False):
         solver = self.initialize_solver()
-        
-        result = solver.solve(self.model, tee=True)
-        
+        print(f"Redirect logs: {redirect_logs}")
+        if redirect_logs:
+            result = solver.solve(self.model, tee=False, logfile="ipopt.solve.log")
+        else:
+            result = solver.solve(self.model, tee=True)
+            
         return self.extract_solver_info(result)
 
     def solve_model_checkpoints(self, iter_per_check=20):

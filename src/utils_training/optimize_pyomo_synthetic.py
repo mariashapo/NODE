@@ -82,8 +82,14 @@ class ExperimentRunner:
         trainer.prepare_inputs()
         return trainer
         
-    def run(self, optimization_type, seed = None):
+    def run(self, optimization_type, seed = None, data_type = None, layer_width = None, t_range = None, n_steps = None):
         """
+        Args:
+            optimization_type (str) : specifies which optimization type to fetch from the config.
+            seed (int) : seed to use for weight initializations.
+            data_type (str) : data type to be used. If None, get it from the config.
+            layer_width ()
+        
         - Load the trainer with the specified 'data type' and 'spacing type', (self.trainer).
         - Obtain the parameter combinations for the specified optimization type.
         - Loop over the parameter combinations.
@@ -96,12 +102,15 @@ class ExperimentRunner:
         if self.params_model['skip_collocation'] == 'inf':
             self.params_model['skip_collocation'] = np.inf
         
+        # we want to add a possibility of over-writing the data config in here 
         self.data_params = self.config['data']
-        self.trainer = self.load_trainer(self.data_params['data_type'], self.data_params['spacing_type'])
+        self.data_type = data_type if data_type is not None else self.data_params['data_type']
+        self.trainer = self.load_trainer(self.data_type, self.data_params['spacing_type'])
         self.results = {}
 
         # generate the parameter combinations to loop over for the optimization type
-        param_combinations = self.get_param_combinations(optimization_type)
+        param_combinations = self.get_param_combinations(optimization_type, t_range = t_range, n_steps = n_steps)
+        print(f"PARAM COMBINATIONS GENERATED: {param_combinations}")
         total_iter = len(param_combinations)
         i = i_since_convergence = 1
 
@@ -113,7 +122,7 @@ class ExperimentRunner:
                 continue
             try:
                 self.trainer.train_pyomo(self.params_model, seed)
-                if (optimization_type in ['training_convergence']) and 'optimal' in self.trainer.termination:
+                if (optimization_type in ['training_convergence', 'training_convergence_wall_time']) and 'optimal' in self.trainer.termination:
                     print(f"Optimal solution found at/before iteration {param_comb}")
                     self.tested_params.append((param_comb[0], param_comb[1]))
                     i_since_convergence = 1
@@ -134,8 +143,15 @@ class ExperimentRunner:
 
         return self.results, self.trainer
 
-    def get_param_combinations(self, optimization_type):
+    def get_param_combinations(self, optimization_type, t_range = None, n_steps = None):
         """
+        Inputs:
+            optimisation_type (str) : specify the optimisation_type being executed.
+            t_range (None | list) : allow overwriting the time range for *training_convergence_wall_time* optimisation type. e.g. [0.01, 6]
+            n_steps (None | int) : allow overwriting the number of steps for *training_convergence_wall_time* optimisation type.
+            TODO: [2] the decision for which parameters can be overwritten is currently based on the most-used optimisation types.
+                but should be more generalised. 
+        
         Generate the parameter combinations for the specified optimization type.
         - Load the optimization configuration from the config file.
         """
@@ -163,17 +179,18 @@ class ExperimentRunner:
             param_combinations = param_values
 
         elif optimization_type == 'training_convergence':
+            # TODO: [1] this really needs to be cleaned up, but some optimization types allow for multiple data inputs
+            # while the rest use the data type specified by the general config
             data = opt_config['data']
             pre_initialize = [opt_config['pre_initialize']]
             l_range = range(opt_config['l_range'][0], opt_config['l_range'][1])
             param_combinations = list(itertools.product(data, pre_initialize, l_range))
             
         elif optimization_type == 'training_convergence_wall_time':
-            data = opt_config['data']
             pre_initialize = [opt_config['pre_initialize']]
 
-            t_start, t_end = opt_config['t_range']
-            n_steps = opt_config['n_steps']
+            t_start, t_end = t_range if t_range is not None else opt_config['t_range']
+            n_steps = n_steps if n_steps is not None else opt_config['n_steps']
 
             # Nonlinear spacing — more dense near t_start
             exponent = 2.0  # >1 means denser near t_start
@@ -181,8 +198,8 @@ class ExperimentRunner:
             wall_times = t_start + (t_end - t_start) * base**exponent
             wall_times = [round(float(t), 5) for t in wall_times]
 
-            # Combine into param tuples
-            param_combinations = list(itertools.product(data, pre_initialize, wall_times))
+            # TODO: [1] here we are using data_type from the general config
+            param_combinations = list(itertools.product([self.data_type], pre_initialize, wall_times))
 
 
         elif optimization_type == 'network_size_grid_search':

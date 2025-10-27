@@ -288,7 +288,9 @@ class Results:
     def collect_data_into_df(results, key_list = None):
         """Simplified method for synthetic data collection.
         
-        key_list (list) : optionally specify the column names for the key entries.  
+        Expected data structure {(param1, param2, param2) : metrics}, where metrics is also a dictionary.
+        
+        key_list (list) : optionally specify the column names for the key (hyperparameter) entries.  
         """
         flattened_data = []
 
@@ -317,13 +319,40 @@ class Results:
         df[numeric_cols] = df[numeric_cols].astype("float")
         return df    
     
-    
     @staticmethod
-    def flatten_convergence_data(results_li : list, key_list = None) -> pd.DataFrame:
-        """Flatten a list of convergence data dictionaries into a dataframe."""
+    def parse_sequential_training(one_seed_result):
+        """Parse results coming from the sequential training."""
+        # compute time for one iteration
+        # assume that the last iteration is the actual training & everything beforehand is just pre-training
+        t_elapsed = one_seed_result["time_elapsed"][-1]
+        n_records = len(one_seed_result["train_loss"][-1][0])
+        t_per_iter = t_elapsed / n_records
+        
+        iters = np.array(range(1, n_records + 1))
+        t_before = np.sum(one_seed_result["time_elapsed"][:-1])
+        t_iters = iters * t_per_iter + t_before
+        training_loss = np.array(one_seed_result["train_loss"][-1][0])
+        testing_loss = np.array(one_seed_result["train_loss"][-1][1])
+
+        df = pd.DataFrame({"time_elapsed" : t_iters, "mse_train": training_loss, "mse_test" : testing_loss})
+        df["system"] = one_seed_result["data_type"]
+        df["pretrain"] = len(one_seed_result["time_elapsed"]) > 1
+        df["max_iter"] = str(one_seed_result["max_iter"])
+        
+        return df
+        
+    @staticmethod
+    def flatten_convergence_data(results_li : list, model_type : str, key_list = None) -> pd.DataFrame:
+        """Flatten a list of convergence data dictionaries into a dataframe.
+        
+        model_type (str) : {"pyomo", "pytorch", "jax"}
+        """
         dfs_li = []
         for i, result in enumerate(results_li):
-            df = Results.collect_data_into_df(result, key_list)
+            if model_type == "pyomo":
+                df = Results.collect_data_into_df(result, key_list)
+            else:
+                df = Results.parse_sequential_training(result)
             if "seed" not in df.columns:
                 df["seed"] = i
             dfs_li.append(df)
@@ -429,7 +458,7 @@ class ConvergenceCI:
 
         if ci == 't':
             # normal approx for n≥15; slightly conservative for n≈10
-            z = 1.96 if n >= 15 else 2.13 if n >= 10 else 2.57
+            z = 1.96 # if n >= 15 else 2.13 if n >= 10 else 2.57
             half = z * std / math.sqrt(max(n,1))
             lo, hi = mean - half, mean + half
         elif ci == 'bootstrap':

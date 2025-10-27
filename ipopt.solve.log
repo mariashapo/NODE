@@ -1,0 +1,15 @@
+Solver command line: ['/Users/mariiashapo/anaconda3/envs/node_25/bin/ipopt', '/var/folders/2v/gfm3z1tn5fj8zss_r9hrgnv80000gn/T/tmp67gehqkw.pyomo.nl', '-AMPL', 'tol=1e-08', 'print_level=1', 'max_iter=3000', 'max_wall_time=6.0']
+
+Ipopt 3.14.16: tol=1e-08
+print_level=1
+max_iter=3000
+max_wall_time=6.0
+
+
+******************************************************************************
+This program contains Ipopt, a library for large-scale nonlinear optimization.
+ Ipopt is released as open source code under the Eclipse Public License (EPL).
+         For more information visit https://github.com/coin-or/Ipopt
+******************************************************************************
+
+

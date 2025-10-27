@@ -1,0 +1,834 @@
+ERROR:stderr:Traceback (most recent call last):
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+ERROR:stderr:return _run_code(code, main_globals, None,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
+ERROR:stderr:exec(code, run_globals)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 56, in <module>
+ERROR:stderr:main()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 46, in main
+ERROR:stderr:results, _ = runner.run(args.exp, s)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 100, in run
+ERROR:stderr:self.trainer = self.load_trainer(self.data_params['data_type'], self.data_params['spacing_type'])
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 82, in load_trainer
+ERROR:stderr:trainer.prepare_inputs()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 100, in prepare_inputs
+ERROR:stderr:self.prepare_collocation()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 72, in prepare_collocation
+ERROR:stderr:self.D = np.array(self.collocation.compute_derivative_matrix())
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 66, in compute_derivative_matrix
+ERROR:stderr:self.D = Collocation.derivative_matrix_barycentric_v1(self.nodes)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 177, in derivative_matrix_barycentric_v1
+ERROR:stderr:D = Collocation.lagrange_derivative(nodes, weights)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 241, in lagrange_derivative
+ERROR:stderr:D = D.at[i, j].set(weights[j] / weights[i] / (xi[i] - xi[j]))
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/array.py", line 336, in __getitem__
+ERROR:stderr:return lax_numpy._rewriting_take(self, idx)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 5601, in _rewriting_take
+ERROR:stderr:if (result := _attempt_rewriting_take_via_slice(arr, idx, mode)) is not None:
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 5588, in _attempt_rewriting_take_via_slice
+ERROR:stderr:arr = lax.squeeze(arr, tuple(int_indices))
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/lax/lax.py", line 1373, in squeeze
+ERROR:stderr:return squeeze_p.bind(array, dimensions=dimensions)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 387, in bind
+ERROR:stderr:return self.bind_with_trace(find_top_trace(args), args, params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 391, in bind_with_trace
+ERROR:stderr:out = trace.process_primitive(self, map(trace.full_raise, args), params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 482, in full_raise
+ERROR:stderr:if not isinstance(val, Tracer):
+ERROR:stderr:KeyboardInterrupt
+ERROR:stderr:Traceback (most recent call last):
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+ERROR:stderr:return _run_code(code, main_globals, None,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
+ERROR:stderr:exec(code, run_globals)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 56, in <module>
+ERROR:stderr:main()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 46, in main
+ERROR:stderr:results, _ = runner.run(args.exp, s)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 115, in run
+ERROR:stderr:self.trainer.train_pyomo(self.params_model, seed)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 157, in train_pyomo
+ERROR:stderr:result = self.model.solve_model(self.redirect_logs)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/models/nn_pyomo_base.py", line 263, in solve_model
+ERROR:stderr:result = solver.solve(self.model, tee=True, logfile="ipopt.solve.log")
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/pyomo/opt/base/solvers.py", line 610, in solve
+ERROR:stderr:_status = self._apply_solver()
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/pyomo/opt/solver/shellcmd.py", line 266, in _apply_solver
+ERROR:stderr:self._rc, self._log = self._execute_command(self._command)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/pyomo/opt/solver/shellcmd.py", line 334, in _execute_command
+ERROR:stderr:results = subprocess.run(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/subprocess.py", line 507, in run
+ERROR:stderr:stdout, stderr = process.communicate(input, timeout=timeout)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/subprocess.py", line 1126, in communicate
+ERROR:stderr:self.wait()
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/subprocess.py", line 1189, in wait
+ERROR:stderr:return self._wait(timeout=timeout)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/subprocess.py", line 1933, in _wait
+ERROR:stderr:(pid, sts) = self._try_wait(0)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/subprocess.py", line 1891, in _try_wait
+ERROR:stderr:(pid, sts) = os.waitpid(self.pid, wait_flags)
+ERROR:stderr:KeyboardInterrupt
+ERROR:stderr:Traceback (most recent call last):
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+ERROR:stderr:return _run_code(code, main_globals, None,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
+ERROR:stderr:exec(code, run_globals)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 56, in <module>
+ERROR:stderr:main()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 46, in main
+ERROR:stderr:results, _ = runner.run(args.exp, s)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 115, in run
+ERROR:stderr:self.trainer.train_pyomo(self.params_model, seed)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 158, in train_pyomo
+ERROR:stderr:result = self.model.solve_model(self.redirect_logs)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/models/nn_pyomo_base.py", line 263, in solve_model
+ERROR:stderr:result = solver.solve(self.model, tee=False, logfile="ipopt.solve.log")
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/pyomo/opt/base/solvers.py", line 610, in solve
+ERROR:stderr:_status = self._apply_solver()
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/pyomo/opt/solver/shellcmd.py", line 266, in _apply_solver
+ERROR:stderr:self._rc, self._log = self._execute_command(self._command)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/pyomo/opt/solver/shellcmd.py", line 334, in _execute_command
+ERROR:stderr:results = subprocess.run(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/subprocess.py", line 505, in run
+ERROR:stderr:with Popen(*popenargs, **kwargs) as process:
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/subprocess.py", line 951, in __init__
+ERROR:stderr:self._execute_child(args, executable, preexec_fn, close_fds,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/subprocess.py", line 1793, in _execute_child
+ERROR:stderr:part = os.read(errpipe_read, 50000)
+ERROR:stderr:KeyboardInterrupt
+ERROR:stderr:Traceback (most recent call last):
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+ERROR:stderr:return _run_code(code, main_globals, None,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
+ERROR:stderr:exec(code, run_globals)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 57, in <module>
+ERROR:stderr:main()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 47, in main
+ERROR:stderr:results, _ = runner.run(args.exp, s)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 107, in run
+ERROR:stderr:self.trainer = self.load_trainer(self.data_params['data_type'], self.data_params['spacing_type'])
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 82, in load_trainer
+ERROR:stderr:trainer.prepare_inputs()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 100, in prepare_inputs
+ERROR:stderr:self.prepare_collocation()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 72, in prepare_collocation
+ERROR:stderr:self.D = np.array(self.collocation.compute_derivative_matrix())
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 66, in compute_derivative_matrix
+ERROR:stderr:self.D = Collocation.derivative_matrix_barycentric_v1(self.nodes)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 177, in derivative_matrix_barycentric_v1
+ERROR:stderr:D = Collocation.lagrange_derivative(nodes, weights)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 241, in lagrange_derivative
+ERROR:stderr:D = D.at[i, j].set(weights[j] / weights[i] / (xi[i] - xi[j]))
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/array.py", line 336, in __getitem__
+ERROR:stderr:return lax_numpy._rewriting_take(self, idx)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 5601, in _rewriting_take
+ERROR:stderr:if (result := _attempt_rewriting_take_via_slice(arr, idx, mode)) is not None:
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 5588, in _attempt_rewriting_take_via_slice
+ERROR:stderr:arr = lax.squeeze(arr, tuple(int_indices))
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/lax/lax.py", line 1373, in squeeze
+ERROR:stderr:return squeeze_p.bind(array, dimensions=dimensions)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 387, in bind
+ERROR:stderr:return self.bind_with_trace(find_top_trace(args), args, params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 391, in bind_with_trace
+ERROR:stderr:out = trace.process_primitive(self, map(trace.full_raise, args), params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 879, in process_primitive
+ERROR:stderr:return primitive.impl(*tracers, **params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/dispatch.py", line 81, in apply_primitive
+ERROR:stderr:fun = xla_primitive_callable(prim, **params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/util.py", line 299, in wrapper
+ERROR:stderr:return cached(config.trace_context(), *args, **kwargs)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/config.py", line 209, in trace_context
+ERROR:stderr:numpy_rank_promotion.value, default_matmul_precision.value,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/config.py", line 276, in value
+ERROR:stderr:@property
+ERROR:stderr:KeyboardInterrupt
+ERROR:stderr:Traceback (most recent call last):
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+ERROR:stderr:return _run_code(code, main_globals, None,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
+ERROR:stderr:exec(code, run_globals)
+ERROR:stderr:  File "/Users/mariiashapo/.vscode/extensions/ms-python.debugpy-2025.10.0-darwin-arm64/bundled/libs/debugpy/adapter/../../debugpy/launcher/../../debugpy/__main__.py", line 71, in <module>
+ERROR:stderr:cli.main()
+ERROR:stderr:  File "/Users/mariiashapo/.vscode/extensions/ms-python.debugpy-2025.10.0-darwin-arm64/bundled/libs/debugpy/adapter/../../debugpy/launcher/../../debugpy/../debugpy/server/cli.py", line 501, in main
+ERROR:stderr:run()
+ERROR:stderr:  File "/Users/mariiashapo/.vscode/extensions/ms-python.debugpy-2025.10.0-darwin-arm64/bundled/libs/debugpy/adapter/../../debugpy/launcher/../../debugpy/../debugpy/server/cli.py", line 351, in run_file
+ERROR:stderr:runpy.run_path(target, run_name="__main__")
+ERROR:stderr:  File "/Users/mariiashapo/.vscode/extensions/ms-python.debugpy-2025.10.0-darwin-arm64/bundled/libs/debugpy/_vendored/pydevd/_pydevd_bundle/pydevd_runpy.py", line 310, in run_path
+ERROR:stderr:return _run_module_code(code, init_globals, run_name, pkg_name=pkg_name, script_name=fname)
+ERROR:stderr:  File "/Users/mariiashapo/.vscode/extensions/ms-python.debugpy-2025.10.0-darwin-arm64/bundled/libs/debugpy/_vendored/pydevd/_pydevd_bundle/pydevd_runpy.py", line 127, in _run_module_code
+ERROR:stderr:_run_code(code, mod_globals, init_globals, mod_name, mod_spec, pkg_name, script_name)
+ERROR:stderr:  File "/Users/mariiashapo/.vscode/extensions/ms-python.debugpy-2025.10.0-darwin-arm64/bundled/libs/debugpy/_vendored/pydevd/_pydevd_bundle/pydevd_runpy.py", line 118, in _run_code
+ERROR:stderr:exec(code, run_globals)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 57, in <module>
+ERROR:stderr:main()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 47, in main
+ERROR:stderr:results, _ = runner.run(args.exp, s)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 107, in run
+ERROR:stderr:self.trainer = self.load_trainer(data_type, self.data_params['spacing_type'])
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 82, in load_trainer
+ERROR:stderr:trainer.prepare_inputs()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 100, in prepare_inputs
+ERROR:stderr:self.prepare_collocation()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 72, in prepare_collocation
+ERROR:stderr:self.D = np.array(self.collocation.compute_derivative_matrix())
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 66, in compute_derivative_matrix
+ERROR:stderr:self.D = Collocation.derivative_matrix_barycentric_v1(self.nodes)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 177, in derivative_matrix_barycentric_v1
+ERROR:stderr:D = Collocation.lagrange_derivative(nodes, weights)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 241, in lagrange_derivative
+ERROR:stderr:D = D.at[i, j].set(weights[j] / weights[i] / (xi[i] - xi[j]))
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/array_methods.py", line 493, in set
+ERROR:stderr:return scatter._scatter_update(self.array, self.index, values, lax.scatter,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/ops/scatter.py", line 80, in _scatter_update
+ERROR:stderr:return _scatter_impl(x, y, scatter_op, treedef, static_idx, dynamic_idx,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/ops/scatter.py", line 104, in _scatter_impl
+ERROR:stderr:indexer = jnp._index_to_gather(jnp.shape(x), idx,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 5845, in _index_to_gather
+ERROR:stderr:i_converted = lax.convert_element_type(i, index_dtype)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/lax/lax.py", line 517, in convert_element_type
+ERROR:stderr:return _convert_element_type(operand, new_dtype, weak_type=False)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/lax/lax.py", line 559, in _convert_element_type
+ERROR:stderr:return convert_element_type_p.bind(operand, new_dtype=new_dtype,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 387, in bind
+ERROR:stderr:return self.bind_with_trace(find_top_trace(args), args, params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 391, in bind_with_trace
+ERROR:stderr:out = trace.process_primitive(self, map(trace.full_raise, args), params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 879, in process_primitive
+ERROR:stderr:return primitive.impl(*tracers, **params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/dispatch.py", line 81, in apply_primitive
+ERROR:stderr:fun = xla_primitive_callable(prim, **params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/util.py", line 299, in wrapper
+ERROR:stderr:return cached(config.trace_context(), *args, **kwargs)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/config.py", line 192, in trace_context
+ERROR:stderr:def trace_context():
+ERROR:stderr:  File "/Users/mariiashapo/.vscode/extensions/ms-python.debugpy-2025.10.0-darwin-arm64/bundled/libs/debugpy/_vendored/pydevd/_pydevd_bundle/pydevd_trace_dispatch_regular.py", line 354, in __call__
+ERROR:stderr:def __call__(self, frame, event, arg):
+ERROR:stderr:KeyboardInterrupt
+ERROR:stderr:Traceback (most recent call last):
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 57, in <module>
+ERROR:stderr:main()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 47, in main
+ERROR:stderr:results, _ = runner.run(args.exp, s)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 118, in run
+ERROR:stderr:skip_combination = self.update_params_model(param_comb, optimization_type, i_since_convergence)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 257, in update_params_model
+ERROR:stderr:self.trainer = self.load_trainer(data)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 82, in load_trainer
+ERROR:stderr:trainer.prepare_inputs()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 100, in prepare_inputs
+ERROR:stderr:self.prepare_collocation()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 72, in prepare_collocation
+ERROR:stderr:self.D = np.array(self.collocation.compute_derivative_matrix())
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 66, in compute_derivative_matrix
+ERROR:stderr:self.D = Collocation.derivative_matrix_barycentric_v1(self.nodes)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 177, in derivative_matrix_barycentric_v1
+ERROR:stderr:D = Collocation.lagrange_derivative(nodes, weights)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 241, in lagrange_derivative
+ERROR:stderr:D = D.at[i, j].set(weights[j] / weights[i] / (xi[i] - xi[j]))
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/array.py", line 336, in __getitem__
+ERROR:stderr:return lax_numpy._rewriting_take(self, idx)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 5601, in _rewriting_take
+ERROR:stderr:if (result := _attempt_rewriting_take_via_slice(arr, idx, mode)) is not None:
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 5559, in _attempt_rewriting_take_via_slice
+ERROR:stderr:idx += (arr.ndim - len(idx)) * (slice(None),)
+ERROR:stderr:KeyboardInterrupt
+ERROR:stderr:Traceback (most recent call last):
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+ERROR:stderr:return _run_code(code, main_globals, None,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
+ERROR:stderr:exec(code, run_globals)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 60, in <module>
+ERROR:stderr:main()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 50, in main
+ERROR:stderr:results, _ = runner.run(args.exp, s)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 118, in run
+ERROR:stderr:skip_combination = self.update_params_model(param_comb, optimization_type, i_since_convergence)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 265, in update_params_model
+ERROR:stderr:self.trainer = self.load_trainer(data)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 79, in load_trainer
+ERROR:stderr:raise ValueError(f"Invalid type {data_type}")
+ERROR:stderr:ValueError
+ERROR:stderr::
+ERROR:stderr:Invalid type h
+ERROR:stderr:Traceback (most recent call last):
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+ERROR:stderr:return _run_code(code, main_globals, None,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
+ERROR:stderr:exec(code, run_globals)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 60, in <module>
+ERROR:stderr:main()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 50, in main
+ERROR:stderr:results, _ = runner.run(args.exp, s)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 118, in run
+ERROR:stderr:skip_combination = self.update_params_model(param_comb, optimization_type, i_since_convergence)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 265, in update_params_model
+ERROR:stderr:self.trainer = self.load_trainer(data)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 79, in load_trainer
+ERROR:stderr:raise ValueError(f"Invalid type {data_type}")
+ERROR:stderr:ValueError
+ERROR:stderr::
+ERROR:stderr:Invalid type h
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:stderr:Traceback (most recent call last):
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+ERROR:stderr:return _run_code(code, main_globals, None,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
+ERROR:stderr:exec(code, run_globals)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 60, in <module>
+ERROR:stderr:main()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 50, in main
+ERROR:stderr:results, _ = runner.run(args.exp, s)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 118, in run
+ERROR:stderr:skip_combination = self.update_params_model(param_comb, optimization_type, i_since_convergence)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 265, in update_params_model
+ERROR:stderr:self.trainer = self.load_trainer(data)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 82, in load_trainer
+ERROR:stderr:trainer.prepare_inputs()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 100, in prepare_inputs
+ERROR:stderr:self.prepare_collocation()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 72, in prepare_collocation
+ERROR:stderr:self.D = np.array(self.collocation.compute_derivative_matrix())
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 66, in compute_derivative_matrix
+ERROR:stderr:self.D = Collocation.derivative_matrix_barycentric_v1(self.nodes)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 177, in derivative_matrix_barycentric_v1
+ERROR:stderr:D = Collocation.lagrange_derivative(nodes, weights)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 241, in lagrange_derivative
+ERROR:stderr:D = D.at[i, j].set(weights[j] / weights[i] / (xi[i] - xi[j]))
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/array.py", line 336, in __getitem__
+ERROR:stderr:return lax_numpy._rewriting_take(self, idx)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 5601, in _rewriting_take
+ERROR:stderr:if (result := _attempt_rewriting_take_via_slice(arr, idx, mode)) is not None:
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 5578, in _attempt_rewriting_take_via_slice
+ERROR:stderr:arr = lax.slice(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/lax/slicing.py", line 108, in slice
+ERROR:stderr:return slice_p.bind(operand, start_indices=tuple(start_indices),
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 387, in bind
+ERROR:stderr:return self.bind_with_trace(find_top_trace(args), args, params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 391, in bind_with_trace
+ERROR:stderr:out = trace.process_primitive(self, map(trace.full_raise, args), params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 879, in process_primitive
+ERROR:stderr:return primitive.impl(*tracers, **params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/lax/slicing.py", line 1169, in _slice_impl
+ERROR:stderr:return dispatch.apply_primitive(dynamic_slice_p, x, *start_indices,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/dispatch.py", line 86, in apply_primitive
+ERROR:stderr:outs = fun(*args)
+ERROR:stderr:KeyboardInterrupt
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:stderr:Traceback (most recent call last):
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+ERROR:stderr:return _run_code(code, main_globals, None,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
+ERROR:stderr:exec(code, run_globals)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 60, in <module>
+ERROR:stderr:ts = time.strftime('%Y-%m-%d_%H-%M')
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 50, in main
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 118, in run
+ERROR:stderr:skip_combination = self.update_params_model(param_comb, optimization_type, i_since_convergence)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 265, in update_params_model
+ERROR:stderr:self.trainer = self.load_trainer(data)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 82, in load_trainer
+ERROR:stderr:trainer.prepare_inputs()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 100, in prepare_inputs
+ERROR:stderr:self.prepare_collocation()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 72, in prepare_collocation
+ERROR:stderr:self.D = np.array(self.collocation.compute_derivative_matrix())
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 66, in compute_derivative_matrix
+ERROR:stderr:self.D = Collocation.derivative_matrix_barycentric_v1(self.nodes)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 177, in derivative_matrix_barycentric_v1
+ERROR:stderr:D = Collocation.lagrange_derivative(nodes, weights)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 241, in lagrange_derivative
+ERROR:stderr:D = D.at[i, j].set(weights[j] / weights[i] / (xi[i] - xi[j]))
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/array_methods.py", line 493, in set
+ERROR:stderr:return scatter._scatter_update(self.array, self.index, values, lax.scatter,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/ops/scatter.py", line 80, in _scatter_update
+ERROR:stderr:return _scatter_impl(x, y, scatter_op, treedef, static_idx, dynamic_idx,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/ops/scatter.py", line 104, in _scatter_impl
+ERROR:stderr:indexer = jnp._index_to_gather(jnp.shape(x), idx,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 5841, in _index_to_gather
+ERROR:stderr:if core.definitely_equal(x_shape[x_axis], 0):
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 1339, in definitely_equal
+ERROR:stderr:if isinstance(x, Tracer) or isinstance(y, Tracer):
+ERROR:stderr:KeyboardInterrupt
+ERROR:stderr:Traceback (most recent call last):
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+ERROR:stderr:return _run_code(code, main_globals, None,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
+ERROR:stderr:exec(code, run_globals)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 67, in <module>
+ERROR:stderr:main()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 56, in main
+ERROR:stderr:results, _ = runner.run(args.exp, seed = seed, data_type = args.data_type, layer_width = args.layer_width, t_range = args.t_range, n_steps = args.n_steps)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 107, in run
+ERROR:stderr:self.trainer = self.load_trainer(self.data_type, self.data_params['spacing_type'])
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 82, in load_trainer
+ERROR:stderr:trainer.prepare_inputs()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 100, in prepare_inputs
+ERROR:stderr:self.prepare_collocation()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 72, in prepare_collocation
+ERROR:stderr:self.D = np.array(self.collocation.compute_derivative_matrix())
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 66, in compute_derivative_matrix
+ERROR:stderr:self.D = Collocation.derivative_matrix_barycentric_v1(self.nodes)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 176, in derivative_matrix_barycentric_v1
+ERROR:stderr:weights = Collocation.compute_lagrange_weights(nodes)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 197, in compute_lagrange_weights
+ERROR:stderr:terms = nodes[j] - jnp.delete(nodes, j)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 3706, in delete
+ERROR:stderr:return concatenate([a[idx + (slice(0, obj),)], a[idx + (slice(obj + 1, None),)]], axis=axis)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 2305, in concatenate
+ERROR:stderr:arrays_out = [lax.concatenate(arrays_out[i:i+k], axis)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 2305, in <listcomp>
+ERROR:stderr:arrays_out = [lax.concatenate(arrays_out[i:i+k], axis)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/lax/lax.py", line 623, in concatenate
+ERROR:stderr:return concatenate_p.bind(*operands, dimension=dimension)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 387, in bind
+ERROR:stderr:return self.bind_with_trace(find_top_trace(args), args, params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 391, in bind_with_trace
+ERROR:stderr:out = trace.process_primitive(self, map(trace.full_raise, args), params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 879, in process_primitive
+ERROR:stderr:return primitive.impl(*tracers, **params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/dispatch.py", line 86, in apply_primitive
+ERROR:stderr:outs = fun(*args)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/traceback_util.py", line 179, in reraise_with_filtered_traceback
+ERROR:stderr:return fun(*args, **kwargs)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 304, in cache_miss
+ERROR:stderr:outs, out_flat, out_tree, args_flat, jaxpr, attrs_tracked = _python_pjit_helper(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 181, in _python_pjit_helper
+ERROR:stderr:out_flat = pjit_p.bind(*args_flat, **params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 2789, in bind
+ERROR:stderr:return self.bind_with_trace(top_trace, args, params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 391, in bind_with_trace
+ERROR:stderr:out = trace.process_primitive(self, map(trace.full_raise, args), params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 879, in process_primitive
+ERROR:stderr:return primitive.impl(*tracers, **params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 1525, in _pjit_call_impl
+ERROR:stderr:return xc._xla.pjit(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 1508, in call_impl_cache_miss
+ERROR:stderr:out_flat, compiled = _pjit_call_impl_python(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 1434, in _pjit_call_impl_python
+ERROR:stderr:compiled = _resolve_and_lower(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/interpreters/pxla.py", line 2363, in compile
+ERROR:stderr:executable = UnloadedMeshExecutable.from_hlo(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/interpreters/pxla.py", line 2860, in from_hlo
+ERROR:stderr:xla_executable = _cached_compilation(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/interpreters/pxla.py", line 2660, in _cached_compilation
+ERROR:stderr:detailed_logging=compiler.use_detailed_logging(computation),
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/compiler.py", line 92, in use_detailed_logging
+ERROR:stderr:return _walk_operations(module.operation, bound) < 0
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/compiler.py", line 83, in _walk_operations
+ERROR:stderr:k = _walk_operations(child_op, k)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/compiler.py", line 82, in _walk_operations
+ERROR:stderr:for child_op in block:
+ERROR:stderr:KeyboardInterrupt
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:stderr:Traceback (most recent call last):
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+ERROR:stderr:return _run_code(code, main_globals, None,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
+ERROR:stderr:exec(code, run_globals)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 67, in <module>
+ERROR:stderr:main()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 56, in main
+ERROR:stderr:results, _ = runner.run(args.exp, seed = seed, data_type = args.data_type, layer_width = args.layer_width, t_range = args.t_range, n_steps = args.n_steps)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 118, in run
+ERROR:stderr:skip_combination = self.update_params_model(param_comb, optimization_type, i_since_convergence)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 265, in update_params_model
+ERROR:stderr:self.trainer = self.load_trainer(data)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 82, in load_trainer
+ERROR:stderr:trainer.prepare_inputs()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 100, in prepare_inputs
+ERROR:stderr:self.prepare_collocation()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 72, in prepare_collocation
+ERROR:stderr:self.D = np.array(self.collocation.compute_derivative_matrix())
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 66, in compute_derivative_matrix
+ERROR:stderr:self.D = Collocation.derivative_matrix_barycentric_v1(self.nodes)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 177, in derivative_matrix_barycentric_v1
+ERROR:stderr:D = Collocation.lagrange_derivative(nodes, weights)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 241, in lagrange_derivative
+ERROR:stderr:D = D.at[i, j].set(weights[j] / weights[i] / (xi[i] - xi[j]))
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/array.py", line 336, in __getitem__
+ERROR:stderr:return lax_numpy._rewriting_take(self, idx)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 5601, in _rewriting_take
+ERROR:stderr:if (result := _attempt_rewriting_take_via_slice(arr, idx, mode)) is not None:
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 5588, in _attempt_rewriting_take_via_slice
+ERROR:stderr:arr = lax.squeeze(arr, tuple(int_indices))
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/lax/lax.py", line 1369, in squeeze
+ERROR:stderr:ndim = np.ndim(array)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/numpy/core/fromnumeric.py", line 3208, in ndim
+ERROR:stderr:try:
+ERROR:stderr:KeyboardInterrupt
+ERROR:stderr:Traceback (most recent call last):
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+ERROR:stderr:return _run_code(code, main_globals, None,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
+ERROR:stderr:exec(code, run_globals)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 67, in <module>
+ERROR:stderr:if __name__ == "__main__":
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 56, in main
+ERROR:stderr:# run(self, optimization_type, seed = None, data_type = None, layer_width = None, t_range = None, n_steps = None)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 107, in run
+ERROR:stderr:self.trainer = self.load_trainer(self.data_type, self.data_params['spacing_type'])
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 82, in load_trainer
+ERROR:stderr:trainer.prepare_inputs()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 100, in prepare_inputs
+ERROR:stderr:self.prepare_collocation()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 72, in prepare_collocation
+ERROR:stderr:self.D = np.array(self.collocation.compute_derivative_matrix())
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 66, in compute_derivative_matrix
+ERROR:stderr:self.D = Collocation.derivative_matrix_barycentric_v1(self.nodes)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 177, in derivative_matrix_barycentric_v1
+ERROR:stderr:D = Collocation.lagrange_derivative(nodes, weights)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 241, in lagrange_derivative
+ERROR:stderr:D = D.at[i, j].set(weights[j] / weights[i] / (xi[i] - xi[j]))
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/array_methods.py", line 493, in set
+ERROR:stderr:return scatter._scatter_update(self.array, self.index, values, lax.scatter,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/ops/scatter.py", line 80, in _scatter_update
+ERROR:stderr:return _scatter_impl(x, y, scatter_op, treedef, static_idx, dynamic_idx,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/ops/scatter.py", line 104, in _scatter_impl
+ERROR:stderr:indexer = jnp._index_to_gather(jnp.shape(x), idx,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 5836, in _index_to_gather
+ERROR:stderr:abstract_i = core.get_aval(i)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 1463, in get_aval
+ERROR:stderr:return concrete_aval(x)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 1452, in concrete_aval
+ERROR:stderr:if handler: return handler(x)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/abstract_arrays.py", line 68, in _make_concrete_python_scalar
+ERROR:stderr:return canonical_concrete_aval(np.array(x, dtype=dtype), weak_type=weak_type)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/abstract_arrays.py", line 46, in canonical_concrete_aval
+ERROR:stderr:return ConcreteArray(dtypes.canonicalize_dtype(np.result_type(val)), val,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 1769, in __init__
+ERROR:stderr:dtypes.check_valid_dtype(self.dtype)
+ERROR:stderr:KeyboardInterrupt
+ERROR:stderr:Traceback (most recent call last):
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+ERROR:stderr:return _run_code(code, main_globals, None,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
+ERROR:stderr:exec(code, run_globals)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 68, in <module>
+ERROR:stderr:main()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 57, in main
+ERROR:stderr:results, _ = runner.run(args.exp, seed = seed, data_type = args.data_type, layer_width = args.layer_width, t_range = args.t_range, n_steps = args.n_steps)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 107, in run
+ERROR:stderr:self.trainer = self.load_trainer(self.data_type, self.data_params['spacing_type'])
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 82, in load_trainer
+ERROR:stderr:trainer.prepare_inputs()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 100, in prepare_inputs
+ERROR:stderr:self.prepare_collocation()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 72, in prepare_collocation
+ERROR:stderr:self.D = np.array(self.collocation.compute_derivative_matrix())
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 66, in compute_derivative_matrix
+ERROR:stderr:self.D = Collocation.derivative_matrix_barycentric_v1(self.nodes)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 176, in derivative_matrix_barycentric_v1
+ERROR:stderr:weights = Collocation.compute_lagrange_weights(nodes)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 197, in compute_lagrange_weights
+ERROR:stderr:terms = nodes[j] - jnp.delete(nodes, j)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 3706, in delete
+ERROR:stderr:return concatenate([a[idx + (slice(0, obj),)], a[idx + (slice(obj + 1, None),)]], axis=axis)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/array.py", line 336, in __getitem__
+ERROR:stderr:return lax_numpy._rewriting_take(self, idx)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 5601, in _rewriting_take
+ERROR:stderr:if (result := _attempt_rewriting_take_via_slice(arr, idx, mode)) is not None:
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 5578, in _attempt_rewriting_take_via_slice
+ERROR:stderr:arr = lax.slice(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/lax/slicing.py", line 108, in slice
+ERROR:stderr:return slice_p.bind(operand, start_indices=tuple(start_indices),
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 387, in bind
+ERROR:stderr:return self.bind_with_trace(find_top_trace(args), args, params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 391, in bind_with_trace
+ERROR:stderr:out = trace.process_primitive(self, map(trace.full_raise, args), params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 879, in process_primitive
+ERROR:stderr:return primitive.impl(*tracers, **params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/lax/slicing.py", line 1169, in _slice_impl
+ERROR:stderr:return dispatch.apply_primitive(dynamic_slice_p, x, *start_indices,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/dispatch.py", line 86, in apply_primitive
+ERROR:stderr:outs = fun(*args)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/traceback_util.py", line 179, in reraise_with_filtered_traceback
+ERROR:stderr:return fun(*args, **kwargs)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 304, in cache_miss
+ERROR:stderr:outs, out_flat, out_tree, args_flat, jaxpr, attrs_tracked = _python_pjit_helper(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 181, in _python_pjit_helper
+ERROR:stderr:out_flat = pjit_p.bind(*args_flat, **params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 2789, in bind
+ERROR:stderr:return self.bind_with_trace(top_trace, args, params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 391, in bind_with_trace
+ERROR:stderr:out = trace.process_primitive(self, map(trace.full_raise, args), params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 879, in process_primitive
+ERROR:stderr:return primitive.impl(*tracers, **params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 1525, in _pjit_call_impl
+ERROR:stderr:return xc._xla.pjit(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 1508, in call_impl_cache_miss
+ERROR:stderr:out_flat, compiled = _pjit_call_impl_python(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 1434, in _pjit_call_impl_python
+ERROR:stderr:compiled = _resolve_and_lower(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/interpreters/pxla.py", line 2363, in compile
+ERROR:stderr:executable = UnloadedMeshExecutable.from_hlo(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/interpreters/pxla.py", line 2860, in from_hlo
+ERROR:stderr:xla_executable = _cached_compilation(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/interpreters/pxla.py", line 2678, in _cached_compilation
+ERROR:stderr:xla_executable = compiler.compile_or_get_cached(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/compiler.py", line 330, in compile_or_get_cached
+ERROR:stderr:return _compile_and_write_cache(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/compiler.py", line 501, in _compile_and_write_cache
+ERROR:stderr:executable = backend_compile(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/profiler.py", line 335, in wrapper
+ERROR:stderr:return func(*args, **kwargs)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/compiler.py", line 237, in backend_compile
+ERROR:stderr:return backend.compile(built_c, compile_options=options)
+ERROR:stderr:KeyboardInterrupt
+ERROR:stderr:Traceback (most recent call last):
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+ERROR:stderr:return _run_code(code, main_globals, None,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
+ERROR:stderr:exec(code, run_globals)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 68, in <module>
+ERROR:stderr:main()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 57, in main
+ERROR:stderr:results, _ = runner.run(args.exp, seed = seed, data_type = args.data_type, layer_width = args.layer_width, t_range = args.t_range, n_steps = args.n_steps)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 107, in run
+ERROR:stderr:self.trainer = self.load_trainer(self.data_type, self.data_params['spacing_type'])
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 82, in load_trainer
+ERROR:stderr:trainer.prepare_inputs()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 100, in prepare_inputs
+ERROR:stderr:self.prepare_collocation()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 72, in prepare_collocation
+ERROR:stderr:self.D = np.array(self.collocation.compute_derivative_matrix())
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 66, in compute_derivative_matrix
+ERROR:stderr:self.D = Collocation.derivative_matrix_barycentric_v1(self.nodes)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 176, in derivative_matrix_barycentric_v1
+ERROR:stderr:weights = Collocation.compute_lagrange_weights(nodes)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 197, in compute_lagrange_weights
+ERROR:stderr:terms = nodes[j] - jnp.delete(nodes, j)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 3706, in delete
+ERROR:stderr:return concatenate([a[idx + (slice(0, obj),)], a[idx + (slice(obj + 1, None),)]], axis=axis)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/array.py", line 336, in __getitem__
+ERROR:stderr:return lax_numpy._rewriting_take(self, idx)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 5601, in _rewriting_take
+ERROR:stderr:if (result := _attempt_rewriting_take_via_slice(arr, idx, mode)) is not None:
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 5578, in _attempt_rewriting_take_via_slice
+ERROR:stderr:arr = lax.slice(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/lax/slicing.py", line 108, in slice
+ERROR:stderr:return slice_p.bind(operand, start_indices=tuple(start_indices),
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 387, in bind
+ERROR:stderr:return self.bind_with_trace(find_top_trace(args), args, params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 391, in bind_with_trace
+ERROR:stderr:out = trace.process_primitive(self, map(trace.full_raise, args), params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 879, in process_primitive
+ERROR:stderr:return primitive.impl(*tracers, **params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/lax/slicing.py", line 1169, in _slice_impl
+ERROR:stderr:return dispatch.apply_primitive(dynamic_slice_p, x, *start_indices,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/dispatch.py", line 86, in apply_primitive
+ERROR:stderr:outs = fun(*args)
+ERROR:stderr:KeyboardInterrupt
+ERROR:stderr:Traceback (most recent call last):
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+ERROR:stderr:return _run_code(code, main_globals, None,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
+ERROR:stderr:exec(code, run_globals)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 68, in <module>
+ERROR:stderr:main()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 57, in main
+ERROR:stderr:results, _ = runner.run(args.exp, seed = seed, data_type = args.data_type, layer_width = args.layer_width, t_range = args.t_range, n_steps = args.n_steps)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 107, in run
+ERROR:stderr:self.trainer = self.load_trainer(self.data_type, self.data_params['spacing_type'])
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 82, in load_trainer
+ERROR:stderr:trainer.prepare_inputs()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 100, in prepare_inputs
+ERROR:stderr:self.prepare_collocation()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 72, in prepare_collocation
+ERROR:stderr:self.D = np.array(self.collocation.compute_derivative_matrix())
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 66, in compute_derivative_matrix
+ERROR:stderr:self.D = Collocation.derivative_matrix_barycentric_v1(self.nodes)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 176, in derivative_matrix_barycentric_v1
+ERROR:stderr:weights = Collocation.compute_lagrange_weights(nodes)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 197, in compute_lagrange_weights
+ERROR:stderr:terms = nodes[j] - jnp.delete(nodes, j)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 3706, in delete
+ERROR:stderr:return concatenate([a[idx + (slice(0, obj),)], a[idx + (slice(obj + 1, None),)]], axis=axis)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/array.py", line 336, in __getitem__
+ERROR:stderr:return lax_numpy._rewriting_take(self, idx)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 5601, in _rewriting_take
+ERROR:stderr:if (result := _attempt_rewriting_take_via_slice(arr, idx, mode)) is not None:
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 5578, in _attempt_rewriting_take_via_slice
+ERROR:stderr:arr = lax.slice(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/lax/slicing.py", line 108, in slice
+ERROR:stderr:return slice_p.bind(operand, start_indices=tuple(start_indices),
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 387, in bind
+ERROR:stderr:return self.bind_with_trace(find_top_trace(args), args, params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 391, in bind_with_trace
+ERROR:stderr:out = trace.process_primitive(self, map(trace.full_raise, args), params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 879, in process_primitive
+ERROR:stderr:return primitive.impl(*tracers, **params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/lax/slicing.py", line 1169, in _slice_impl
+ERROR:stderr:return dispatch.apply_primitive(dynamic_slice_p, x, *start_indices,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/dispatch.py", line 86, in apply_primitive
+ERROR:stderr:outs = fun(*args)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/traceback_util.py", line 179, in reraise_with_filtered_traceback
+ERROR:stderr:return fun(*args, **kwargs)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 304, in cache_miss
+ERROR:stderr:outs, out_flat, out_tree, args_flat, jaxpr, attrs_tracked = _python_pjit_helper(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 181, in _python_pjit_helper
+ERROR:stderr:out_flat = pjit_p.bind(*args_flat, **params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 2789, in bind
+ERROR:stderr:return self.bind_with_trace(top_trace, args, params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 391, in bind_with_trace
+ERROR:stderr:out = trace.process_primitive(self, map(trace.full_raise, args), params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 879, in process_primitive
+ERROR:stderr:return primitive.impl(*tracers, **params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 1525, in _pjit_call_impl
+ERROR:stderr:return xc._xla.pjit(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 1508, in call_impl_cache_miss
+ERROR:stderr:out_flat, compiled = _pjit_call_impl_python(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 1434, in _pjit_call_impl_python
+ERROR:stderr:compiled = _resolve_and_lower(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/interpreters/pxla.py", line 2363, in compile
+ERROR:stderr:executable = UnloadedMeshExecutable.from_hlo(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/interpreters/pxla.py", line 2860, in from_hlo
+ERROR:stderr:xla_executable = _cached_compilation(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/interpreters/pxla.py", line 2678, in _cached_compilation
+ERROR:stderr:xla_executable = compiler.compile_or_get_cached(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/compiler.py", line 330, in compile_or_get_cached
+ERROR:stderr:return _compile_and_write_cache(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/compiler.py", line 501, in _compile_and_write_cache
+ERROR:stderr:executable = backend_compile(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/profiler.py", line 335, in wrapper
+ERROR:stderr:return func(*args, **kwargs)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/compiler.py", line 237, in backend_compile
+ERROR:stderr:return backend.compile(built_c, compile_options=options)
+ERROR:stderr:KeyboardInterrupt
+ERROR:stderr:Traceback (most recent call last):
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+ERROR:stderr:return _run_code(code, main_globals, None,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
+ERROR:stderr:exec(code, run_globals)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 68, in <module>
+ERROR:stderr:main()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 57, in main
+ERROR:stderr:results, _ = runner.run(args.exp, seed = seed, data_type = args.data_type, layer_width = args.layer_width, t_range = args.t_range, n_steps = args.n_steps)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 107, in run
+ERROR:stderr:self.trainer = self.load_trainer(self.data_type, self.data_params['spacing_type'])
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 82, in load_trainer
+ERROR:stderr:trainer.prepare_inputs()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 100, in prepare_inputs
+ERROR:stderr:self.prepare_collocation()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 72, in prepare_collocation
+ERROR:stderr:self.D = np.array(self.collocation.compute_derivative_matrix())
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 66, in compute_derivative_matrix
+ERROR:stderr:self.D = Collocation.derivative_matrix_barycentric_v1(self.nodes)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 176, in derivative_matrix_barycentric_v1
+ERROR:stderr:weights = Collocation.compute_lagrange_weights(nodes)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 197, in compute_lagrange_weights
+ERROR:stderr:terms = nodes[j] - jnp.delete(nodes, j)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 3706, in delete
+ERROR:stderr:return concatenate([a[idx + (slice(0, obj),)], a[idx + (slice(obj + 1, None),)]], axis=axis)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/array.py", line 336, in __getitem__
+ERROR:stderr:return lax_numpy._rewriting_take(self, idx)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 5601, in _rewriting_take
+ERROR:stderr:if (result := _attempt_rewriting_take_via_slice(arr, idx, mode)) is not None:
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 5578, in _attempt_rewriting_take_via_slice
+ERROR:stderr:arr = lax.slice(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/lax/slicing.py", line 108, in slice
+ERROR:stderr:return slice_p.bind(operand, start_indices=tuple(start_indices),
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 387, in bind
+ERROR:stderr:return self.bind_with_trace(find_top_trace(args), args, params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 391, in bind_with_trace
+ERROR:stderr:out = trace.process_primitive(self, map(trace.full_raise, args), params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 879, in process_primitive
+ERROR:stderr:return primitive.impl(*tracers, **params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/lax/slicing.py", line 1169, in _slice_impl
+ERROR:stderr:return dispatch.apply_primitive(dynamic_slice_p, x, *start_indices,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/dispatch.py", line 86, in apply_primitive
+ERROR:stderr:outs = fun(*args)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/traceback_util.py", line 179, in reraise_with_filtered_traceback
+ERROR:stderr:return fun(*args, **kwargs)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 304, in cache_miss
+ERROR:stderr:outs, out_flat, out_tree, args_flat, jaxpr, attrs_tracked = _python_pjit_helper(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 181, in _python_pjit_helper
+ERROR:stderr:out_flat = pjit_p.bind(*args_flat, **params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 2789, in bind
+ERROR:stderr:return self.bind_with_trace(top_trace, args, params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 391, in bind_with_trace
+ERROR:stderr:out = trace.process_primitive(self, map(trace.full_raise, args), params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 879, in process_primitive
+ERROR:stderr:return primitive.impl(*tracers, **params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 1525, in _pjit_call_impl
+ERROR:stderr:return xc._xla.pjit(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 1508, in call_impl_cache_miss
+ERROR:stderr:out_flat, compiled = _pjit_call_impl_python(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 1434, in _pjit_call_impl_python
+ERROR:stderr:compiled = _resolve_and_lower(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/interpreters/pxla.py", line 2363, in compile
+ERROR:stderr:executable = UnloadedMeshExecutable.from_hlo(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/interpreters/pxla.py", line 2860, in from_hlo
+ERROR:stderr:xla_executable = _cached_compilation(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/interpreters/pxla.py", line 2660, in _cached_compilation
+ERROR:stderr:detailed_logging=compiler.use_detailed_logging(computation),
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/compiler.py", line 92, in use_detailed_logging
+ERROR:stderr:return _walk_operations(module.operation, bound) < 0
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/compiler.py", line 83, in _walk_operations
+ERROR:stderr:k = _walk_operations(child_op, k)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/compiler.py", line 83, in _walk_operations
+ERROR:stderr:k = _walk_operations(child_op, k)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/compiler.py", line 80, in _walk_operations
+ERROR:stderr:for region in op.regions:
+ERROR:stderr:KeyboardInterrupt
+ERROR:stderr:usage: training_conv_pyomo.py [-h] [--no_print NO_PRINT] [--config CONFIG] [--exp EXP] [--n_seeds N_SEEDS] [--outdir OUTDIR] [--data_type DATA_TYPE]
+ERROR:stderr:                              [--layer_width LAYER_WIDTH] [--t_range T_RANGE] [--n_steps N_STEPS]
+ERROR:stderr:training_conv_pyomo.py: error: argument --no_print: expected one argument
+ERROR:stderr:Traceback (most recent call last):
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+ERROR:stderr:return _run_code(code, main_globals, None,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
+ERROR:stderr:exec(code, run_globals)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 68, in <module>
+ERROR:stderr:main()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 57, in main
+ERROR:stderr:results, _ = runner.run(args.exp, seed = seed, data_type = args.data_type, layer_width = args.layer_width, t_range = args.t_range, n_steps = args.n_steps)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 111, in run
+ERROR:stderr:param_combinations = self.get_param_combinations(optimization_type, t_range = t_range, n_steps = n_steps)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 196, in get_param_combinations
+ERROR:stderr:base = np.linspace(0, 1, n_steps)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/numpy/core/function_base.py", line 122, in linspace
+ERROR:stderr:num = operator.index(num)
+ERROR:stderr:TypeError
+ERROR:stderr::
+ERROR:stderr:'str' object cannot be interpreted as an integer
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'

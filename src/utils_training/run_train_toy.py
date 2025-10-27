@@ -128,6 +128,7 @@ class TrainerToy:
         self.pre_initialize = params_model.get('pre_initialize', True)
         self.reg_norm = params_model.get('reg_norm', False)
         self.skip_collocation = params_model.get('skip_collocation', np.inf)
+        self.redirect_logs = params_model.get('redirect_logs', False)
 
     def train_pyomo(self, params_model, seed):
         
@@ -153,7 +154,7 @@ class TrainerToy:
                         )
         
         self.model.build_model()
-        result = self.model.solve_model()        
+        result = self.model.solve_model(redirect_logs = self.redirect_logs)        
         self.time_elapsed = result['solver_time']
         self.termination = result['termination_condition']
         print(result)
@@ -334,7 +335,7 @@ class TrainerToy:
         self.prepare_train_params_pytorch(params_model)
         
         # Initialize the model
-        self.model = PytorchModel(self.layer_widths, self.lr, custom_weights = custom_params)
+        self.model = PytorchModel(self.layer_widths, self.lr, custom_weights = custom_params, time_invariant = self.time_invar)
         
         # Convert data to appropriate tensor format
         self.t = torch.tensor(self.t, dtype=torch.float32)

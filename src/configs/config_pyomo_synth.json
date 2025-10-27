@@ -1,0 +1,71 @@
+{
+    "model_params": {
+      "layer_widths": [2, 16, 2],
+      "act_func": "tanh",
+      "penalty_lambda_reg": 0.001,
+      "time_invariant": true,
+      "w_init_method": "xavier",
+      "reg_norm": false,
+      "skip_collocation": "inf",
+      "redirect_logs": true,
+      "params": {
+        "tol": 1e-8,
+        "print_level": 1,
+        "max_iter": 3000
+      }
+    },
+    "data": {
+      "data_type": "ho",
+      "spacing_type": "chebyshev",
+      "noise_level": 0.2,
+      "___comment": "possible spacing types: 'chebyshev', 'gauss_legendre', 'gauss_radau', 'gauss_lobatto' "
+    },
+    "optimization_types": {
+      "regularization": {
+        "param_values": [1e-6, 0.0001, 0.01, 0.1, 1]
+      },
+      "tolerances": {
+        "tol_list": [1, 0.1, 0.01, 0.0001, 1e-6, 1e-8]
+      },
+      "reg_tol": {
+        "reg_list": [0.001, 0.01, 0.1],
+        "tol_list": [1e-6, 1e-7, 1e-8]
+      },
+      "skip_collocation": {
+        "param_values": ["inf", 25, 10, 5, 2, 1]
+      },
+      "training_convergence": {
+        "data": ["ho"],
+        "pre_initialize": true,
+        "l_range": [1, 100]
+      },
+      "training_convergence_wall_time": {
+        "pre_initialize": true,
+        "t_range": [0.01, 6],
+        "n_steps": 50
+      },
+      "network_size_grid_search": {
+        "lw_list": [
+          [2, 8, 2],
+          [2, 16, 2],
+          [2, 32, 2],
+          [2, 64, 2],
+          [2, 128, 2]
+        ],
+        "reg_list": [0.0001, 0.001, 0.01],
+        "tol_list": [1e-4, 1e-6]
+      },
+      "activation_function": {
+        "act_func_list": ["tanh", "softplus", "sigmoid"],
+        "data": ["ho", "vdp", "do"]
+      },
+      "weights_init": {
+        "weights_init_list": ["xavier", "he", "random"],
+        "data": ["ho", "vdp", "do"]
+      },
+      "default": {
+        "___comment": "no parameters to iterate over"
+      }
+    }
+  }
+  

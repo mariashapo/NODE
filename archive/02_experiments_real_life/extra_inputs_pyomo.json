@@ -1,0 +1,20 @@
+{
+    "params_data": {
+        "file_path": "../00_data/df_train.csv",
+        "start_date": "2018-01-01",
+        "n_points": 400,
+        "split": 200,
+        "n_days": 1,
+        "m": 0,
+        "prev_hour": true,
+        "prev_week": true,
+        "prev_year": false,
+        "spacing": "gauss_radau",
+        "encoding": {
+            "settlement_date": "t",
+            "temperature": "var1",
+            "hour": "var2",
+            "nd": "y"
+        }
+    }
+}

@@ -35,6 +35,7 @@ Requires-Dist: equinox>=0.11.4; extra == "jax-cpu"
 Requires-Dist: optax>=0.2.2; extra == "jax-cpu"
 Requires-Dist: chex>=0.1.86; extra == "jax-cpu"
 Requires-Dist: jaxtyping>=0.2.31; extra == "jax-cpu"
+Requires-Dist: flax>=0.8.4; extra == "jax-cpu"
 Provides-Extra: optim
 Requires-Dist: casadi>=3.6; extra == "optim"
 Requires-Dist: proxsuite>=0.6; extra == "optim"
@@ -148,5 +149,7 @@ extra_input['plot_collocation'] = True
 extra_input['plot_odeint'] = True
 ```
 
-
+```bash
+python -m pip install -e .
 python -m training_convergnce_studies.training_convergence
+```

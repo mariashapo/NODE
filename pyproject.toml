@@ -75,7 +75,7 @@ optim = [
 
 [tool.setuptools]
 package-dir = { "" = "src" }
-
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["utils*", "utils_training*", "models*", "training_convergnce_studies*"]
+
