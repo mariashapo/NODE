@@ -9,7 +9,7 @@ def main():
     p.add_argument("--n_seeds", type=int, default=1)
     p.add_argument("--outdir", default="results/pytorch")
     p.add_argument("--data_type", default = "ho")
-    p.add_argument("--max_iter", type=json.loads, default=[400, 400])
+    p.add_argument("--max_iter", type=json.loads, default=[200, 1000])
     p.add_argument("--pretrain", type=json.loads, default=[0.2, 1])
     args = p.parse_args()
     

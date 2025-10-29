@@ -58,7 +58,7 @@ def main():
         i+=1
 
     ts = time.strftime('%Y-%m-%d_%H-%M')
-    filename = os.path.join(args.outdir, f'{ts}_{args.data_type}_conv_time_{args.n_seeds}_seeds.pkl')
+    filename = os.path.join(args.outdir, f'pyomo_{ts}_{args.data_type}_{args.n_seeds}_seeds_ct.pkl')
     with open(filename, 'wb') as f:
         pickle.dump(all_results, f)
     print(f"Results saved to {filename}")
