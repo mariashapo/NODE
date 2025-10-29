@@ -832,3 +832,81 @@ ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute
 ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
 ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
 ERROR:root:Failed to complete training: 'NeuralODEPyomo' object has no attribute 'redirect_logs'
+ERROR:stderr:Traceback (most recent call last):
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+ERROR:stderr:return _run_code(code, main_globals, None,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
+ERROR:stderr:exec(code, run_globals)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 70, in <module>
+ERROR:stderr:main()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 55, in main
+ERROR:stderr:results, trainer = runner.run(args.exp, seed = seed, data_type = args.data_type, layer_width = args.layer_width, t_range = args.t_range, n_steps = args.n_steps)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 108, in run
+ERROR:stderr:self.trainer = self.load_trainer(self.data_type, self.data_params['spacing_type'])
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 82, in load_trainer
+ERROR:stderr:trainer.prepare_inputs()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 100, in prepare_inputs
+ERROR:stderr:self.prepare_collocation()
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 72, in prepare_collocation
+ERROR:stderr:self.D = np.array(self.collocation.compute_derivative_matrix())
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 66, in compute_derivative_matrix
+ERROR:stderr:self.D = Collocation.derivative_matrix_barycentric_v1(self.nodes)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 176, in derivative_matrix_barycentric_v1
+ERROR:stderr:weights = Collocation.compute_lagrange_weights(nodes)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 197, in compute_lagrange_weights
+ERROR:stderr:terms = nodes[j] - jnp.delete(nodes, j)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 3706, in delete
+ERROR:stderr:return concatenate([a[idx + (slice(0, obj),)], a[idx + (slice(obj + 1, None),)]], axis=axis)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 2305, in concatenate
+ERROR:stderr:arrays_out = [lax.concatenate(arrays_out[i:i+k], axis)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 2305, in <listcomp>
+ERROR:stderr:arrays_out = [lax.concatenate(arrays_out[i:i+k], axis)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/lax/lax.py", line 623, in concatenate
+ERROR:stderr:return concatenate_p.bind(*operands, dimension=dimension)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 387, in bind
+ERROR:stderr:return self.bind_with_trace(find_top_trace(args), args, params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 391, in bind_with_trace
+ERROR:stderr:out = trace.process_primitive(self, map(trace.full_raise, args), params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 879, in process_primitive
+ERROR:stderr:return primitive.impl(*tracers, **params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/dispatch.py", line 86, in apply_primitive
+ERROR:stderr:outs = fun(*args)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/traceback_util.py", line 179, in reraise_with_filtered_traceback
+ERROR:stderr:return fun(*args, **kwargs)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 304, in cache_miss
+ERROR:stderr:outs, out_flat, out_tree, args_flat, jaxpr, attrs_tracked = _python_pjit_helper(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 181, in _python_pjit_helper
+ERROR:stderr:out_flat = pjit_p.bind(*args_flat, **params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 2789, in bind
+ERROR:stderr:return self.bind_with_trace(top_trace, args, params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 391, in bind_with_trace
+ERROR:stderr:out = trace.process_primitive(self, map(trace.full_raise, args), params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 879, in process_primitive
+ERROR:stderr:return primitive.impl(*tracers, **params)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 1525, in _pjit_call_impl
+ERROR:stderr:return xc._xla.pjit(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 1508, in call_impl_cache_miss
+ERROR:stderr:out_flat, compiled = _pjit_call_impl_python(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 1434, in _pjit_call_impl_python
+ERROR:stderr:compiled = _resolve_and_lower(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 1422, in _resolve_and_lower
+ERROR:stderr:lowered = _pjit_lower(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 1535, in _pjit_lower
+ERROR:stderr:return _pjit_lower_cached(*args, **kwargs)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 1572, in _pjit_lower_cached
+ERROR:stderr:return pxla.lower_sharding_computation(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/profiler.py", line 335, in wrapper
+ERROR:stderr:return func(*args, **kwargs)
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/interpreters/pxla.py", line 2129, in lower_sharding_computation
+ERROR:stderr:nreps, tuple_args, shape_poly_state) = _cached_lowering_to_hlo(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/interpreters/pxla.py", line 1941, in _cached_lowering_to_hlo
+ERROR:stderr:lowering_result = mlir.lower_jaxpr_to_module(
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/interpreters/mlir.py", line 957, in lower_jaxpr_to_module
+ERROR:stderr:ctx = ModuleContext(backend_or_name=backend_or_name,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/interpreters/mlir.py", line 647, in __init__
+ERROR:stderr:self.context = context or make_ir_context()
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/interpreters/mlir.py", line 499, in make_ir_context
+ERROR:stderr:context = ir.Context()
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jaxlib/mlir/_mlir_libs/__init__.py", line 127, in __init__
+ERROR:stderr:super().__init__(*args, **kwargs)
+ERROR:stderr:KeyboardInterrupt

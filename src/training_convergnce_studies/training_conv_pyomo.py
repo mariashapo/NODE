@@ -1,5 +1,5 @@
 # run_training.py
-import argparse, os, time, pickle
+import argparse, os, time, pickle, gc
 from utils_training.optimize_pyomo_synthetic import ExperimentRunner as PyomoExperimentRunner
 from utils.general import generate_seeds
 import argparse, json
@@ -45,17 +45,20 @@ def main():
         sys.stdout = _StreamToLogger(stdout_logger, logging.INFO)   # captures print()
 
     os.makedirs(args.outdir, exist_ok=True)
-    runner = PyomoExperimentRunner(args.config)
     all_results = []
 
     print("STARTING TRAINING")
     i = 1
     for seed in generate_seeds(args.n_seeds):
         print(f"EXECUTING SEED {seed} ({i}/{args.n_seeds})")
-        # run(self, optimization_type, seed = None, data_type = None, layer_width = None, t_range = None, n_steps = None)
-        results, _ = runner.run(args.exp, seed = seed, data_type = args.data_type, layer_width = args.layer_width, t_range = args.t_range, n_steps = args.n_steps)
+        runner = PyomoExperimentRunner(args.config)
+        results, trainer = runner.run(args.exp, seed = seed, data_type = args.data_type, layer_width = args.layer_width, t_range = args.t_range, n_steps = args.n_steps)
         all_results.append(results)
         i+=1
+        
+        # clean up memory here
+        del trainer, runner
+        gc.collect()
 
     ts = time.strftime('%Y-%m-%d_%H-%M')
     filename = os.path.join(args.outdir, f'pyomo_{ts}_{args.data_type}_{args.n_seeds}_seeds_ct.pkl')
