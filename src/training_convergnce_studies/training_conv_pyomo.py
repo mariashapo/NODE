@@ -5,11 +5,16 @@ from utils.general import generate_seeds
 import argparse, json
 import io, sys, logging, warnings
 
-# 2) Send Python warnings into logging (instead of terminal)
-logging.captureWarnings(True)
-warnings.filterwarnings("ignore", category=UserWarning)
+# --- basic setup ---
+os.makedirs("logs", exist_ok=True)
+logging.basicConfig(
+    filename="logs/pyomo_training.log",
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    force=True  # reconfigure even if logging was used before
+)
 
-# # 3) Redirect *print()* and uncaught errors to logging (no terminal output)
+# --- redirect prints (only if later enabled it with --no_print True) ---
 class _StreamToLogger(io.TextIOBase):
     def __init__(self, logger, level):
         self.logger = logger
@@ -19,11 +24,8 @@ class _StreamToLogger(io.TextIOBase):
         if buf:
             for line in buf.splitlines():
                 self.logger.log(self.level, line)
-    def flush(self):  # needed for some libraries
+    def flush(self):
         pass
-
-stdout_logger = logging.getLogger("stdout")
-stderr_logger = logging.getLogger("stderr")
 
 def main():
     p = argparse.ArgumentParser()
@@ -41,8 +43,8 @@ def main():
 
     if args.no_print:
         print(f"Disabling print statements {args.no_print}.")
-        sys.stderr = _StreamToLogger(stderr_logger, logging.ERROR) 
-        sys.stdout = _StreamToLogger(stdout_logger, logging.INFO)   # captures print()
+        sys.stderr = _StreamToLogger(logging.getLogger("stderr"), logging.ERROR) 
+        sys.stdout = _StreamToLogger(logging.getLogger("stdout"), logging.INFO)   # captures print()
 
     os.makedirs(args.outdir, exist_ok=True)
     all_results = []

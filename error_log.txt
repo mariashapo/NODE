@@ -910,3 +910,32 @@ ERROR:stderr:context = ir.Context()
 ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jaxlib/mlir/_mlir_libs/__init__.py", line 127, in __init__
 ERROR:stderr:super().__init__(*args, **kwargs)
 ERROR:stderr:KeyboardInterrupt
+ERROR:stderr:Traceback (most recent call last):
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+ERROR:stderr:return _run_code(code, main_globals, None,
+ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
+ERROR:stderr:exec(code, run_globals)
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 77, in <module>
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 62, in main
+ERROR:stderr:del trainer, runner
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 152, in run
+ERROR:stderr:return self.results, trainer
+ERROR:stderr:UnboundLocalError
+ERROR:stderr::
+ERROR:stderr:local variable 'trainer' referenced before assignment
+ERROR:stderr:/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/non_parametric_collocation.py:95: UserWarning: Data transposed to match expected dimensions.
+ERROR:stderr:  warnings.warn("Data transposed to match expected dimensions.")
+ERROR:stderr:/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/models/nn_pyomo_base.py:87: UserWarning: y_init should be structured such that each row represents a new time point.
+ERROR:stderr:  warnings.warn("y_init should be structured such that each row represents a new time point.")
+ERROR:stderr:/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/non_parametric_collocation.py:95: UserWarning: Data transposed to match expected dimensions.
+ERROR:stderr:  warnings.warn("Data transposed to match expected dimensions.")
+ERROR:stderr:/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/models/nn_pyomo_base.py:87: UserWarning: y_init should be structured such that each row represents a new time point.
+ERROR:stderr:  warnings.warn("y_init should be structured such that each row represents a new time point.")
+ERROR:stderr:/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/non_parametric_collocation.py:95: UserWarning: Data transposed to match expected dimensions.
+ERROR:stderr:  warnings.warn("Data transposed to match expected dimensions.")
+ERROR:stderr:/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/models/nn_pyomo_base.py:87: UserWarning: y_init should be structured such that each row represents a new time point.
+ERROR:stderr:  warnings.warn("y_init should be structured such that each row represents a new time point.")
+ERROR:stderr:/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/non_parametric_collocation.py:95: UserWarning: Data transposed to match expected dimensions.
+ERROR:stderr:  warnings.warn("Data transposed to match expected dimensions.")
+ERROR:stderr:/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/models/nn_pyomo_base.py:87: UserWarning: y_init should be structured such that each row represents a new time point.
+ERROR:stderr:  warnings.warn("y_init should be structured such that each row represents a new time point.")

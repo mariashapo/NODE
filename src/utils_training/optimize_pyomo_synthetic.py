@@ -82,66 +82,66 @@ class ExperimentRunner:
         trainer.prepare_inputs()
         return trainer
         
-    def run(self, optimization_type, seed = None, data_type = None, layer_width = None, t_range = None, n_steps = None):
-        """
-        Args:
-            optimization_type (str) : specifies which optimization type to fetch from the config.
-            seed (int) : seed to use for weight initializations.
-            data_type (str) : data type to be used. If None, get it from the config.
-            layer_width ()
-        
-        - Load the trainer with the specified 'data type' and 'spacing type', (self.trainer).
-        - Obtain the parameter combinations for the specified optimization type.
-        - Loop over the parameter combinations.
-            - Update the model parameters. Might also update the trainer, (self.trainer).
-            - Train the model with the updated model parameters.
-            - Extract the results from the trained model, (results[param_comb]).
-        """
-        
-        # handle 'inf' string in skip_collocation
+    def run(self, optimization_type, seed=None, data_type=None, layer_width=None, t_range=None, n_steps=None):
         if self.params_model['skip_collocation'] == 'inf':
             self.params_model['skip_collocation'] = np.inf
-        
-        # we want to add a possibility of over-writing the data config in here 
+
         self.data_params = self.config['data']
         self.data_type = data_type if data_type is not None else self.data_params['data_type']
-        self.trainer = self.load_trainer(self.data_type, self.data_params['spacing_type'])
         self.results = {}
 
-        # generate the parameter combinations to loop over for the optimization type
-        param_combinations = self.get_param_combinations(optimization_type, t_range = t_range, n_steps = n_steps)
+        param_combinations = self.get_param_combinations(optimization_type, t_range=t_range, n_steps=n_steps)
         print(f"PARAM COMBINATIONS GENERATED: {param_combinations}")
         total_iter = len(param_combinations)
         i = i_since_convergence = 1
 
-        # loop over the parameter combinations
         for param_comb in param_combinations:
             skip_combination = self.update_params_model(param_comb, optimization_type, i_since_convergence)
-            
             if skip_combination:
                 continue
+
+            trainer = None
             try:
-                self.trainer.train_pyomo(self.params_model, seed)
-                if (optimization_type in ['training_convergence', 'training_convergence_wall_time']) and 'optimal' in self.trainer.termination:
+                # fresh trainer per combo
+                trainer = self.load_trainer(self.data_type, self.data_params['spacing_type'])
+                trainer.train_pyomo(self.params_model, seed)
+
+                if (optimization_type in ['training_convergence', 'training_convergence_wall_time']) \
+                and 'optimal' in getattr(trainer, 'termination', ''):
                     print(f"Optimal solution found at/before iteration {param_comb}")
                     self.tested_params.append((param_comb[0], param_comb[1]))
                     i_since_convergence = 1
+
+                # extract → try to keep only small scalars in results
+                try:
+                    r = trainer.extract_results_pyomo()
+                except Exception as e:
+                    r = {'time_elapsed': np.nan, 'mse_train': np.nan, 'mse_test': np.nan}
+                    logging.error(f"Failed to extract results: {e}")
+
+                # optional: coerce to small payload (avoid big arrays)
+                small = {}
+                for k in ('time_elapsed', 'mse_train', 'mse_test', 'status', 'termination'):
+                    if k in r:
+                        small[k] = r[k]
+                self.results[param_comb] = small if small else r
+
             except Exception as e:
                 self.results[param_comb] = {'time_elapsed': np.nan, 'mse_train': np.nan, 'mse_test': np.nan}
                 logging.error(f"Failed to complete training: {e}")
-                continue
 
-            try:
-                self.extract_results(self.trainer, param_comb, optimization_type, self.results)
-            except Exception as e:
-                self.results[param_comb] = {'time_elapsed': np.nan, 'mse_train': np.nan, 'mse_test': np.nan}
-                logging.error(f"Failed to extract results: {e}")
+            # aggressive cleanup
+            self._cleanup_trainer(trainer)
+            del trainer
+            import gc
+            gc.collect()
 
             print(f"Iteration: {i} / {total_iter}")
             i_since_convergence += 1
             i += 1
 
-        return self.results, self.trainer
+        return self.results, None
+
 
     def get_param_combinations(self, optimization_type, t_range = None, n_steps = None):
         """
@@ -249,26 +249,21 @@ class ExperimentRunner:
         elif optimization_type == 'training_convergence':
             data, pre_init, max_iter = param_comb
             self.params_model['params']['max_iter'] = max_iter
-
             if max_iter == 1:
-                self.trainer = self.load_trainer(data)
                 self.params_model['pre_initialize'] = pre_init
                 self.tested_params = []
-
             if (data, pre_init) in self.tested_params:
                 skip_combination = True
-                
+
         elif optimization_type == 'training_convergence_wall_time':
             data, pre_init, max_time = param_comb
             self.params_model['params']['max_wall_time'] = max_time
-
             if param_iteration == 1:
-                self.trainer = self.load_trainer(data)
                 self.params_model['pre_initialize'] = pre_init
                 self.tested_params = []
-
             if (data, pre_init) in self.tested_params:
                 skip_combination = True
+
 
         elif optimization_type == 'network_size_grid_search':
             lw, reg, tol = param_comb
@@ -284,7 +279,7 @@ class ExperimentRunner:
         elif optimization_type == 'weights_init':
             w_init, data = param_comb
             self.params_model['w_init_method'] = w_init
-            self.trainer = self.load_trainer(data)
+            self.params_model['pre_initialize'] = pre_init
         
         elif optimization_type == 'default':
             pass    
@@ -300,6 +295,30 @@ class ExperimentRunner:
     
     def extract_solution(self):
         return self.trainer.extract_pyomo_solution()
+
+    def _cleanup_trainer(self, t):
+        if t is None:
+            return
+        # If trainer exposes a close/reset, call it
+        try:
+            close = getattr(t, "close", None)
+            if callable(close):
+                close()
+        except Exception:
+            pass
+
+        # Null out heavy known attributes if they exist
+        for attr in (
+            "model","instance","solver","results_pyomo",
+            "train_data","test_data","X","Y","train_X","train_y","test_X","test_y",
+            "history","logs","nlp","jac","hess"
+        ):
+            if hasattr(t, attr):
+                try:
+                    setattr(t, attr, None)
+                except Exception:
+                    pass
+
 
 def reload_and_get_attribute(module, attribute_name):
     """

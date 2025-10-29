@@ -1,0 +1,17 @@
+2025-10-29 19:24:26,168 [INFO] STARTING TRAINING
+2025-10-29 19:24:26,168 [INFO] EXECUTING SEED 1775569751 (1/1)
+2025-10-29 19:24:26,169 [INFO] PARAM COMBINATIONS GENERATED: [('ho', True, 0.01), ('ho', True, 0.44688), ('ho', True, 1.7575), ('ho', True, 3.94188), ('ho', True, 7.0)]
+2025-10-29 19:24:55,458 [INFO] seed 1775569751
+2025-10-29 19:24:55,993 [INFO] Redirect logs: True
+2025-10-29 19:24:56,339 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2025-10-29 19:24:56,341 [INFO] {'solver_time': 0.13894104957580566, 'termination_condition': <TerminationCondition.maxIterations: 'maxIterations'>, 'message': 'Ipopt 3.14.16\\x3a Maximum Wallclock Time Exceeded.'}
+2025-10-29 19:24:57,204 [INFO] Iteration: 1 / 5
+2025-10-29 19:25:13,522 [INFO] seed 1775569751
+2025-10-29 19:25:13,992 [INFO] Redirect logs: True
+2025-10-29 19:25:14,746 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2025-10-29 19:25:14,747 [INFO] {'solver_time': 0.5508391857147217, 'termination_condition': <TerminationCondition.maxIterations: 'maxIterations'>, 'message': 'Ipopt 3.14.16\\x3a Maximum Wallclock Time Exceeded.'}
+2025-10-29 19:25:15,532 [INFO] Iteration: 2 / 5
