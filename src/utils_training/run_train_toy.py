@@ -101,13 +101,13 @@ class TrainerToy:
             self.estimate_derivative()
     
     #----------------------------------------------------------------GENERAL PUBLIC FUNCTIONS ---------------------------------------------------        
-    def train(self, params_model, params_solver = None):
+    def train(self, params_model, params_solver = None, seed = 42):
         if self.model_type == 'pyomo':
-            self.train_pyomo(params_model, params_solver)
+            self.train_pyomo(params_model, params_solver, seed)
         elif self.model_type == 'jax_diffrax':
-            self.train_diffrax(params_model, params_solver)
+            self.train_diffrax(params_model, params_solver, seed)
         elif self.model_type == 'pytorch':
-            self.train_pytorch(params_model, params_solver)
+            self.train_pytorch(params_model, params_solver, seed)
             
     def extract_results(self):
         if self.model_type == 'pyomo':
@@ -235,10 +235,11 @@ class TrainerToy:
             raise ValueError(f"Unsupported activation function provided: {self.act_func}")
         
 
-    def train_diffrax(self, params_model, custom_params):
+    def train_diffrax(self, params_model, custom_params, seed):
         self.prepare_train_params_diffrax(params_model)
         
-        rng = random.PRNGKey(42)
+        rng = random.PRNGKey(seed)
+        print(f"Using seed {seed} for JAX training.")
         self.model = JaxDiffModel(self.layer_widths, self.time_invar, act_func = self.act_func)
         # initialize the training state
         self.state = self.model.create_train_state(rng, self.lr, self.lambda_reg, self.rtol, self.atol, self.dt0, custom_params)
@@ -331,11 +332,11 @@ class TrainerToy:
                 'extra_args_test': None
             }
         
-    def train_pytorch(self, params_model, custom_params):
+    def train_pytorch(self, params_model, custom_params, seed = 42):
         self.prepare_train_params_pytorch(params_model)
         
         # Initialize the model
-        self.model = PytorchModel(self.layer_widths, self.lr, custom_weights = custom_params, time_invariant = self.time_invar)
+        self.model = PytorchModel(self.layer_widths, self.lr, custom_weights = custom_params, time_invariant = self.time_invar, seed = seed)
         
         # Convert data to appropriate tensor format
         self.t = torch.tensor(self.t, dtype=torch.float32)

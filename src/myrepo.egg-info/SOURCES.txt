@@ -12,8 +12,9 @@ src/myrepo.egg-info/SOURCES.txt
 src/myrepo.egg-info/dependency_links.txt
 src/myrepo.egg-info/requires.txt
 src/myrepo.egg-info/top_level.txt
-src/training_convergnce_studies/training_conv_pyomo.py
-src/training_convergnce_studies/training_conv_pytorch.py
+src/training_convergence/training_conv_jax.py
+src/training_convergence/training_conv_pyomo.py
+src/training_convergence/training_conv_pytorch.py
 src/utils/__init__.py
 src/utils/analyse_results.py
 src/utils/collocation.py

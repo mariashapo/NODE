@@ -3,9 +3,9 @@ ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/run
 ERROR:stderr:return _run_code(code, main_globals, None,
 ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
 ERROR:stderr:exec(code, run_globals)
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 56, in <module>
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 56, in <module>
 ERROR:stderr:main()
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 46, in main
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 46, in main
 ERROR:stderr:results, _ = runner.run(args.exp, s)
 ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 100, in run
 ERROR:stderr:self.trainer = self.load_trainer(self.data_params['data_type'], self.data_params['spacing_type'])
@@ -41,9 +41,9 @@ ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/run
 ERROR:stderr:return _run_code(code, main_globals, None,
 ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
 ERROR:stderr:exec(code, run_globals)
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 56, in <module>
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 56, in <module>
 ERROR:stderr:main()
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 46, in main
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 46, in main
 ERROR:stderr:results, _ = runner.run(args.exp, s)
 ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 115, in run
 ERROR:stderr:self.trainer.train_pyomo(self.params_model, seed)
@@ -73,9 +73,9 @@ ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/run
 ERROR:stderr:return _run_code(code, main_globals, None,
 ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
 ERROR:stderr:exec(code, run_globals)
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 56, in <module>
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 56, in <module>
 ERROR:stderr:main()
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 46, in main
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 46, in main
 ERROR:stderr:results, _ = runner.run(args.exp, s)
 ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 115, in run
 ERROR:stderr:self.trainer.train_pyomo(self.params_model, seed)
@@ -101,9 +101,9 @@ ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/run
 ERROR:stderr:return _run_code(code, main_globals, None,
 ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
 ERROR:stderr:exec(code, run_globals)
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 57, in <module>
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 57, in <module>
 ERROR:stderr:main()
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 47, in main
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 47, in main
 ERROR:stderr:results, _ = runner.run(args.exp, s)
 ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 107, in run
 ERROR:stderr:self.trainer = self.load_trainer(self.data_params['data_type'], self.data_params['spacing_type'])
@@ -159,9 +159,9 @@ ERROR:stderr:  File "/Users/mariiashapo/.vscode/extensions/ms-python.debugpy-202
 ERROR:stderr:_run_code(code, mod_globals, init_globals, mod_name, mod_spec, pkg_name, script_name)
 ERROR:stderr:  File "/Users/mariiashapo/.vscode/extensions/ms-python.debugpy-2025.10.0-darwin-arm64/bundled/libs/debugpy/_vendored/pydevd/_pydevd_bundle/pydevd_runpy.py", line 118, in _run_code
 ERROR:stderr:exec(code, run_globals)
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 57, in <module>
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 57, in <module>
 ERROR:stderr:main()
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 47, in main
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 47, in main
 ERROR:stderr:results, _ = runner.run(args.exp, s)
 ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 107, in run
 ERROR:stderr:self.trainer = self.load_trainer(data_type, self.data_params['spacing_type'])
@@ -205,9 +205,9 @@ ERROR:stderr:  File "/Users/mariiashapo/.vscode/extensions/ms-python.debugpy-202
 ERROR:stderr:def __call__(self, frame, event, arg):
 ERROR:stderr:KeyboardInterrupt
 ERROR:stderr:Traceback (most recent call last):
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 57, in <module>
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 57, in <module>
 ERROR:stderr:main()
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 47, in main
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 47, in main
 ERROR:stderr:results, _ = runner.run(args.exp, s)
 ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 118, in run
 ERROR:stderr:skip_combination = self.update_params_model(param_comb, optimization_type, i_since_convergence)
@@ -237,9 +237,9 @@ ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/run
 ERROR:stderr:return _run_code(code, main_globals, None,
 ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
 ERROR:stderr:exec(code, run_globals)
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 60, in <module>
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 60, in <module>
 ERROR:stderr:main()
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 50, in main
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 50, in main
 ERROR:stderr:results, _ = runner.run(args.exp, s)
 ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 118, in run
 ERROR:stderr:skip_combination = self.update_params_model(param_comb, optimization_type, i_since_convergence)
@@ -255,9 +255,9 @@ ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/run
 ERROR:stderr:return _run_code(code, main_globals, None,
 ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
 ERROR:stderr:exec(code, run_globals)
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 60, in <module>
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 60, in <module>
 ERROR:stderr:main()
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 50, in main
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 50, in main
 ERROR:stderr:results, _ = runner.run(args.exp, s)
 ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 118, in run
 ERROR:stderr:skip_combination = self.update_params_model(param_comb, optimization_type, i_since_convergence)
@@ -276,9 +276,9 @@ ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/run
 ERROR:stderr:return _run_code(code, main_globals, None,
 ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
 ERROR:stderr:exec(code, run_globals)
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 60, in <module>
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 60, in <module>
 ERROR:stderr:main()
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 50, in main
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 50, in main
 ERROR:stderr:results, _ = runner.run(args.exp, s)
 ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 118, in run
 ERROR:stderr:skip_combination = self.update_params_model(param_comb, optimization_type, i_since_convergence)
@@ -339,9 +339,9 @@ ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/run
 ERROR:stderr:return _run_code(code, main_globals, None,
 ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
 ERROR:stderr:exec(code, run_globals)
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 60, in <module>
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 60, in <module>
 ERROR:stderr:ts = time.strftime('%Y-%m-%d_%H-%M')
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 50, in main
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 50, in main
 ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 118, in run
 ERROR:stderr:skip_combination = self.update_params_model(param_comb, optimization_type, i_since_convergence)
 ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 265, in update_params_model
@@ -374,9 +374,9 @@ ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/run
 ERROR:stderr:return _run_code(code, main_globals, None,
 ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
 ERROR:stderr:exec(code, run_globals)
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 67, in <module>
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 67, in <module>
 ERROR:stderr:main()
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 56, in main
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 56, in main
 ERROR:stderr:results, _ = runner.run(args.exp, seed = seed, data_type = args.data_type, layer_width = args.layer_width, t_range = args.t_range, n_steps = args.n_steps)
 ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 107, in run
 ERROR:stderr:self.trainer = self.load_trainer(self.data_type, self.data_params['spacing_type'])
@@ -447,9 +447,9 @@ ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/run
 ERROR:stderr:return _run_code(code, main_globals, None,
 ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
 ERROR:stderr:exec(code, run_globals)
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 67, in <module>
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 67, in <module>
 ERROR:stderr:main()
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 56, in main
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 56, in main
 ERROR:stderr:results, _ = runner.run(args.exp, seed = seed, data_type = args.data_type, layer_width = args.layer_width, t_range = args.t_range, n_steps = args.n_steps)
 ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 118, in run
 ERROR:stderr:skip_combination = self.update_params_model(param_comb, optimization_type, i_since_convergence)
@@ -483,9 +483,9 @@ ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/run
 ERROR:stderr:return _run_code(code, main_globals, None,
 ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
 ERROR:stderr:exec(code, run_globals)
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 67, in <module>
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 67, in <module>
 ERROR:stderr:if __name__ == "__main__":
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 56, in main
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 56, in main
 ERROR:stderr:# run(self, optimization_type, seed = None, data_type = None, layer_width = None, t_range = None, n_steps = None)
 ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 107, in run
 ERROR:stderr:self.trainer = self.load_trainer(self.data_type, self.data_params['spacing_type'])
@@ -525,9 +525,9 @@ ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/run
 ERROR:stderr:return _run_code(code, main_globals, None,
 ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
 ERROR:stderr:exec(code, run_globals)
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 68, in <module>
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 68, in <module>
 ERROR:stderr:main()
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 57, in main
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 57, in main
 ERROR:stderr:results, _ = runner.run(args.exp, seed = seed, data_type = args.data_type, layer_width = args.layer_width, t_range = args.t_range, n_steps = args.n_steps)
 ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 107, in run
 ERROR:stderr:self.trainer = self.load_trainer(self.data_type, self.data_params['spacing_type'])
@@ -601,9 +601,9 @@ ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/run
 ERROR:stderr:return _run_code(code, main_globals, None,
 ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
 ERROR:stderr:exec(code, run_globals)
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 68, in <module>
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 68, in <module>
 ERROR:stderr:main()
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 57, in main
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 57, in main
 ERROR:stderr:results, _ = runner.run(args.exp, seed = seed, data_type = args.data_type, layer_width = args.layer_width, t_range = args.t_range, n_steps = args.n_steps)
 ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 107, in run
 ERROR:stderr:self.trainer = self.load_trainer(self.data_type, self.data_params['spacing_type'])
@@ -645,9 +645,9 @@ ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/run
 ERROR:stderr:return _run_code(code, main_globals, None,
 ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
 ERROR:stderr:exec(code, run_globals)
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 68, in <module>
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 68, in <module>
 ERROR:stderr:main()
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 57, in main
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 57, in main
 ERROR:stderr:results, _ = runner.run(args.exp, seed = seed, data_type = args.data_type, layer_width = args.layer_width, t_range = args.t_range, n_steps = args.n_steps)
 ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 107, in run
 ERROR:stderr:self.trainer = self.load_trainer(self.data_type, self.data_params['spacing_type'])
@@ -721,9 +721,9 @@ ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/run
 ERROR:stderr:return _run_code(code, main_globals, None,
 ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
 ERROR:stderr:exec(code, run_globals)
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 68, in <module>
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 68, in <module>
 ERROR:stderr:main()
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 57, in main
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 57, in main
 ERROR:stderr:results, _ = runner.run(args.exp, seed = seed, data_type = args.data_type, layer_width = args.layer_width, t_range = args.t_range, n_steps = args.n_steps)
 ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 107, in run
 ERROR:stderr:self.trainer = self.load_trainer(self.data_type, self.data_params['spacing_type'])
@@ -800,9 +800,9 @@ ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/run
 ERROR:stderr:return _run_code(code, main_globals, None,
 ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
 ERROR:stderr:exec(code, run_globals)
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 68, in <module>
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 68, in <module>
 ERROR:stderr:main()
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 57, in main
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 57, in main
 ERROR:stderr:results, _ = runner.run(args.exp, seed = seed, data_type = args.data_type, layer_width = args.layer_width, t_range = args.t_range, n_steps = args.n_steps)
 ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 111, in run
 ERROR:stderr:param_combinations = self.get_param_combinations(optimization_type, t_range = t_range, n_steps = n_steps)
@@ -837,9 +837,9 @@ ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/run
 ERROR:stderr:return _run_code(code, main_globals, None,
 ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
 ERROR:stderr:exec(code, run_globals)
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 70, in <module>
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 70, in <module>
 ERROR:stderr:main()
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 55, in main
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 55, in main
 ERROR:stderr:results, trainer = runner.run(args.exp, seed = seed, data_type = args.data_type, layer_width = args.layer_width, t_range = args.t_range, n_steps = args.n_steps)
 ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 108, in run
 ERROR:stderr:self.trainer = self.load_trainer(self.data_type, self.data_params['spacing_type'])
@@ -915,8 +915,8 @@ ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/run
 ERROR:stderr:return _run_code(code, main_globals, None,
 ERROR:stderr:  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
 ERROR:stderr:exec(code, run_globals)
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 77, in <module>
-ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergnce_studies/training_conv_pyomo.py", line 62, in main
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 77, in <module>
+ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 62, in main
 ERROR:stderr:del trainer, runner
 ERROR:stderr:  File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 152, in run
 ERROR:stderr:return self.results, trainer

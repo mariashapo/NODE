@@ -29,7 +29,7 @@ jobs:
         shell: "bash -l {0}"
         run: |
           mkdir -p results/pyomo
-          python -m training_convergnce_studies.training_convergence \
+          python -m training_convergence.training_convergence \
             --config config.json \
             --exp training_convergence_wall_time \
             --n_seeds 1

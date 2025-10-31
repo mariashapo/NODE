@@ -110,6 +110,6 @@ extra_input['plot_odeint'] = True
 ```bash
 conda activate node_25
 python -m pip install -e .
-python -m src.training_convergnce_studies.training_conv_pyomo
-python -m src.training_convergnce_studies.training_conv_pyomo --layer_width '[2,32,2]' --t_range '[0.01,7]' --n_steps 5 --no_print True
+python -m src.training_convergence.training_conv_pyomo
+python -m src.training_convergence.training_conv_pyomo --layer_width '[2,32,2]' --t_range '[0.01,7]' --n_steps 5 --no_print True
 ```

@@ -1,4 +1,4 @@
 models
-training_convergnce_studies
+training_convergence
 utils
 utils_training
