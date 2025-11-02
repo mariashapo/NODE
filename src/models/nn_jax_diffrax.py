@@ -113,8 +113,8 @@ class NeuralODE(nn.Module):
             y0=y0,
             args=args,
             stepsize_controller=stepsize_controller,
-            saveat=saveat
-            #, adjoint=dfx.RecursiveCheckpointAdjoint(checkpoints=100) 
+            saveat=saveat,
+            # adjoint=dfx.RecursiveCheckpointAdjoint(checkpoints=100) 
         )
 
         pred_solution = solution.ys
@@ -147,7 +147,7 @@ class NeuralODE(nn.Module):
             epoch += 1
             state, loss = train_step_jit(state, t, observed_data, y0, extra_args)
                       
-            if log and epoch % log['epoch_recording_step'] == 0:
+            if log and (epoch % log['epoch_recording_step'] == 0 or epoch == 1):
                 if jnp.squeeze(observed_data).shape[0] != log['t'].shape[0]:
                     pass 
                 else:

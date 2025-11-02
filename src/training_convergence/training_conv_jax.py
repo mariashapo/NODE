@@ -30,7 +30,7 @@ def main():
     p.add_argument("--data_type", default = "ho")
     p.add_argument("--max_iter", type=json.loads, default=[200, 200])
     p.add_argument("--pretrain", type=json.loads, default=[0.2, 1])
-    p.add_argument("--log", type=json.loads, default = 25)
+    p.add_argument("--log", type=json.loads, default = 100)
     args = p.parse_args()
     
     params_model = {
@@ -67,7 +67,7 @@ def main():
                 results["max_iter"] = args.max_iter
         finally:
             _cleanup_trainer(trainer)
-            trainer = None
+            del trainer
             gc.collect()
             try: ctypes.CDLL("libc.so.6").malloc_trim(0)
             except Exception: pass
@@ -80,7 +80,7 @@ def main():
             results_no_log = trainer.extract_results() or {}
         finally:
             _cleanup_trainer(trainer)
-            trainer = None
+            del trainer
             gc.collect()
             try: ctypes.CDLL("libc.so.6").malloc_trim(0)
             except Exception: pass
