@@ -1,3 +1,37 @@
+# ---- put this at the very top, BEFORE any JIT-triggering imports/calls ----
+import os
+_cache_dir = os.path.expanduser("~/.jax_cache")
+os.makedirs(_cache_dir, exist_ok=True)
+
+# Robust JAX compilation cache init (handles different package layouts)
+_initialized = False
+try:
+    # Layout like on your Mac: submodule exposes 'initialize_cache'
+    from jax.experimental.compilation_cache import compilation_cache as _cc
+    _cc.initialize_cache(_cache_dir)
+    _initialized = True
+except Exception:
+    pass
+
+if not _initialized:
+    try:
+        # Older mid versions: function at top-level module
+        from jax.experimental.compilation_cache import initialize_cache as _init_cache
+        _init_cache(_cache_dir)
+        _initialized = True
+    except Exception:
+        pass
+
+if not _initialized:
+    try:
+        # Newer layout: package exposes function directly
+        from jax.experimental import compilation_cache as _cc2
+        _cc2.initialize_cache(_cache_dir)
+        _initialized = True
+    except Exception:
+        pass
+# ---------------------------------------------------------------------------
+
 import numpy as np
 import jax
 import jax.numpy as jnp
@@ -7,7 +41,6 @@ import optax
 
 from flax import linen as nn
 from flax.training import train_state
-from jax import random
 import flax.linen.initializers as initializers
 import diffrax as dfx
 
@@ -115,7 +148,6 @@ class NeuralODE(nn.Module):
             state, loss = train_step_jit(state, t, observed_data, y0, extra_args)
                       
             if log and epoch % log['epoch_recording_step'] == 0:
-                
                 if jnp.squeeze(observed_data).shape[0] != log['t'].shape[0]:
                     pass 
                 else:
@@ -188,5 +220,3 @@ def debug_print(value, transform=lambda x: x):
         print(transform(x))
         return x  
     return host_callback.id_tap(print_func, value)
-
-
