@@ -1,10 +1,16 @@
 """There no dedicated experiment runner for the synthetic Jax-diffrax model, the same way there is one for Pyomo (PyomoExperimentRunner)."""
-import argparse, os, time, pickle
+import argparse, os, time, pickle, psutil
 from utils.general import generate_seeds
 import argparse, json
 from utils_training.run_train_toy import TrainerToy as Trainer
 import gc, ctypes
+import jax, gc, ctypes
 
+def print_memory(prefix=""):
+    """Print current RSS (resident set size) in MB."""
+    process = psutil.Process(os.getpid())
+    mem_mb = process.memory_info().rss / (1024 ** 2)
+    print(f"{prefix}Memory usage: {mem_mb:.2f} MB")
 
 def _cleanup_trainer(tr):
     if tr is None:
@@ -47,14 +53,13 @@ def main():
         'act_func': 'tanh',
     }
     
-    all_results = []
+    # all_results = []
     print("STARTING TRAINING")
     for seed in generate_seeds(args.n_seeds):
         print(f"EXECUTING SEED {seed}")
-
         results = {}
         trainer = None
-
+        print_memory("Memory use loop start: ")
         try:
             if args.log > 0:
                 trainer = Trainer.load_trainer(args.data_type, spacing_type="uniform", model_type="jax_diffrax")
@@ -66,12 +71,14 @@ def main():
                 results["pretrain"] = args.pretrain
                 results["max_iter"] = args.max_iter
         finally:
+            print_memory("Memory before trainer cleanup: ")
             _cleanup_trainer(trainer)
             del trainer
+            jax.clear_caches()
             gc.collect()
             try: ctypes.CDLL("libc.so.6").malloc_trim(0)
             except Exception: pass
-
+        print_memory("Memory after trainer use: ")
         # ---- timing run (no per-epoch logging logging) ----
         try:
             trainer = Trainer.load_trainer(args.data_type, spacing_type="uniform", model_type="jax_diffrax")
@@ -81,6 +88,7 @@ def main():
         finally:
             _cleanup_trainer(trainer)
             del trainer
+            jax.clear_caches()
             gc.collect()
             try: ctypes.CDLL("libc.so.6").malloc_trim(0)
             except Exception: pass
@@ -93,14 +101,26 @@ def main():
             results["max_iter"] = args.max_iter
 
         results["time_elapsed"] = results_no_log.get("time_elapsed")
-        all_results.append(results)
+        print_memory("Current memory use: ")
+        
+        ts = time.strftime('%Y-%m-%d_%H-%M')
+        # Create the top-level results directory if needed
+        os.makedirs(args.outdir, exist_ok=True)
 
-    ts = time.strftime('%Y-%m-%d_%H-%M')
-    os.makedirs(args.outdir, exist_ok=True)
-    filename = os.path.join(args.outdir, f'jax_{ts}_{args.data_type}_{args.n_seeds}_seeds.pkl')
-    with open(filename, 'wb') as f:
-        pickle.dump(all_results, f)
-    print(f"Results saved to {filename}")
+        max_iter = str(args.max_iter).strip('[]').replace(',','_').replace(' ','')
+        # Create a dated subfolder for this run
+        subdir = os.path.join(args.outdir, f"jax_{args.data_type}_{max_iter}")
+        os.makedirs(subdir, exist_ok=True)
+
+        # Full filename for this seed
+        filename = os.path.join(subdir, f"{seed}_{ts}.pkl")
+
+        # Write out the results for this seed
+        with open(filename, "wb") as f:
+            pickle.dump(results, f)
+
+        print(f"Results saved to {filename}")
+
 
 if __name__ == "__main__":
     main()
