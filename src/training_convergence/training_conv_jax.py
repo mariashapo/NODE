@@ -1,16 +1,11 @@
 """There no dedicated experiment runner for the synthetic Jax-diffrax model, the same way there is one for Pyomo (PyomoExperimentRunner)."""
-import argparse, os, time, pickle, psutil
-from utils.general import generate_seeds
+import argparse, os, time, pickle
+from utils.general import generate_seeds, print_memory
 import argparse, json
 from utils_training.run_train_toy import TrainerToy as Trainer
 import gc, ctypes
 import jax, gc, ctypes
 
-def print_memory(prefix=""):
-    """Print current RSS (resident set size) in MB."""
-    process = psutil.Process(os.getpid())
-    mem_mb = process.memory_info().rss / (1024 ** 2)
-    print(f"{prefix}Memory usage: {mem_mb:.2f} MB")
 
 def _cleanup_trainer(tr):
     if tr is None:

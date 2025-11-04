@@ -1,4 +1,5 @@
 """General utils."""
+import os, time, psutil
 import numpy as np
 import time
 
@@ -33,3 +34,9 @@ def generate_seeds(n_seeds: int, method: str = "random"):
 
     else:
         raise ValueError("Method must be 'random' or 'time'.")
+    
+def print_memory(prefix=""):
+    """Print current RSS (resident set size) in MB."""
+    process = psutil.Process(os.getpid())
+    mem_mb = process.memory_info().rss / (1024 ** 2)
+    print(f"{prefix}Memory usage: {mem_mb:.2f} MB")

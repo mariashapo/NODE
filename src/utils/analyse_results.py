@@ -424,56 +424,142 @@ class ConvergenceCI:
         return y
 
     @staticmethod
-    def time_ci(df, *, system, pretrain, x_col='time_elapsed', y_col='mse_train',
-                seed_col='seed', grid_points=200, tmax_quantile=0.95,
-                ci='t', alpha=0.05):
-        """
-        df: tidy DataFrame from Results.flatten_convergence_list, concatenated across seeds
-        Returns: (x_grid, mean, lo, hi, Y) where Y has shape (n_seeds, len(x_grid))
-        """
-        sel = df[(df['system']==system) & (df['pretrain']==pretrain)]
-        if sel.empty:
-            raise ValueError("No rows match (system, pretrain).")
-
-        curves = []
-        tmax = []
-        for s, g in sel.groupby(seed_col):
-            x = g[x_col].to_numpy()
-            y = g[y_col].to_numpy()
+    def time_ci(
+        df, *,
+        x_col='time_elapsed', y_col='mse_train', seed_col='seed',
+        grid_points=200, tmax_quantile=0.9,
+        interp='linear', extrapolate=True,
+        alpha=0.05, logspace=True, eps=1e-12
+    ):
+        curves, tmax = [], []
+        for _, g in df.groupby(seed_col):
+            x = np.asarray(g[x_col], dtype=float)
+            y = np.asarray(g[y_col], dtype=float)
+            m = np.isfinite(x) & np.isfinite(y)
+            x, y = x[m], y[m]
             if x.size == 0: 
                 continue
-            curves.append((s, x, y))
+            o = np.argsort(x, kind='mergesort')
+            x, y = x[o], y[o]
+            # keep LAST value for duplicate timestamps
+            _, idx_rev = np.unique(x[::-1], return_index=True)
+            idx = np.sort((x.size - 1) - idx_rev)
+            x, y = x[idx], y[idx]
+            curves.append((x, y))
             tmax.append(x[-1])
-
         if not curves:
             raise ValueError("No curves after grouping by seed.")
 
-        T95 = float(np.quantile(np.array(tmax), tmax_quantile))
-        x_grid = np.linspace(0.0, T95, grid_points)
+        Tq = float(np.quantile(np.array(tmax, float), tmax_quantile))
+        x_grid = np.linspace(0.0, Tq, int(grid_points))
 
-        Y = np.stack([ConvergenceCI._step_interp(x, y, x_grid) for _, x, y in curves], axis=0)
-        n = Y.shape[0]
-        mean = Y.mean(axis=0)
-        std  = Y.std(axis=0, ddof=1) if n > 1 else np.zeros_like(mean)
+        def _interp_linear(x, y, xg):
+            yg = np.interp(xg, x, y)
+            if not extrapolate:
+                yg[(xg < x[0]) | (xg > x[-1])] = np.nan
+            return yg
 
-        if ci == 't':
-            # normal approx for n≥15; slightly conservative for n≈10
-            z = 1.96 # if n >= 15 else 2.13 if n >= 10 else 2.57
-            half = z * std / math.sqrt(max(n,1))
-            lo, hi = mean - half, mean + half
-        elif ci == 'bootstrap':
-            B = min(10000, max(2000, 500*n))
-            rng = np.random.default_rng(0)
-            lo = np.empty_like(mean); hi = np.empty_like(mean)
-            for j in range(Y.shape[1]):
-                col = Y[:, j]
-                means = col[rng.integers(0, n, size=(B,))].mean(axis=0)
-                lo[j], hi[j] = np.quantile(means, [alpha/2, 1-alpha/2])
+        def _interp_step(x, y, xg):
+            idx = np.searchsorted(x, xg, side='right') - 1
+            yg = np.where((idx >= 0) & (idx < y.size), y[np.clip(idx, 0, y.size-1)], np.nan)
+            if extrapolate:
+                yg = np.where(xg < x[0], y[0], yg)
+                yg = np.where(xg > x[-1], y[-1], yg)
+            return yg
+
+        fn = _interp_linear if interp == 'linear' else _interp_step
+        Y = np.vstack([fn(x, y, x_grid) for (x, y) in curves])  # (n_seeds, T)
+        counts = np.sum(np.isfinite(Y), axis=0).astype(float)
+
+        # dynamic z for two-sided (1 - alpha)
+        try:
+            from scipy.stats import norm
+            z = norm.ppf(1 - alpha/2.0)
+        except Exception:
+            z = 1.959963984540054  # fallback to 95% if SciPy not present
+
+        if logspace:
+            # guard against non-positive values; treat <=0 as missing
+            Yp = np.where(Y > eps, Y, np.nan)
+            L = np.log(Yp)
+            mean_L = np.nanmean(L, axis=0)
+            std_L  = np.nanstd(L, axis=0, ddof=1)
+            with np.errstate(invalid='ignore', divide='ignore'):
+                half_L = z * std_L / np.sqrt(counts)
+            mean = np.exp(mean_L)
+            lo   = np.exp(mean_L - half_L)
+            hi   = np.exp(mean_L + half_L)
         else:
-            raise ValueError("ci must be 't' or 'bootstrap'.")
+            mean = np.nanmean(Y, axis=0)
+            std  = np.nanstd(Y, axis=0, ddof=1)
+            with np.errstate(invalid='ignore', divide='ignore'):
+                half = z * std / np.sqrt(counts)
+            lo, hi = mean - half, mean + half
 
         return x_grid, mean, lo, hi, Y
-    
+
+
+def plot_convergence_debug(
+    df, *,
+    x_col='time_elapsed', y_col='mse_train', seed_col='seed',
+    grid_points=200, tmax_quantile=0.95,
+    interp='linear', extrapolate=False,
+    ci=True, alpha_band=0.25, lw=1.8,
+    logy=True, figsize=(10, 5),
+    color_mean='C0', color_traces='gray', alpha_traces=0.4
+):
+    """
+    Plot all per-seed convergence curves and (optionally) the aggregate CI.
+
+    Parameters
+    ----------
+    df : DataFrame from Results.flatten_convergence_list
+    system, pretrain : filters
+    interp : 'linear' | 'step' | None
+    extrapolate : extend curves past last x value when True
+    ci : whether to overlay mean ± CI from time_ci()
+    logy : log-scale for MSE
+    """
+    fig, ax = plt.subplots(figsize=figsize)
+
+    # ---- 1. plot all seed traces (raw, not averaged)
+
+    for s, g in df.groupby(seed_col):
+        x = np.asarray(g[x_col], dtype=float)
+        y = np.asarray(g[y_col], dtype=float)
+        m = np.isfinite(x) & np.isfinite(y)
+        x, y = x[m], y[m]
+        if len(x) == 0:
+            continue
+        order = np.argsort(x)
+        x, y = x[order], y[order]
+        ax.plot(x, y, color=color_traces, lw=1.0, alpha=alpha_traces)
+
+    # ---- 2. optionally overlay mean + CI
+    if ci:
+        xg, mean, lo, hi, _ = ConvergenceCI.time_ci(
+            df,
+            x_col=x_col, y_col=y_col, seed_col=seed_col,
+            grid_points=grid_points, tmax_quantile=tmax_quantile,
+            interp=interp, extrapolate=extrapolate,
+        )
+        ax.plot(xg, mean, color=color_mean, lw=lw, label="Mean")
+        ax.fill_between(xg, lo, hi, color=color_mean, alpha=alpha_band, label="95% CI")
+
+    # ---- 3. style
+    if logy:
+        ax.set_yscale('log')
+        ax.set_ylabel("Training MSE (log scale)")
+    else:
+        ax.set_ylabel("Training MSE")
+
+    ax.set_xlabel("Training Time (s)")
+    ax.grid(True, which='both', ls=':', lw=0.6, alpha=0.6)
+    ax.legend(frameon=False)
+    plt.tight_layout()
+    plt.show()
+    return ax
+
 def has_nested_tuple(t):
     for item in t:
         if isinstance(item, tuple):
@@ -492,3 +578,5 @@ def convert_lists_in_tuple(param_tuple):
     """
     
     return tuple(str(item) if isinstance(item, list) else item for item in param_tuple)
+
+

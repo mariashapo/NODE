@@ -1,9 +1,9 @@
-Solver command line: ['/Users/mariiashapo/anaconda3/envs/node_25/bin/ipopt', '/var/folders/2v/gfm3z1tn5fj8zss_r9hrgnv80000gn/T/tmpv5ois3be.pyomo.nl', '-AMPL', 'tol=1e-08', 'print_level=1', 'max_iter=3000', 'max_wall_time=7.0']
+Solver command line: ['/Users/mariiashapo/anaconda3/envs/node_25/bin/ipopt', '/var/folders/2v/gfm3z1tn5fj8zss_r9hrgnv80000gn/T/tmpd7usdpbe.pyomo.nl', '-AMPL', 'tol=1e-08', 'print_level=1', 'max_iter=3000', 'max_wall_time=10.0']
 
 Ipopt 3.14.16: tol=1e-08
 print_level=1
 max_iter=3000
-max_wall_time=7.0
+max_wall_time=10.0
 
 
 ******************************************************************************

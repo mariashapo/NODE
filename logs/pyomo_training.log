@@ -35,3 +35,115 @@
 2025-10-29 19:26:19,069 [INFO] Optimal solution found at/before iteration ('ho', True, 7.0)
 2025-10-29 19:26:19,843 [INFO] Iteration: 5 / 5
 2025-10-29 19:26:20,019 [INFO] Results saved to results/pyomo/pyomo_2025-10-29_19-26_ho_1_seeds_ct.pkl
+2025-11-03 19:06:44,222 [INFO] STARTING TRAINING
+2025-11-03 19:06:44,222 [INFO] EXECUTING SEED 935726293 (1/2)
+2025-11-03 19:06:44,222 [INFO] Memory use loop start: Memory usage: 345.08 MB
+2025-11-03 19:06:44,223 [INFO] PARAM COMBINATIONS GENERATED: [('vdp', True, 0.01), ('vdp', True, 5.0)]
+2025-11-03 19:06:55,183 [ERROR] Traceback (most recent call last):
+2025-11-03 19:06:55,183 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+2025-11-03 19:06:55,184 [ERROR] return _run_code(code, main_globals, None,
+2025-11-03 19:06:55,184 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
+2025-11-03 19:06:55,184 [ERROR] exec(code, run_globals)
+2025-11-03 19:06:55,185 [ERROR]   File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 81, in <module>
+2025-11-03 19:06:55,185 [ERROR] main()
+2025-11-03 19:06:55,185 [ERROR]   File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 57, in main
+2025-11-03 19:06:55,185 [ERROR] results, trainer = runner.run(args.exp, seed = seed, data_type = args.data_type, layer_width = args.layer_width, t_range = args.t_range, n_steps = args.n_steps)
+2025-11-03 19:06:55,185 [ERROR]   File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 106, in run
+2025-11-03 19:06:55,185 [ERROR] trainer = self.load_trainer(self.data_type, self.data_params['spacing_type'])
+2025-11-03 19:06:55,185 [ERROR]   File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 82, in load_trainer
+2025-11-03 19:06:55,185 [ERROR] trainer.prepare_inputs()
+2025-11-03 19:06:55,185 [ERROR]   File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 100, in prepare_inputs
+2025-11-03 19:06:55,185 [ERROR] self.prepare_collocation()
+2025-11-03 19:06:55,185 [ERROR]   File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 72, in prepare_collocation
+2025-11-03 19:06:55,185 [ERROR] self.D = np.array(self.collocation.compute_derivative_matrix())
+2025-11-03 19:06:55,185 [ERROR]   File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 66, in compute_derivative_matrix
+2025-11-03 19:06:55,186 [ERROR] self.D = Collocation.derivative_matrix_barycentric_v1(self.nodes)
+2025-11-03 19:06:55,186 [ERROR]   File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 177, in derivative_matrix_barycentric_v1
+2025-11-03 19:06:55,186 [ERROR] D = Collocation.lagrange_derivative(nodes, weights)
+2025-11-03 19:06:55,186 [ERROR]   File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 241, in lagrange_derivative
+2025-11-03 19:06:55,186 [ERROR] D = D.at[i, j].set(weights[j] / weights[i] / (xi[i] - xi[j]))
+2025-11-03 19:06:55,186 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/array_methods.py", line 493, in set
+2025-11-03 19:06:55,187 [ERROR] return scatter._scatter_update(self.array, self.index, values, lax.scatter,
+2025-11-03 19:06:55,187 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/ops/scatter.py", line 70, in _scatter_update
+2025-11-03 19:06:55,187 [ERROR] x = jnp.asarray(x)
+2025-11-03 19:06:55,187 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 2683, in asarray
+2025-11-03 19:06:55,188 [ERROR] return array(a, dtype=dtype, copy=bool(copy), order=order)  # type: ignore
+2025-11-03 19:06:55,188 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 2575, in array
+2025-11-03 19:06:55,188 [ERROR] dtype = dtypes._lattice_result_type(*leaves)[0] if leaves else dtypes.float_
+2025-11-03 19:06:55,188 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/dtypes.py", line 687, in _lattice_result_type
+2025-11-03 19:06:55,189 [ERROR] dtypes, weak_types = zip(*(_dtype_and_weaktype(arg) for arg in args))
+2025-11-03 19:06:55,189 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/dtypes.py", line 687, in <genexpr>
+2025-11-03 19:06:55,189 [ERROR] dtypes, weak_types = zip(*(_dtype_and_weaktype(arg) for arg in args))
+2025-11-03 19:06:55,189 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/dtypes.py", line 495, in _dtype_and_weaktype
+2025-11-03 19:06:55,189 [ERROR] return dtype(value), any(value is typ for typ in _weak_types) or is_weakly_typed(value)
+2025-11-03 19:06:55,189 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/dtypes.py", line 673, in dtype
+2025-11-03 19:06:55,189 [ERROR] elif issubdtype(getattr(x, 'dtype', None), extended):
+2025-11-03 19:06:55,189 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/array.py", line 229, in dtype
+2025-11-03 19:06:55,190 [ERROR] @property
+2025-11-03 19:06:55,190 [ERROR] KeyboardInterrupt
+2025-11-03 19:07:43,494 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2025-11-03 19:08:11,089 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2025-11-03 19:08:33,920 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2025-11-03 19:20:23,992 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2025-11-03 19:20:51,641 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2025-11-03 19:21:14,790 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2025-11-03 19:21:42,947 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2025-11-03 19:25:42,619 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2025-11-03 19:31:37,862 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2025-11-03 19:37:19,135 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.19\x3a Maximum Wallclock Time Exceeded.
+2025-11-03 19:55:54,933 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2025-11-03 20:03:40,667 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2025-11-03 20:04:37,236 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2025-11-03 20:05:36,012 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2025-11-03 20:17:03,990 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2025-11-03 20:17:38,895 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2025-11-03 20:18:09,186 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2025-11-03 20:20:19,785 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2025-11-03 20:27:46,018 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2025-11-03 20:31:19,208 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2025-11-03 20:36:41,669 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2025-11-03 20:37:34,928 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.

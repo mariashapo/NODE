@@ -575,3 +575,96 @@ class NeuralODEPyomo:
         else:
             os.makedirs(folder_path)
             print(f"Folder {folder_path} created")
+
+    # ----------------------------------------------- MEMORY CLEANUP HELPERS -----------------------------------------------
+
+    def _strip_model_components(self, keep_names=()):
+        """
+        Delete memory-heavy Pyomo components from self.model.
+        keep_names: iterable of component names (strings) to keep.
+        """
+        import gc
+        if getattr(self, "model", None) is None:
+            return
+
+        print("Stripping model components.")
+        keep = set(keep_names)
+        m = self.model
+
+        # Types we usually want to drop
+        drop_types = (
+            pyo.Var, pyo.Constraint, pyo.ConstraintList, pyo.Objective,
+            pyo.Param, pyo.Set, pyo.Expression, pyo.Suffix
+        )
+
+        # Collect first to avoid mutating while iterating
+        comps = list(m.component_objects(drop_types, descend_into=True))
+        for comp in comps:
+            if comp.name in keep:
+                continue
+            # Use parent to delete; handles nested blocks correctly
+            m.del_component(comp)
+
+        # Final sweep
+        gc.collect()
+
+    def free_model(self, drop_model_object=False, keep_names=()):
+        """
+        Free most of the model’s memory by deleting Vars/Constraints/etc.
+        - drop_model_object=True will also drop the ConcreteModel reference entirely.
+        - keep_names: keep specific components (by name), e.g., ('obj',) or ('y',).
+        """
+        import gc
+        if getattr(self, "model", None) is None:
+            return
+
+        # 1) Strip heavy components
+        self._strip_model_components(keep_names=keep_names)
+
+        # 2) Try to close any persistent solver handles if you ever attach them
+        try:
+            if hasattr(self, "solver") and hasattr(self.solver, "close"):
+                self.solver.close()
+        except Exception:
+            pass
+
+        # 3) Optionally drop the model object itself
+        if drop_model_object:
+            self.model = None
+
+        gc.collect()
+
+    def dispose(self, drop_data=False, drop_params=False, drop_model=True):
+        """
+        Full instance cleanup:
+          - drop_model: remove all model components and (by default) the model object.
+          - drop_data: set large numpy/jax arrays on this object to None.
+          - drop_params: set self.params to None (if you copied a large dict).
+
+        Use cases:
+          - After training/evaluation when you no longer need the instance.
+          - Before rebuilding a new model in-place to avoid memory bloat.
+        """
+        import gc
+
+        # Model side
+        self.free_model(drop_model_object=drop_model, keep_names=())
+
+        # Data side (break Python references so GC can free RAM)
+        if drop_data:
+            self.y_observed = None
+            self.y_collocation = None
+            self.first_derivative_matrix = None
+            self.y_init = None
+            self.extra_inputs = None
+            self.t = None
+
+        if drop_params:
+            self.params = None
+
+        # Also clear any cached predictions/checkpoints you may have attached
+        for attr in ("_cached_pred", "_cached_states", "_cached_solver_info"):
+            if hasattr(self, attr):
+                setattr(self, attr, None)
+
+        gc.collect()

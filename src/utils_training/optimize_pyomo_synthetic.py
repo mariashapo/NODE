@@ -1,14 +1,12 @@
 import numpy as np
 import itertools
-import jax.numpy as jnp
-
+from utils.general import print_memory
 import json
 import itertools
-import sys
-import os
 import importlib
 import logging
-
+from pympler import asizeof
+import tracemalloc
 
 logging.basicConfig(level=logging.ERROR, filename='error_log.txt')
 
@@ -112,29 +110,28 @@ class ExperimentRunner:
                     self.tested_params.append((param_comb[0], param_comb[1]))
                     i_since_convergence = 1
 
-                # extract → try to keep only small scalars in results
+                # extract -> try to keep only small scalars in results
                 try:
                     r = trainer.extract_results_pyomo()
                 except Exception as e:
                     r = {'time_elapsed': np.nan, 'mse_train': np.nan, 'mse_test': np.nan}
                     logging.error(f"Failed to extract results: {e}")
 
-                # optional: coerce to small payload (avoid big arrays)
-                small = {}
-                for k in ('time_elapsed', 'mse_train', 'mse_test', 'status', 'termination'):
-                    if k in r:
-                        small[k] = r[k]
-                self.results[param_comb] = small if small else r
+
+                self.results[param_comb] = r
 
             except Exception as e:
                 self.results[param_comb] = {'time_elapsed': np.nan, 'mse_train': np.nan, 'mse_test': np.nan}
                 logging.error(f"Failed to complete training: {e}")
 
+
+            print_memory("Finished training: ")
             # aggressive cleanup
             self._cleanup_trainer(trainer)
             del trainer
             import gc
             gc.collect()
+            print_memory("Attempted clean up: ")
 
             print(f"Iteration: {i} / {total_iter}")
             i_since_convergence += 1
@@ -307,17 +304,17 @@ class ExperimentRunner:
         except Exception:
             pass
 
-        # Null out heavy known attributes if they exist
         for attr in (
-            "model","instance","solver","results_pyomo",
-            "train_data","test_data","X","Y","train_X","train_y","test_X","test_y",
-            "history","logs","nlp","jac","hess"
+            "D", "est_sol", "nodes", "t", "t_test", "true_derivative"
         ):
             if hasattr(t, attr):
                 try:
                     setattr(t, attr, None)
                 except Exception:
                     pass
+        
+        t.model.free_model(drop_model_object=True)
+        t.model.dispose(drop_data=True, drop_params=False, drop_model=True)
 
 
 def reload_and_get_attribute(module, attribute_name):
