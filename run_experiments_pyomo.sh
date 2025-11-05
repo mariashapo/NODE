@@ -13,6 +13,7 @@ mkdir -p "$OUTDIR" logs
 
 # Sanity check (kept, since you asked for it)
 micromamba run -n "$ENV" python -V
+micromamba run -n "$ENV" pip install pympler
 
 # --------------------------
 # Pyomo experiments

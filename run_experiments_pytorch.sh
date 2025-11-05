@@ -5,7 +5,7 @@
 set -euo pipefail
 
 ENV="node25"
-OUTDIR="results/study01"
+OUTDIR="results/study_vdp"
 
 # Ensure required dirs exist (safe even if you redirect logs outside)
 mkdir -p "$OUTDIR" logs
@@ -18,30 +18,19 @@ micromamba run -n "$ENV" python -V
 # --------------------------
 micromamba run -n "$ENV" python -m src.training_convergence.training_conv_pytorch \
   --max_iter '[100,100]' --pretrain '[0.2,1]' \
-  --n_seeds 1 --outdir "$OUTDIR"
-
-micromamba run -n "$ENV" python -m src.training_convergence.training_conv_jax \
-  --max_iter '[100,100]' --pretrain '[0.2,1]' \
-  --n_seeds 1 --outdir "$OUTDIR"
+  --n_seeds 1 --outdir "$OUTDIR" --data_type "vdp"
 
 micromamba run -n "$ENV" python -m src.training_convergence.training_conv_pytorch \
   --max_iter '[1000]' --pretrain '[1]' \
-  --n_seeds 20 --outdir "$OUTDIR"
+  --n_seeds 20 --outdir "$OUTDIR" --data_type "vdp"
 
 micromamba run -n "$ENV" python -m src.training_convergence.training_conv_pytorch \
   --max_iter '[200,1000]' --pretrain '[0.2,1]' \
-  --n_seeds 20 --outdir "$OUTDIR"
+  --n_seeds 20 --outdir "$OUTDIR" --data_type "vdp"
 
 micromamba run -n "$ENV" python -m src.training_convergence.training_conv_pytorch \
   --max_iter '[400,1000]' --pretrain '[0.2,1]' \
-  --n_seeds 20 --outdir "$OUTDIR"
+  --n_seeds 20 --outdir "$OUTDIR" --data_type "vdp"
 
-micromamba run -n "$ENV" python -m src.training_convergence.training_conv_jax \
-  --max_iter '[10000]' --pretrain '[1]' \
-  --n_seeds 20 --outdir "$OUTDIR"
-
-micromamba run -n "$ENV" python -m src.training_convergence.training_conv_jax \
-  --max_iter '[1000,5000]' --pretrain '[0.2,1]' \
-  --n_seeds 20 --outdir "$OUTDIR"
 
 

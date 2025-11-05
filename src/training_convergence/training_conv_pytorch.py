@@ -46,12 +46,23 @@ def main():
         results["time_elapsed"] = results_no_log["time_elapsed"]
         all_results.append(results)
 
-    ts = time.strftime('%Y-%m-%d_%H-%M')
-    os.makedirs(args.outdir, exist_ok=True)
-    filename = os.path.join(args.outdir, f'pytoch_{ts}_{args.data_type}_{args.n_seeds}_seeds.pkl')
-    with open(filename, 'wb') as f:
-        pickle.dump(all_results, f)
-    print(f"Results saved to {filename}")
+        ts = time.strftime('%Y-%m-%d_%H-%M')
+        # create the top-level results directory if needed
+        os.makedirs(args.outdir, exist_ok=True)
+
+        max_iter = str(args.max_iter).strip('[]').replace(',','_').replace(' ','')
+        # create a dated subfolder for this run
+        subdir = os.path.join(args.outdir, f"pytorch_{args.data_type}_{max_iter}")
+        os.makedirs(subdir, exist_ok=True)
+
+        # full filename for this seed
+        filename = os.path.join(subdir, f"{seed}_{ts}.pkl")
+
+        # write out the results for this seed
+        with open(filename, "wb") as f:
+            pickle.dump(results, f)
+
+        print(f"Results saved to {filename}")
 
 if __name__ == "__main__":
     main()
