@@ -9,8 +9,12 @@
       "skip_collocation": "inf",
       "redirect_logs": true,
       "params": {
-        "tol": 1e-8,
-        "print_level": 1,
+        "tol": 1e-20,
+        "linear_solver": "mumps",
+        "mu_strategy": "adaptive",
+        "nlp_scaling_method": "gradient-based",
+        "check_derivatives_for_naninf": "yes",
+        "print_level": 3,
         "max_iter": 3000
       }
     },

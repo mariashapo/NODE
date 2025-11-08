@@ -147,3 +147,89 @@
 2025-11-03 20:37:34,928 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
   - termination condition: maxIterations
   - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2025-11-08 11:53:46,131 [INFO] STARTING TRAINING
+2025-11-08 11:53:46,132 [INFO] EXECUTING SEED 1188561307 (1/1)
+2025-11-08 11:53:46,132 [INFO] Memory use loop start: Memory usage: 348.17 MB
+2025-11-08 11:53:46,132 [INFO] PARAM COMBINATIONS GENERATED: [('ho', True, 0.01), ('ho', True, 10.0)]
+2025-11-08 11:53:49,010 [ERROR] Traceback (most recent call last):
+2025-11-08 11:53:49,010 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+2025-11-08 11:53:49,010 [ERROR] return _run_code(code, main_globals, None,
+2025-11-08 11:53:49,010 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
+2025-11-08 11:53:49,010 [ERROR] exec(code, run_globals)
+2025-11-08 11:53:49,010 [ERROR]   File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 82, in <module>
+2025-11-08 11:53:49,010 [ERROR] main()
+2025-11-08 11:53:49,010 [ERROR]   File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 57, in main
+2025-11-08 11:53:49,011 [ERROR] results, trainer = runner.run(args.exp, seed = seed, data_type = args.data_type, layer_width = args.layer_width, t_range = args.t_range, n_steps = args.n_steps)
+2025-11-08 11:53:49,011 [ERROR]   File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 104, in run
+2025-11-08 11:53:49,011 [ERROR] trainer = self.load_trainer(self.data_type, self.data_params['spacing_type'])
+2025-11-08 11:53:49,011 [ERROR]   File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 80, in load_trainer
+2025-11-08 11:53:49,011 [ERROR] trainer.prepare_inputs()
+2025-11-08 11:53:49,011 [ERROR]   File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 100, in prepare_inputs
+2025-11-08 11:53:49,011 [ERROR] self.prepare_collocation()
+2025-11-08 11:53:49,011 [ERROR]   File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 72, in prepare_collocation
+2025-11-08 11:53:49,011 [ERROR] self.D = np.array(self.collocation.compute_derivative_matrix())
+2025-11-08 11:53:49,011 [ERROR]   File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 66, in compute_derivative_matrix
+2025-11-08 11:53:49,011 [ERROR] self.D = Collocation.derivative_matrix_barycentric_v1(self.nodes)
+2025-11-08 11:53:49,011 [ERROR]   File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 176, in derivative_matrix_barycentric_v1
+2025-11-08 11:53:49,011 [ERROR] weights = Collocation.compute_lagrange_weights(nodes)
+2025-11-08 11:53:49,011 [ERROR]   File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/collocation_obj.py", line 197, in compute_lagrange_weights
+2025-11-08 11:53:49,011 [ERROR] terms = nodes[j] - jnp.delete(nodes, j)
+2025-11-08 11:53:49,011 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 3706, in delete
+2025-11-08 11:53:49,012 [ERROR] return concatenate([a[idx + (slice(0, obj),)], a[idx + (slice(obj + 1, None),)]], axis=axis)
+2025-11-08 11:53:49,012 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 2305, in concatenate
+2025-11-08 11:53:49,013 [ERROR] arrays_out = [lax.concatenate(arrays_out[i:i+k], axis)
+2025-11-08 11:53:49,013 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/numpy/lax_numpy.py", line 2305, in <listcomp>
+2025-11-08 11:53:49,013 [ERROR] arrays_out = [lax.concatenate(arrays_out[i:i+k], axis)
+2025-11-08 11:53:49,013 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/lax/lax.py", line 623, in concatenate
+2025-11-08 11:53:49,013 [ERROR] return concatenate_p.bind(*operands, dimension=dimension)
+2025-11-08 11:53:49,013 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 387, in bind
+2025-11-08 11:53:49,014 [ERROR] return self.bind_with_trace(find_top_trace(args), args, params)
+2025-11-08 11:53:49,014 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 391, in bind_with_trace
+2025-11-08 11:53:49,014 [ERROR] out = trace.process_primitive(self, map(trace.full_raise, args), params)
+2025-11-08 11:53:49,014 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 879, in process_primitive
+2025-11-08 11:53:49,014 [ERROR] return primitive.impl(*tracers, **params)
+2025-11-08 11:53:49,014 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/dispatch.py", line 86, in apply_primitive
+2025-11-08 11:53:49,014 [ERROR] outs = fun(*args)
+2025-11-08 11:53:49,014 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/traceback_util.py", line 179, in reraise_with_filtered_traceback
+2025-11-08 11:53:49,015 [ERROR] return fun(*args, **kwargs)
+2025-11-08 11:53:49,015 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 304, in cache_miss
+2025-11-08 11:53:49,015 [ERROR] outs, out_flat, out_tree, args_flat, jaxpr, attrs_tracked = _python_pjit_helper(
+2025-11-08 11:53:49,015 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 181, in _python_pjit_helper
+2025-11-08 11:53:49,015 [ERROR] out_flat = pjit_p.bind(*args_flat, **params)
+2025-11-08 11:53:49,015 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 2789, in bind
+2025-11-08 11:53:49,015 [ERROR] return self.bind_with_trace(top_trace, args, params)
+2025-11-08 11:53:49,015 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 391, in bind_with_trace
+2025-11-08 11:53:49,016 [ERROR] out = trace.process_primitive(self, map(trace.full_raise, args), params)
+2025-11-08 11:53:49,016 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/core.py", line 879, in process_primitive
+2025-11-08 11:53:49,016 [ERROR] return primitive.impl(*tracers, **params)
+2025-11-08 11:53:49,016 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 1525, in _pjit_call_impl
+2025-11-08 11:53:49,016 [ERROR] return xc._xla.pjit(
+2025-11-08 11:53:49,016 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 1508, in call_impl_cache_miss
+2025-11-08 11:53:49,016 [ERROR] out_flat, compiled = _pjit_call_impl_python(
+2025-11-08 11:53:49,016 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/pjit.py", line 1434, in _pjit_call_impl_python
+2025-11-08 11:53:49,016 [ERROR] compiled = _resolve_and_lower(
+2025-11-08 11:53:49,017 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/interpreters/pxla.py", line 2363, in compile
+2025-11-08 11:53:49,017 [ERROR] executable = UnloadedMeshExecutable.from_hlo(
+2025-11-08 11:53:49,017 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/interpreters/pxla.py", line 2860, in from_hlo
+2025-11-08 11:53:49,017 [ERROR] xla_executable = _cached_compilation(
+2025-11-08 11:53:49,017 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/interpreters/pxla.py", line 2678, in _cached_compilation
+2025-11-08 11:53:49,017 [ERROR] xla_executable = compiler.compile_or_get_cached(
+2025-11-08 11:53:49,017 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/compiler.py", line 330, in compile_or_get_cached
+2025-11-08 11:53:49,018 [ERROR] return _compile_and_write_cache(
+2025-11-08 11:53:49,018 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/compiler.py", line 501, in _compile_and_write_cache
+2025-11-08 11:53:49,018 [ERROR] executable = backend_compile(
+2025-11-08 11:53:49,018 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/profiler.py", line 335, in wrapper
+2025-11-08 11:53:49,018 [ERROR] return func(*args, **kwargs)
+2025-11-08 11:53:49,018 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/compiler.py", line 237, in backend_compile
+2025-11-08 11:53:49,018 [ERROR] return backend.compile(built_c, compile_options=options)
+2025-11-08 11:53:49,018 [ERROR] KeyboardInterrupt
+2025-11-08 11:54:32,129 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2025-11-08 12:04:55,115 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: other
+  - message from solver: <undefined>
+2025-11-08 12:04:55,116 [ERROR] Failed to complete training: Unknown attribute `time' for object with type <class 'pyomo.opt.results.solver.SolverInformation'>
+2025-11-08 12:07:56,491 [ERROR] Failed to complete training: Cannot load a SolverResults object with bad status: error
+2025-11-08 12:12:00,931 [ERROR] Failed to complete training: Cannot load a SolverResults object with bad status: error
+2025-11-08 12:19:09,083 [ERROR] Failed to complete training: Cannot load a SolverResults object with bad status: error

@@ -33,7 +33,7 @@ def main():
     p.add_argument("--config", default="src/configs/config_pyomo_synth.json")
     p.add_argument("--exp", default="training_convergence_wall_time")
     p.add_argument("--n_seeds", type=int, default=1)
-    p.add_argument("--outdir", default="results/pyomo")
+    p.add_argument("--outdir", default=None)
     p.add_argument("--data_type", default = "ho")
     p.add_argument("--layer_width", type=json.loads, default=None)
     # training_convergence_wall_time specific arguments:
@@ -46,7 +46,8 @@ def main():
         sys.stderr = _StreamToLogger(logging.getLogger("stderr"), logging.ERROR) 
         sys.stdout = _StreamToLogger(logging.getLogger("stdout"), logging.INFO)   # captures print()
 
-    os.makedirs(args.outdir, exist_ok=True)
+    if args.outdir:
+        os.makedirs(args.outdir, exist_ok=True)
 
     print("STARTING TRAINING")
     i = 1
@@ -61,21 +62,25 @@ def main():
         # clean up memory here
         del trainer, runner
         gc.collect()
+        gc.collect()
         print_memory("Attempted clean up: ")
 
         ts = time.strftime('%Y-%m-%d_%H-%M')
         # create a dated subfolder for this run
-        subdir = os.path.join(args.outdir, f"pyomo_{args.data_type}_{args.layer_width[1]}")
-        os.makedirs(subdir, exist_ok=True)
+        if args.outdir:
+            subdir = os.path.join(args.outdir, f"pyomo_{args.data_type}_{args.layer_width[1]}")
+            os.makedirs(subdir, exist_ok=True)
 
-        # full filename for this seed
-        filename = os.path.join(subdir, f"{seed}_{ts}.pkl")
+            # full filename for this seed
+            filename = os.path.join(subdir, f"{seed}_{ts}.pkl")
 
-        # write out the results for this seed
-        with open(filename, "wb") as f:
-            pickle.dump(results, f)
+            # write out the results for this seed
+            with open(filename, "wb") as f:
+                pickle.dump(results, f)
 
-        print(f"Results saved to {filename}")
+            print(f"Results saved to {filename}")
+        else:
+            print(results)
 
 if __name__ == "__main__":
     main()

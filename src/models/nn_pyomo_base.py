@@ -154,7 +154,6 @@ class NeuralODEPyomo:
                     self.model.ode.add((nn_y - dy_dt)**2 <= self.constraint_penalty)
                 
             elif M == 2:
-                # nn_u, nn_v = self.nn_output(nn_input, model)
                 nn_y1, nn_y2 = self.nn_output(nn_input, self.model)
                 
                 if self.constraint == "l2":

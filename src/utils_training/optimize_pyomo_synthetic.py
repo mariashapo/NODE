@@ -312,8 +312,7 @@ class ExperimentRunner:
                     setattr(t, attr, None)
                 except Exception:
                     pass
-        
-        t.model.free_model(drop_model_object=True)
+    
         t.model.dispose(drop_data=True, drop_params=False, drop_model=True)
 
 

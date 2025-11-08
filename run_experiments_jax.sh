@@ -5,7 +5,7 @@
 set -euo pipefail
 
 ENV="node25"
-OUTDIR="results/study01"
+OUTDIR="results/study_ho"
 
 # Ensure required dirs exist (safe even if you redirect logs outside)
 mkdir -p "$OUTDIR" logs
@@ -22,11 +22,15 @@ micromamba run -n "$ENV" python -m src.training_convergence.training_conv_jax \
   --n_seeds 1 --outdir "$OUTDIR"
 
 micromamba run -n "$ENV" python -m src.training_convergence.training_conv_jax \
-  --max_iter '[5000]' --pretrain '[1]' \
+  --max_iter '[15000]' --pretrain '[1]' \
   --n_seeds 15 --outdir "$OUTDIR"
 
 micromamba run -n "$ENV" python -m src.training_convergence.training_conv_jax \
-  --max_iter '[1000,5000]' --pretrain '[0.2,1]' \
+  --max_iter '[500,10000]' --pretrain '[0.2,1]' \
+  --n_seeds 15 --outdir "$OUTDIR"
+
+micromamba run -n "$ENV" python -m src.training_convergence.training_conv_jax \
+  --max_iter '[1000,10000]' --pretrain '[0.2,1]' \
   --n_seeds 15 --outdir "$OUTDIR"
 
 

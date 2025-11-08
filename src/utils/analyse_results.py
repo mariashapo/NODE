@@ -7,8 +7,8 @@ import matplotlib.patches as mpatches
 import importlib
 import ast
 import jax.numpy as jnp
-from jaxlib import xla_extension as jax_types
-import math
+import os
+import pickle
 
 
 class Graphs:
@@ -580,3 +580,121 @@ def convert_lists_in_tuple(param_tuple):
     return tuple(str(item) if isinstance(item, list) else item for item in param_tuple)
 
 
+def plot_ci_fn(x, mean, lo, hi, label=None, logy=True, color=None, alpha_fill=0.2, linewidth=2.5):
+    """
+    Simple confidence interval plotting helper.
+    Draws mean + shaded CI region on existing axes.
+    """
+    plt.plot(x, mean, label=label, linewidth=linewidth, color=color)
+    plt.fill_between(x, lo, hi, alpha=alpha_fill, color=color)
+
+
+def plot_multi_ci(
+    df_map,
+    logy=True,
+    grid=True,
+    band_alpha=0.25,
+    line_width=2.0,
+    grid_points=500,
+    tmax_quantile=0.8,
+    y_col=None,
+    title=None,
+    align_grid=True,
+    extrapolate = False
+):
+    """
+    Plot convergence confidence intervals for multiple preprocessed DataFrames.
+
+    Parameters
+    ----------
+    df_map : dict
+        Mapping of model labels to preprocessed DataFrames.
+        Example: {"Pyomo": df_pyomo, "JAX": df_jax, "PyTorch": df_torch}
+    logy : bool
+        Use log scale on y-axis.
+    grid : bool
+        Display grid lines.
+    band_alpha : float
+        Transparency for confidence bands.
+    line_width : float
+        Width of mean curve lines.
+    grid_points : int
+        Number of interpolation points for CI computation.
+    tmax_quantile : float
+        Quantile cutoff for time axis in CI computation.
+    y_col : str or None
+        Optional column name for target metric ("mse_train", "mse_test", etc.).
+    title : str or None
+        Optional plot title.
+    align_grid : bool
+        Whether to resample all models to a common x-grid for comparison.
+    """
+
+    curves = {}
+    for label, df in df_map.items():
+        x, mean, lo, hi, _ = ConvergenceCI.time_ci(
+            df,
+            grid_points=grid_points,
+            tmax_quantile=tmax_quantile,
+            y_col = y_col,
+            extrapolate = extrapolate)
+        curves[label] = dict(x=x, mean=mean, lo=lo, hi=hi)
+
+    # Align x-grids if desired
+    if align_grid:
+        all_x = np.concatenate([c["x"] for c in curves.values()])
+        x_common = np.linspace(all_x.min(), all_x.max(), grid_points)
+        for d in curves.values():
+            d["mean"] = np.interp(x_common, d["x"], d["mean"])
+            d["lo"]   = np.interp(x_common, d["x"], d["lo"])
+            d["hi"]   = np.interp(x_common, d["x"], d["hi"])
+            d["x"] = x_common
+
+    # Create plot
+    fig, ax = plt.subplots(figsize=(12, 7))
+    eps = 1e-12 if logy else 0.0
+
+    for label, d in curves.items():
+        mean = np.clip(d["mean"], eps, None)
+        lo   = np.clip(d["lo"], eps, None)
+        hi   = np.clip(d["hi"], eps, None)
+        ax.plot(d["x"], mean, label=label, linewidth=line_width)
+        ax.fill_between(d["x"], lo, hi, alpha=band_alpha)
+
+    if logy:
+        ax.set_yscale("log")
+
+    ax.set_xlabel("Training Time (s)")
+    ylabel = "Training MSE" if y_col is None else y_col.replace("_", " ").title()
+    ax.set_ylabel(ylabel + (" (log scale)" if logy else ""))
+
+    if grid:
+        ax.grid(True, which="both", linestyle="--", linewidth=0.5, alpha=0.4)
+
+    if title:
+        ax.set_title(title)
+
+    ax.legend(frameon=False)
+    plt.tight_layout()
+    plt.show()
+
+    return ax
+
+def load_all_pickles(folder, recursive=True):
+    """Load all .pkl files from a folder into a list."""
+    all_results = []
+    for root, dirs, files in os.walk(folder):
+        for fname in sorted(files):
+            if fname.endswith(".pkl"):
+                fpath = os.path.join(root, fname)
+                try:
+                    with open(fpath, "rb") as f:
+                        data = pickle.load(f)
+                    all_results.append(data)
+                    print(f"Loaded {fpath}")
+                except Exception as e:
+                    print(f"⚠️ Skipping {fpath}: {e}")
+        if not recursive:
+            break
+    print(f"\nLoaded {len(all_results)} files from {folder}")
+    return all_results
