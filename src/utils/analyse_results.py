@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import pickle
-import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import importlib
@@ -9,7 +8,7 @@ import ast
 import jax.numpy as jnp
 import os
 import pickle
-
+from matplotlib.lines import Line2D
 
 class Graphs:
     @staticmethod
@@ -413,73 +412,103 @@ class Results:
  
 class ConvergenceCI:
     @staticmethod
-    def _step_interp(x_src, y_src, x_grid):
-        """Right-continuous step interpolation."""
-        y = np.empty_like(x_grid, dtype=float)
-        j = 0
-        for i, xg in enumerate(x_grid):
-            while j + 1 < len(x_src) and x_src[j + 1] <= xg:
-                j += 1
-            y[i] = y_src[j if xg >= x_src[0] else 0]
-        return y
+    def _step_interp(x_src, y_src, x_grid, *, extrapolate_back=True):
+        """
+        Right-continuous step interpolation with optional backward-only extrapolation.
+
+        - If extrapolate_back=True, x_grid < x_src[0] uses y_src[0].
+        - We NEVER extrapolate forward; x_grid > x_src[-1] -> NaN.
+        """
+        idx = np.searchsorted(x_src, x_grid, side='right') - 1
+        yg = np.where((idx >= 0) & (idx < y_src.size), y_src[np.clip(idx, 0, y_src.size-1)], np.nan)
+        # no forward extrapolation
+        yg = np.where(x_grid > x_src[-1], np.nan, yg)
+        # backward-only extrapolation if requested
+        if extrapolate_back:
+            yg = np.where(x_grid < x_src[0], y_src[0], yg)
+        else:
+            yg = np.where(x_grid < x_src[0], np.nan, yg)
+        return yg
 
     @staticmethod
     def time_ci(
         df, *,
         x_col='time_elapsed', y_col='mse_train', seed_col='seed',
         grid_points=200, tmax_quantile=0.9,
-        interp='linear', extrapolate=True,
-        alpha=0.05, logspace=True, eps=1e-12
+        interp='linear',
+        extrapolate=True,  # backward-only extrapolation
+        alpha=0.05, logspace=True, eps=1e-12,
+        cutoff_missing_frac=0.5,  # new parameter
     ):
-        curves, tmax = [], []
+        curves, tmax_list, tmin_list = [], [], []
         for _, g in df.groupby(seed_col):
             x = np.asarray(g[x_col], dtype=float)
             y = np.asarray(g[y_col], dtype=float)
             m = np.isfinite(x) & np.isfinite(y)
             x, y = x[m], y[m]
-            if x.size == 0: 
+            if x.size == 0:
                 continue
             o = np.argsort(x, kind='mergesort')
             x, y = x[o], y[o]
-            # keep LAST value for duplicate timestamps
             _, idx_rev = np.unique(x[::-1], return_index=True)
             idx = np.sort((x.size - 1) - idx_rev)
             x, y = x[idx], y[idx]
             curves.append((x, y))
-            tmax.append(x[-1])
+            tmax_list.append(x[-1])
+            tmin_list.append(x[0])
         if not curves:
             raise ValueError("No curves after grouping by seed.")
 
-        Tq = float(np.quantile(np.array(tmax, float), tmax_quantile))
+        tmax_arr = np.array(tmax_list, dtype=float)
+        tmin_arr = np.array(tmin_list, dtype=float)
+
+        Tq = float(np.quantile(tmax_arr, tmax_quantile))
         x_grid = np.linspace(0.0, Tq, int(grid_points))
 
         def _interp_linear(x, y, xg):
-            yg = np.interp(xg, x, y)
-            if not extrapolate:
-                yg[(xg < x[0]) | (xg > x[-1])] = np.nan
+            left_val = y[0] if extrapolate else np.nan
+            yg = np.interp(xg, x, y, left=left_val, right=np.nan)
             return yg
 
         def _interp_step(x, y, xg):
             idx = np.searchsorted(x, xg, side='right') - 1
             yg = np.where((idx >= 0) & (idx < y.size), y[np.clip(idx, 0, y.size-1)], np.nan)
+            yg = np.where(xg > x[-1], np.nan, yg)  # no forward extrap
             if extrapolate:
                 yg = np.where(xg < x[0], y[0], yg)
-                yg = np.where(xg > x[-1], y[-1], yg)
             return yg
 
         fn = _interp_linear if interp == 'linear' else _interp_step
         Y = np.vstack([fn(x, y, x_grid) for (x, y) in curves])  # (n_seeds, T)
-        counts = np.sum(np.isfinite(Y), axis=0).astype(float)
+        finite_mask = np.isfinite(Y)
+        counts = np.sum(finite_mask, axis=0).astype(float)
+        n_seeds = len(curves)
+        avail_frac = counts / n_seeds
 
-        # dynamic z for two-sided (1 - alpha)
-        try:
-            from scipy.stats import norm
-            z = norm.ppf(1 - alpha/2.0)
-        except Exception:
-            z = 1.959963984540054  # fallback to 95% if SciPy not present
+        min_support_abs = 5
 
+        too_sparse_frac = avail_frac < (1 - cutoff_missing_frac)
+        too_sparse_abs  = counts < min_support_abs
+        too_sparse_mask = too_sparse_frac | too_sparse_abs
+
+        # Mask out undersupported grid points
+        if np.any(too_sparse_mask):
+            Y[:, too_sparse_mask] = np.nan
+            finite_mask[:, too_sparse_mask] = False
+            counts[too_sparse_mask] = 0.0
+
+        # (rest identical to before)
+        x0 = tmin_arr[:, None]
+        Xg = x_grid[None, :]
+        pre_mask_matrix = (Xg < x0) & finite_mask
+        pre_count = np.sum(pre_mask_matrix, axis=0).astype(float)
+        with np.errstate(invalid='ignore', divide='ignore'):
+            pre_frac = pre_count / counts
+        pre_mask = np.isfinite(pre_frac) & (pre_frac == 1.0)
+
+        from scipy.stats import norm
+        z = norm.ppf(1 - alpha/2.0)
         if logspace:
-            # guard against non-positive values; treat <=0 as missing
             Yp = np.where(Y > eps, Y, np.nan)
             L = np.log(Yp)
             mean_L = np.nanmean(L, axis=0)
@@ -496,7 +525,15 @@ class ConvergenceCI:
                 half = z * std / np.sqrt(counts)
             lo, hi = mean - half, mean + half
 
-        return x_grid, mean, lo, hi, Y
+        meta = dict(
+            counts=counts,
+            avail_frac=avail_frac,
+            too_sparse_mask=too_sparse_mask,
+            pre_frac=pre_frac,
+            tmin_global=float(np.min(tmin_arr)),
+            tmax_quantile=Tq,
+        )
+        return x_grid, mean, lo, hi, Y, pre_mask, meta
 
 
 def plot_convergence_debug(
@@ -589,77 +626,85 @@ def plot_ci_fn(x, mean, lo, hi, label=None, logy=True, color=None, alpha_fill=0.
     plt.fill_between(x, lo, hi, alpha=alpha_fill, color=color)
 
 
-def plot_multi_ci(
-    df_map,
+def plot_time_bands(
+    df_map, *,
+    y_col='mse_train',
+    grid_points=200,
+    tmax_quantile=0.9,
+    align_grid=True,
+    line_width=2.0,
+    band_alpha=0.25,
     logy=True,
     grid=True,
-    band_alpha=0.25,
-    line_width=2.0,
-    grid_points=500,
-    tmax_quantile=0.8,
-    y_col=None,
     title=None,
-    align_grid=True,
-    extrapolate = False
+    extrapolate=True,  # backward-only semantics (matches time_ci)
+    cutoff_missing_frac = 0.5
 ):
-    """
-    Plot convergence confidence intervals for multiple preprocessed DataFrames.
-
-    Parameters
-    ----------
-    df_map : dict
-        Mapping of model labels to preprocessed DataFrames.
-        Example: {"Pyomo": df_pyomo, "JAX": df_jax, "PyTorch": df_torch}
-    logy : bool
-        Use log scale on y-axis.
-    grid : bool
-        Display grid lines.
-    band_alpha : float
-        Transparency for confidence bands.
-    line_width : float
-        Width of mean curve lines.
-    grid_points : int
-        Number of interpolation points for CI computation.
-    tmax_quantile : float
-        Quantile cutoff for time axis in CI computation.
-    y_col : str or None
-        Optional column name for target metric ("mse_train", "mse_test", etc.).
-    title : str or None
-        Optional plot title.
-    align_grid : bool
-        Whether to resample all models to a common x-grid for comparison.
-    """
-
     curves = {}
+
+    # --- compute curves ---
     for label, df in df_map.items():
-        x, mean, lo, hi, _ = ConvergenceCI.time_ci(
+        if type(tmax_quantile) == dict:
+            tmax_q = tmax_quantile[label]
+        else:
+            tmax_q = tmax_quantile
+        x, mean, lo, hi, Y, pre_mask, meta = ConvergenceCI.time_ci(
             df,
             grid_points=grid_points,
-            tmax_quantile=tmax_quantile,
-            y_col = y_col,
-            extrapolate = extrapolate)
-        curves[label] = dict(x=x, mean=mean, lo=lo, hi=hi)
+            tmax_quantile=tmax_q,
+            y_col=y_col,
+            extrapolate=extrapolate,  # backward-only extrapolation
+            logspace=logy,
+            cutoff_missing_frac = cutoff_missing_frac
+        )
+        curves[label] = dict(
+            x=x, mean=mean, lo=lo, hi=hi,
+            pre_mask=pre_mask,
+            t_pre_end=meta['tmin_global']  # handy if we realign grids
+        )
 
-    # Align x-grids if desired
+    # --- optionally align x-grids across labels ---
     if align_grid:
         all_x = np.concatenate([c["x"] for c in curves.values()])
-        x_common = np.linspace(all_x.min(), all_x.max(), grid_points)
-        for d in curves.values():
-            d["mean"] = np.interp(x_common, d["x"], d["mean"])
-            d["lo"]   = np.interp(x_common, d["x"], d["lo"])
-            d["hi"]   = np.interp(x_common, d["x"], d["hi"])
-            d["x"] = x_common
+        x_common = np.linspace(np.nanmin(all_x), np.nanmax(all_x), grid_points)
 
-    # Create plot
+        for d in curves.values():
+            # Preserve backward-only extrapolation: left=first value, right=np.nan
+            d["mean"] = np.interp(x_common, d["x"], d["mean"],
+                                  left=d["mean"][0], right=np.nan)
+            d["lo"]   = np.interp(x_common, d["x"], d["lo"],
+                                  left=d["lo"][0],   right=np.nan)
+            d["hi"]   = np.interp(x_common, d["x"], d["hi"],
+                                  left=d["hi"][0],   right=np.nan)
+            d["x"] = x_common
+            # Recompute dashed mask from stored boundary
+            d["pre_mask"] = x_common < d["t_pre_end"]
+
+    # --- plot ---
     fig, ax = plt.subplots(figsize=(12, 7))
     eps = 1e-12 if logy else 0.0
 
+    any_pre = False
     for label, d in curves.items():
+        x = d["x"]
         mean = np.clip(d["mean"], eps, None)
-        lo   = np.clip(d["lo"], eps, None)
-        hi   = np.clip(d["hi"], eps, None)
-        ax.plot(d["x"], mean, label=label, linewidth=line_width)
-        ax.fill_between(d["x"], lo, hi, alpha=band_alpha)
+        lo   = np.clip(d["lo"],   eps, None)
+        hi   = np.clip(d["hi"],   eps, None)
+        pre  = d["pre_mask"]
+        post = ~pre
+
+        # Plot the non-pre-training (observed/support) part first to anchor color & legend
+        # We allow this to be empty; matplotlib will still assign a color.
+        [main_line] = ax.plot(x[post], mean[post], label=label, linewidth=line_width)
+        color = main_line.get_color()
+
+        # Fill band for the whole domain (NaNs create gaps automatically)
+        ax.fill_between(x, lo, hi, alpha=band_alpha, facecolor=color, edgecolor='none')
+
+        # Plot the pre-training (pure backward-extrapolated) part with dashed style
+        if np.any(pre):
+            any_pre = True
+            ax.plot(x[pre], mean[pre], linewidth=line_width, linestyle='--', color=color)
 
     if logy:
         ax.set_yscale("log")
@@ -674,11 +719,20 @@ def plot_multi_ci(
     if title:
         ax.set_title(title)
 
-    ax.legend(frameon=False)
+    # Build legend with an extra entry for the dashed meaning.
+    if any_pre:
+        pre_proxy = Line2D([0], [0], linestyle='--', color='black', label='pre-training')
+        handles, labels = ax.get_legend_handles_labels()
+        handles.append(pre_proxy)
+        labels.append('pre-training')
+        ax.legend(handles, labels, frameon=False)
+    else:
+        ax.legend(frameon=False)
+
     plt.tight_layout()
     plt.show()
-
     return ax
+
 
 def load_all_pickles(folder, recursive=True):
     """Load all .pkl files from a folder into a list."""

@@ -1,6 +1,6 @@
 {
     "model_params": {
-      "layer_widths": [2, 16, 2],
+      "layer_widths": [2, 32, 2],
       "act_func": "tanh",
       "penalty_lambda_reg": 0.001,
       "time_invariant": true,
@@ -9,19 +9,15 @@
       "skip_collocation": "inf",
       "redirect_logs": true,
       "params": {
-        "tol": 1e-20,
-        "linear_solver": "mumps",
-        "mu_strategy": "adaptive",
-        "nlp_scaling_method": "gradient-based",
-        "check_derivatives_for_naninf": "yes",
+        "tol": 1e-12,
         "print_level": 3,
         "max_iter": 3000
       }
     },
     "data": {
-      "data_type": "ho",
+      "data_type": "vdp",
       "spacing_type": "chebyshev",
-      "noise_level": 0.2,
+      "noise_level": 0.1,
       "___comment": "possible spacing types: 'chebyshev', 'gauss_legendre', 'gauss_radau', 'gauss_lobatto' "
     },
     "optimization_types": {

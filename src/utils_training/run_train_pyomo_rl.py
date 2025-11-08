@@ -22,19 +22,13 @@ append_path(os.path.abspath(os.path.join('..', 'utils')))
 append_path(os.path.abspath(os.path.join('..', 'utils_training')))
 append_path(os.path.abspath(os.path.join('..', 'models')))
 
-# preprocessing
-DataPreprocessor = reload_module('preprocess', 'DataPreprocessor')
 
-# generation of collocation points
-import collocation_obj
-Collocation = collocation_obj.Collocation
+from utils.collocation_obj import Collocation
+from utils.preprocess import DataPreprocessor
 
 # ode solvers
-import ode_solver_pyomo_opt
-DirectODESolver = ode_solver_pyomo_opt.DirectODESolver
-
-import nn_pyomo_base
-NeuralODEPyomo = nn_pyomo_base.NeuralODEPyomo
+from models.ode_solver_pyomo_opt import DirectODESolver
+from models.nn_pyomo_base import NeuralODEPyomo
 
 class Trainer:
     def __init__(self, params_results, params_data, params_model, params_solver, params_ode = None, Ds_train = None, Ds_test = None):
