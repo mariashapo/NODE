@@ -88,13 +88,13 @@ def main():
             try: ctypes.CDLL("libc.so.6").malloc_trim(0)
             except Exception: pass
 
-        # merge timing into results
         if not args.log:
             results["train_loss"] = results_no_log.get("train_loss", getattr(trainer, "losses", None))
             results["data_type"] = args.data_type
             results["pretrain"] = args.pretrain
             results["max_iter"] = args.max_iter
-
+            
+        # merge timing into results
         results["time_elapsed"] = results_no_log.get("time_elapsed")
         print_memory("Current memory use: ")
         

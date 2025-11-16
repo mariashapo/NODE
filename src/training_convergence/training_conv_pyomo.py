@@ -59,9 +59,7 @@ def main():
         i+=1
         
         print_memory("Training ended: ")
-        # clean up memory here
         del trainer, runner
-        gc.collect()
         gc.collect()
         print_memory("Attempted clean up: ")
 

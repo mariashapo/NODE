@@ -167,7 +167,6 @@ class NeuralODEPyomo:
     
         def _objective(m):
             if M == 1:
-                # mse
                 data_fit = sum((m.y[i] - self.y_observed[i])**2 for i in m.t_idx) / len(m.t_idx)
             elif M == 2:
                 data_fit = sum((m.y1[i] - self.y_observed[i, 0])**2 + (m.y2[i] - self.y_observed[i, 1])**2 for i in m.t_idx) / len(m.t_idx)

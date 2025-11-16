@@ -138,7 +138,7 @@ class TrainerToy:
             self.est_sol = None
         
         self.model = PyomoModel(
-                        self.y_noisy, # remember to pass noisy data
+                        self.y_noisy, # pass noisy data
                         self.t, 
                         self.D,
                         self.layer_widths, 

@@ -485,7 +485,7 @@ class ConvergenceCI:
         n_seeds = len(curves)
         avail_frac = counts / n_seeds
 
-        min_support_abs = 5
+        min_support_abs = 3
 
         too_sparse_frac = avail_frac < (1 - cutoff_missing_frac)
         too_sparse_abs  = counts < min_support_abs
