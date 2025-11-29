@@ -1,6 +1,6 @@
-Solver command line: ['/opt/homebrew/bin/ipopt', '/var/folders/2v/gfm3z1tn5fj8zss_r9hrgnv80000gn/T/tmpw1177au4.pyomo.nl', '-AMPL', 'tol=1e-15', 'print_level=3', 'max_iter=3000', 'constr_viol_tol=1e-12', 'compl_inf_tol=1e-12', 'dual_inf_tol=1e-12', 'acceptable_tol=1e-09', 'acceptable_constr_viol_tol=1e-09']
+Solver command line: ['/Users/mariiashapo/anaconda3/envs/node_25/bin/ipopt', '/var/folders/2v/gfm3z1tn5fj8zss_r9hrgnv80000gn/T/tmphcd0okmd.pyomo.nl', '-AMPL', 'tol=1e-15', 'print_level=3', 'max_iter=3000', 'constr_viol_tol=1e-12', 'compl_inf_tol=1e-12', 'dual_inf_tol=1e-12', 'acceptable_tol=1e-09', 'acceptable_constr_viol_tol=1e-09', 'max_wall_time=0.01']
 
-Ipopt 3.14.19: tol=1e-15
+Ipopt 3.14.16: tol=1e-15
 print_level=3
 max_iter=3000
 constr_viol_tol=1e-12
@@ -8,6 +8,7 @@ compl_inf_tol=1e-12
 dual_inf_tol=1e-12
 acceptable_tol=1e-09
 acceptable_constr_viol_tol=1e-09
+max_wall_time=0.01
 
 
 ******************************************************************************
@@ -27,25 +28,25 @@ Total number of inequality constraints...............:        0
         inequality constraints with only upper bounds:        0
 
 
-Number of Iterations....: 71
+Number of Iterations....: 0
 
                                    (scaled)                 (unscaled)
-Objective...............:   8.3223064141385986e-02    8.3223064141385986e-02
-Dual infeasibility......:   5.0821383612945861e-17    5.0821383612945861e-17
-Constraint violation....:   2.1919198395935519e-14    2.6589841439772499e-13
+Objective...............:   6.5255089241852970e-02    6.5255089241852970e-02
+Dual infeasibility......:   3.3591806445241179e-03    3.3591806445241179e-03
+Constraint violation....:   5.6890014201276458e+00    5.6890014201276458e+00
 Variable bound violation:   0.0000000000000000e+00    0.0000000000000000e+00
-Complementarity.........:   9.0909090909090985e-17    9.0909090909090985e-17
-Overall NLP error.......:   2.1919198395935519e-14    2.6589841439772499e-13
+Complementarity.........:   1.0061932753445447e+02    1.0061932753445447e+02
+Overall NLP error.......:   1.0061932753445447e+02    1.0061932753445447e+02
 
 
-Number of objective function evaluations             = 93
-Number of objective gradient evaluations             = 72
-Number of equality constraint evaluations            = 93
+Number of objective function evaluations             = 1
+Number of objective gradient evaluations             = 1
+Number of equality constraint evaluations            = 1
 Number of inequality constraint evaluations          = 0
-Number of equality constraint Jacobian evaluations   = 72
+Number of equality constraint Jacobian evaluations   = 1
 Number of inequality constraint Jacobian evaluations = 0
-Number of Lagrangian Hessian evaluations             = 71
-Total seconds in IPOPT                               = 6.779
+Number of Lagrangian Hessian evaluations             = 0
+Total seconds in IPOPT                               = 0.077
 
-EXIT: Solved To Acceptable Level.
+EXIT: Maximum wallclock time exceeded.
 

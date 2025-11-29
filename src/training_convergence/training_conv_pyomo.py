@@ -31,7 +31,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--no_print", type=bool, default = False)
     p.add_argument("--config", default="src/configs/config_pyomo_synth.json")
-    p.add_argument("--exp", default="default") # "training_convergence_wall_time"
+    p.add_argument("--exp", default="training_convergence_wall_time") # "default"
     p.add_argument("--n_seeds", type=int, default=1)
     p.add_argument("--outdir", default=None)
     p.add_argument("--data_type", default = "vdp")

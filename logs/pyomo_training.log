@@ -571,3 +571,6 @@ deterministic order.  (deprecated in 5.7)
 2025-11-29 17:52:13,270 [WARNING] Setting Var 'y[197,0]' to a numeric value `-21.42713542288796` outside the bounds (-5.0, 5.0).
 2025-11-29 17:52:13,270 [WARNING] Setting Var 'y[198,0]' to a numeric value `-21.432512129106126` outside the bounds (-5.0, 5.0).
 2025-11-29 17:52:13,270 [WARNING] Setting Var 'y[199,0]' to a numeric value `-21.434304541128537` outside the bounds (-5.0, 5.0).
+2025-11-29 18:41:01,929 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.

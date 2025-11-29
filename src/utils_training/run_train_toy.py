@@ -149,6 +149,7 @@ class TrainerToy:
         if not self.pre_initialize:
             self.est_sol = None
         
+        self.seed = seed
         self.model = PyomoModel(
                         self.y_noisy, # pass noisy data
                         self.t, 
@@ -200,27 +201,27 @@ class TrainerToy:
 
         
         # ------------------------------------------------ FIGURES ---------------------------------------------------
-        plt.figure(figsize=(10, 6))
-        plt.plot(self.t, self.y, label='True Data', alpha = 1, color = 'green', ls = '--')
-        # plt.plot(ts_test, ys_test, alpha = 1, color = 'green', ls = '--')
-        # plt.plot(ts_test, y_pred_test, color='blue', label='Model Prediction (Test) -  Odeint', alpha = 1)
-        plt.plot(self.t, odeint_pred, color='#FF8C10', label='Model Prediction (Train) - Odeint', alpha = 1)
-        plt.plot(self.t, y_solution, color='blue', label='Model Prediction (Train) - Collocation', alpha = 1, ls = '--')
-        plt.title(f"Collocation-based training (DEV))")
-        plt.legend(loc ="lower right")
-        plt.grid(True)
-        plt.savefig(f'results/colloc_solver_train.png', format='png')  
-        plt.close()
+        # plt.figure(figsize=(10, 6))
+        # plt.plot(self.t, self.y, label='True Data', alpha = 1, color = 'green', ls = '--')
+        # # plt.plot(ts_test, ys_test, alpha = 1, color = 'green', ls = '--')
+        # # plt.plot(ts_test, y_pred_test, color='blue', label='Model Prediction (Test) -  Odeint', alpha = 1)
+        # plt.plot(self.t, odeint_pred, color='#FF8C10', label='Model Prediction (Train) - Odeint', alpha = 1)
+        # plt.plot(self.t, y_solution, color='blue', label='Model Prediction (Train) - Collocation', alpha = 1, ls = '--')
+        # plt.title(f"Collocation-based training (DEV))")
+        # plt.legend(loc ="lower right")
+        # plt.grid(True)
+        # plt.savefig(f'results/colloc_solver_train_{self.seed}.png', format='png')  
+        # plt.close()
 
-        plt.figure(figsize=(10, 6))
-        plt.plot(self.t_test, self.y_test, label='True Data', alpha = 1, color = 'green', ls = '--')
-        plt.plot(self.t_test, odeint_pred_test, color='#FF8C10', label='Model Prediction (Train) - Odeint', alpha = 1)
-        plt.plot(self.t_test, y_solution_test, color='blue', label='Model Prediction (Train) - Collocation', alpha = 1, ls = '--')
-        plt.title(f"Collocation-based training (DEV))")
-        plt.legend(loc ="lower right")
-        plt.grid(True)
-        plt.savefig(f'results/colloc_solver_test.png', format='png')  
-        plt.close()
+        # plt.figure(figsize=(10, 6))
+        # plt.plot(self.t_test, self.y_test, label='True Data', alpha = 1, color = 'green', ls = '--')
+        # plt.plot(self.t_test, odeint_pred_test, color='#FF8C10', label='Model Prediction (Train) - Odeint', alpha = 1)
+        # plt.plot(self.t_test, y_solution_test, color='blue', label='Model Prediction (Train) - Collocation', alpha = 1, ls = '--')
+        # plt.title(f"Collocation-based training (DEV))")
+        # plt.legend(loc ="lower right")
+        # plt.grid(True)
+        # plt.savefig(f'results/colloc_solver_test_{self.seed}.png', format='png')  
+        # plt.close()
 
         if self.detailed or detailed:
             results = {
