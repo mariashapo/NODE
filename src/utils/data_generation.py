@@ -70,6 +70,7 @@ def legendre_gauss_nodes(n, start, end):
 
 #------------------------------------DATA GENERATION---------------------------------#
 def generate_ode_data(n_points, noise_level, ode_type, params, start_time=0, end_time=10, spacing_type="equally_spaced", initial_state=None, seed=0, t = None):
+    """If *t* is provided, it overrides start_time, end_time, spacing_type, and n_points."""
     
     if initial_state is None:
         if ode_type != "decay":

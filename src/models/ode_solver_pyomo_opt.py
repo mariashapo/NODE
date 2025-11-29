@@ -79,7 +79,8 @@ class DirectODESolver:
 
                 # accumulate penalties for each dimension
                 for d in m.dimensions:
-                    dy_dt = sum(self.D[i-1, j-1] * m.y[j, d] for j in m.t)
+                    # dy_dt = sum(self.D[i-1, j-1] * m.y[j, d] for j in m.t)
+                    dy_dt = sum(self.D[i, j] * m.y[j, d] for j in m.t)
                     penalty += (nn_output[d] - dy_dt)**2
             
             # penalty for slack variables

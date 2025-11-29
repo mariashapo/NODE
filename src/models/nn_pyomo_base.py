@@ -1,13 +1,11 @@
+"""Base model script to train collocation-based Neural ODEs using Pyomo and IPOPT solver."""
 import numpy as np
 import pyomo.environ as pyo
 from pyomo.environ import ConcreteModel, Var, Constraint, ConstraintList, Objective, SolverFactory, value, RangeSet
 
-import jax
 import jax.numpy as jnp
 from jax.experimental.ode import odeint
-from scipy.integrate import ode, solve_ivp
 import diffrax as dfx
-from diffrax import ImplicitEuler, ODETerm
 
 import os
 import pickle

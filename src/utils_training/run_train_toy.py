@@ -1,3 +1,4 @@
+"""Module for running synthetic toy problem training for all three Neural ODE implementations."""
 import numpy as np
 import jax
 import jax.numpy as jnp
@@ -19,7 +20,7 @@ from utils.collocation_obj import Collocation
 from models.nn_pyomo_base import NeuralODEPyomo as PyomoModel
 from models.nn_jax_diffrax import NeuralODE as JaxDiffModel
 from models.nn_pytorch import NeuralODE as PytorchModel
-
+from models.ode_solver_pyomo_base import DirectODESolver # direct solver for post-training predictions
 
 class TrainerToy:
     def __init__(self, params_data, model_type):
@@ -43,22 +44,27 @@ class TrainerToy:
             self.generate_nodes()
         else:
             self.nodes = jnp.linspace(self.start_time, self.end_time, self.N)
-            
+        
+        # self.nodes will override t, start_time, end_time, spacing_type, n_points within generate_ode_data() function
         self.t, self.y, self.y_noisy, true_derivative = generate_ode_data(
             self.N, self.noise_level, self.ode_type, self.data_param, 
-            min(self.nodes), max(self.nodes), 
             initial_state = self.init_state, t = self.nodes)
         
         self.true_derivative = true_derivative
         
-        test_end_time = max(self.nodes) + (max(self.nodes) - min(self.nodes))
-        
+        # preserve the same span for test data and deduce test nodes
+        self.start_time_test = max(self.nodes)
+        self.end_time_test = max(self.nodes) + (max(self.nodes) - min(self.nodes))
+
+        if self.model_type == 'pyomo':
+            self.generate_nodes_test()
+        else:
+            self.nodes_test = jnp.linspace(self.start_time, self.end_time, self.N)
+
         self.init_state_test = self.y[-1]
         t_test, y_test, _, _ = generate_ode_data(
-            self.N*2, self.noise_level, self.ode_type, self.data_param, 
-            max(self.nodes), test_end_time, 
-            spacing_type = "uniform", 
-            initial_state = self.init_state_test)
+            self.N, self.noise_level, self.ode_type, self.data_param, 
+            initial_state = self.init_state_test, t = self.nodes_test)
         
         self.t_test = t_test
         self.y_test = y_test
@@ -67,12 +73,18 @@ class TrainerToy:
         collocation = Collocation(self.N, self.start_time, self.end_time, self.spacing_type)
         self.nodes = collocation.compute_nodes()
         self.collocation = collocation
-       
+
+    def generate_nodes_test(self):
+        collocation_test = Collocation(self.N, self.start_time_test, self.end_time_test, self.spacing_type)
+        self.nodes_test = collocation_test.compute_nodes()
+        self.collocation_test = collocation_test
+
     def prepare_collocation(self):
         self.D = np.array(self.collocation.compute_derivative_matrix())
+        self.D_test = np.array(self.collocation_test.compute_derivative_matrix())
         
     def estimate_derivative(self):
-        est_der, est_sol = collocate_data(self.y_noisy, self.t, 'EpanechnikovKernel', bandwidth=0.5)
+        _, est_sol = collocate_data(self.y_noisy, self.t, 'EpanechnikovKernel', bandwidth=0.5)
         self.est_sol = np.array(est_sol)
         
     def prepare_inputs(self):
@@ -159,15 +171,57 @@ class TrainerToy:
         self.termination = result['termination_condition']
         print(result)
         
+        
+        
     def extract_results_pyomo(self, detailed = False):
         direct_model_pred = self.model.extract_solution()
         # regenerate train data
+        # ----------------------------------- these are the ODEINT predictions -----------------------------------
         odeint_pred = self.model.neural_ode(self.init_state, self.t)
         odeint_pred_test = self.model.neural_ode(self.init_state_test, self.t_test)
         
         mse_train = np.mean((self.y - odeint_pred)**2)
         mse_test = np.mean((self.y_test - odeint_pred_test)**2)
         
+        # -------------------------------------- COLLOCATION PREDICTION (TRAIN) --------------------------------------
+        trained_weights_biases = self.model.extract_weights()
+        direct_solver = DirectODESolver(self.t, self.layer_widths, trained_weights_biases, self.init_state, self.D, y_init_guess=odeint_pred)
+        direct_solver.build_model()
+        direct_solver.solve_model()
+        y_solution = direct_solver.extract_solution()     
+        mse_train_coll = np.mean(np.square(np.squeeze(self.y) - np.squeeze(y_solution)))
+
+        # -------------------------------------- COLLOCATION PREDICTION (TEST) --------------------------------------
+        direct_solver = DirectODESolver(self.t_test, self.layer_widths, trained_weights_biases, self.init_state_test, self.D_test, y_init_guess=odeint_pred_test)
+        direct_solver.build_model()
+        direct_solver.solve_model()
+        y_solution_test = direct_solver.extract_solution()     
+        mse_test_coll = np.mean(np.square(np.squeeze(self.y_test) - np.squeeze(y_solution_test)))
+
+        
+        # ------------------------------------------------ FIGURES ---------------------------------------------------
+        plt.figure(figsize=(10, 6))
+        plt.plot(self.t, self.y, label='True Data', alpha = 1, color = 'green', ls = '--')
+        # plt.plot(ts_test, ys_test, alpha = 1, color = 'green', ls = '--')
+        # plt.plot(ts_test, y_pred_test, color='blue', label='Model Prediction (Test) -  Odeint', alpha = 1)
+        plt.plot(self.t, odeint_pred, color='#FF8C10', label='Model Prediction (Train) - Odeint', alpha = 1)
+        plt.plot(self.t, y_solution, color='blue', label='Model Prediction (Train) - Collocation', alpha = 1, ls = '--')
+        plt.title(f"Collocation-based training (DEV))")
+        plt.legend(loc ="lower right")
+        plt.grid(True)
+        plt.savefig(f'results/colloc_solver_train.png', format='png')  
+        plt.close()
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(self.t_test, self.y_test, label='True Data', alpha = 1, color = 'green', ls = '--')
+        plt.plot(self.t_test, odeint_pred_test, color='#FF8C10', label='Model Prediction (Train) - Odeint', alpha = 1)
+        plt.plot(self.t_test, y_solution_test, color='blue', label='Model Prediction (Train) - Collocation', alpha = 1, ls = '--')
+        plt.title(f"Collocation-based training (DEV))")
+        plt.legend(loc ="lower right")
+        plt.grid(True)
+        plt.savefig(f'results/colloc_solver_test.png', format='png')  
+        plt.close()
+
         if self.detailed or detailed:
             results = {
                 'time_elapsed': self.time_elapsed,
@@ -176,6 +230,8 @@ class TrainerToy:
                 'odeint_pred_test': odeint_pred_test,
                 'mse_train': mse_train,
                 'mse_test': mse_test,
+                'mse_train_coll': mse_train_coll,
+                'mse_test_coll': mse_test_coll,
                 'termination': self.termination,
                 'seed': self.seed
             }

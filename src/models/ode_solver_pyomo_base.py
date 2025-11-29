@@ -4,11 +4,20 @@ from pyomo.environ import ConcreteModel, Var, Constraint, ConstraintList, Object
 
 class DirectODESolver:
     """
-    Direct collocation-based solver treating the collocation as an optimization problem with 'hard' constraints.
+    Direct collocation-based solver treating the collocation as an optimization problem
+    with 'soft' ODE constraints (residuals in the objective) and hard initial condition.
     """
-    def __init__(self, t, layer_sizes, trained_weights_biases, initial_state, D, 
-                 act_func="tanh", time_invariant=True, extra_input=None,
-                 params=None):
+    def __init__(self,
+                 t,
+                 layer_sizes,
+                 trained_weights_biases,
+                 initial_state,
+                 D,
+                 act_func="tanh",
+                 time_invariant=True,
+                 extra_input=None,
+                 params=None,
+                 y_init_guess=None):   # <--- NEW ARG
         self.t = t
         self.layer_sizes = layer_sizes
         self.initial_state = initial_state  
@@ -25,6 +34,20 @@ class DirectODESolver:
         
         # Determine dimensions
         self.dimensions = len(self.initial_state)
+
+        # Optional warm-start trajectory (shape (N, dim) or (N,))
+        if y_init_guess is not None:
+            arr = np.asarray(y_init_guess, dtype=float)
+            if arr.ndim == 1:
+                arr = arr.reshape(-1, 1)
+            if arr.shape[0] != len(t) or arr.shape[1] != self.dimensions:
+                raise ValueError(
+                    f"y_init_guess has shape {arr.shape}, "
+                    f"expected ({len(t)}, {self.dimensions})"
+                )
+            self.y_init_guess = arr
+        else:
+            self.y_init_guess = None
 
         # Model weights
         self.W1 = trained_weights_biases['W1']
@@ -51,45 +74,50 @@ class DirectODESolver:
         self.model.t = RangeSet(0, self.N - 1)
         self.model.dimensions = RangeSet(0, self.dimensions - 1)
 
+        # Initialization rule for y (warm-start if provided)
+        if self.y_init_guess is not None:
+            def y_init_rule(m, i, d):
+                return float(self.y_init_guess[i, d])
+        else:
+            def y_init_rule(m, i, d):
+                return 0.1
+
         # Define state variables over time and dimensions
-        self.model.y = Var(self.model.t, self.model.dimensions, domain=pyo.Reals, 
-                           initialize=0.1, bounds=(lower_bound, upper_bound))
+        self.model.y = Var(
+            self.model.t,
+            self.model.dimensions,
+            domain=pyo.Reals,
+            initialize=y_init_rule,                  # <--- uses warm start
+            bounds=(lower_bound, upper_bound)
+        )
 
-        # Slack variables for initial conditions
-        self.model.slack = Var(self.model.dimensions, domain=pyo.Reals, 
-                               bounds=(-1e-1, 1e-1), initialize=0.0)
-
-        # Initial condition constraints
+        # --- HARD INITIAL CONDITIONS (no slack) ---
         def init_condition_rule(m, d):
-            return m.y[0, d] == self.initial_state[d] + m.slack[d]
+            return m.y[0, d] == self.initial_state[d]
         
         self.model.init_condition = Constraint(self.model.dimensions, rule=init_condition_rule)
 
-        # ODE constraints
-        self.model.ode = ConstraintList()
-        for i in self.model.t:
-            # Build neural network input
-            nn_input = [self.model.y[i, d] for d in self.model.dimensions]
-
-            # Add time and extra inputs
-            if not self.time_invariant:
-                nn_input.append(self.t[i])
-
-            if self.extra_input is not None:
-                for input_array in self.extra_input.T:
-                    nn_input.append(input_array[i])
-
-            nn_output = self.nn_output(nn_input)  # Should return an array/list of length 'dimensions'
-
-            # Add ODE constraints for each dimension
-            for d in self.model.dimensions:
-                dy_dt = sum(self.D[i-1, j-1] * self.model.y[j, d] for j in self.model.t)
-                self.model.ode.add(nn_output[d] == dy_dt)
-
-        # Objective function to minimize slack variables
+        # Objective: sum of squared collocation residuals
         def _objective(m):
-            # Ensuring the slack variables do not grow too large
-            return 1 + 1e6 * sum(m.slack[d]**2 for d in m.dimensions)
+            total = 0.0
+            for i in m.t:
+                nn_input = [m.y[i, d] for d in m.dimensions]
+
+                # add time and extra inputs if needed
+                if not self.time_invariant:
+                    nn_input.append(self.t[i])
+
+                if self.extra_input is not None:
+                    for input_array in self.extra_input.T:
+                        nn_input.append(input_array[i])
+
+                nn_output = self.nn_output(nn_input)
+
+                for d in m.dimensions:
+                    dy_dt = sum(self.D[i, j] * m.y[j, d] for j in m.t)
+                    res = dy_dt - nn_output[d]
+                    total += res**2
+            return total
         
         self.model.obj = Objective(rule=_objective, sense=pyo.minimize)
 
@@ -106,7 +134,7 @@ class DirectODESolver:
             else:
                 raise ValueError("Unsupported activation function.")
 
-            outputs = np.dot(self.W2, hidden) + self.b2  # Should be an array of length 'dimensions'
+            outputs = np.dot(self.W2, hidden) + self.b2  # length = dimensions
         elif len(self.layer_sizes) == 4:
             # For deeper networks
             hidden1 = np.dot(self.W1, nn_input) + self.b1
@@ -133,7 +161,7 @@ class DirectODESolver:
         else:
             raise ValueError("Only networks with 1 or 2 hidden layers are supported.")
 
-        return outputs  # Should return an array/list of length 'dimensions'
+        return outputs  # array/list of length 'dimensions'
 
     def solve_model(self):
         # Solve the model using IPOPT
@@ -155,5 +183,8 @@ class DirectODESolver:
 
     def extract_solution(self):
         # Extract the solution for all time points and dimensions
-        y_values = np.array([[value(self.model.y[i, d]) for d in self.model.dimensions] for i in self.model.t])
+        y_values = np.array([
+            [value(self.model.y[i, d]) for d in self.model.dimensions]
+            for i in self.model.t
+        ])
         return y_values  # Shape: (N, dimensions)

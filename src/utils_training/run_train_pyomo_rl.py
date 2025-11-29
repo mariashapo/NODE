@@ -1,29 +1,13 @@
+"""Module to train Pyomo Neural ODE models for the real-life time series forecasting."""
 import numpy as np
-import jax.numpy as jnp
+# import jax.numpy as jnp
 
 import matplotlib.pyplot as plt
-import sys
 import os
 import shutil
 import time
 import pickle
-import importlib
 
-def append_path(path):
-    if path not in sys.path:
-        sys.path.append(path)
-
-def reload_module(module_name, class_name):
-    module = importlib.import_module(module_name)
-    importlib.reload(module)
-    return getattr(module, class_name)
-        
-append_path(os.path.abspath(os.path.join('..', 'utils')))
-append_path(os.path.abspath(os.path.join('..', 'utils_training')))
-append_path(os.path.abspath(os.path.join('..', 'models')))
-
-
-from utils.collocation_obj import Collocation
 from utils.preprocess import DataPreprocessor
 
 # ode solvers

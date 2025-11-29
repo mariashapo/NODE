@@ -9,3 +9,4 @@ data.txt
 */*.json
 *.png
 00_archive
+node_modules

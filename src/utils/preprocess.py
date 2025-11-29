@@ -1,3 +1,4 @@
+"""Real-life data preprocessing module."""
 import numpy as np
 import pandas as pd
 import jax.numpy as jnp
@@ -9,16 +10,7 @@ import sys
 import os
 import importlib
 
-path_ = os.path.abspath(os.path.join('..', 'utils'))
-if path_ not in sys.path:
-    sys.path.append(path_)
-
-def reload_module(module_name, class_name):
-    module = importlib.import_module(module_name)
-    importlib.reload(module)
-    return getattr(module, class_name)
-
-Collocation = reload_module('collocation_obj', 'Collocation')
+from utils.collocation_obj import Collocation
 
 
 class DataPreprocessor:
@@ -169,7 +161,6 @@ class DataPreprocessor:
             t_train = np.linspace(t_train.min(), t_train.max(), num_nodes)
             t_test = np.linspace(t_test.min(), t_test.max(), num_nodes_test)
         else:
-            Collocation = reload_module('collocation_obj', 'Collocation')
             collocation_train = Collocation(num_nodes, t_train.min(), t_train.max(), self.spacing)
             t_train = collocation_train.compute_nodes()
             self.collocation_train = collocation_train

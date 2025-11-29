@@ -31,14 +31,14 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--no_print", type=bool, default = False)
     p.add_argument("--config", default="src/configs/config_pyomo_synth.json")
-    p.add_argument("--exp", default="training_convergence_wall_time")
+    p.add_argument("--exp", default="default") # "training_convergence_wall_time"
     p.add_argument("--n_seeds", type=int, default=1)
     p.add_argument("--outdir", default=None)
-    p.add_argument("--data_type", default = "ho")
+    p.add_argument("--data_type", default = "vdp")
     p.add_argument("--layer_width", type=json.loads, default=None)
     # training_convergence_wall_time specific arguments:
     p.add_argument("--t_range", type=json.loads, default=None)
-    p.add_argument("--n_steps", type=int, default=5)
+    p.add_argument("--n_steps", type=int, default=1)
     args = p.parse_args()
 
     if args.no_print:
