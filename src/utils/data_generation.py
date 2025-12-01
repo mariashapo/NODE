@@ -2,6 +2,7 @@ import jax.numpy as jnp
 from jax.experimental.ode import odeint
 from jax import random, jit, vmap
 import numpy as np
+from sklearn.preprocessing import StandardScaler
 
 #-----------------------------------ODE DEFINITIONS-----------------------------------#
 @jit
@@ -118,5 +119,41 @@ def generate_ode_data(n_points, noise_level, ode_type, params, start_time=0, end
     #----------------------------------------NOISE---------------------------------------#
     key = random.PRNGKey(seed)
     y_noisy = y + noise_level * random.normal(key, y.shape)
-    
+
     return t, y, y_noisy, true_derivatives
+
+
+def scale_synthetic_data(y, y_noisy=None, true_derivatives=None, scaler=None):
+    """Standardize synthetic trajectories (and optional derivatives).
+
+    Args:
+        y: Clean trajectory values with shape ``(n_points, n_states)``.
+        y_noisy: Optional noisy trajectory with the same shape as ``y``.
+        true_derivatives: Optional derivative values with the same trailing
+            dimension as ``y``.
+        scaler: Optional ``sklearn.preprocessing.StandardScaler`` instance. If
+            not provided, a new scaler is fit on ``y``.
+
+    Returns:
+        y_scaled, y_noisy_scaled, true_derivatives_scaled, scaler: Scaled
+        arrays (or ``None`` if the corresponding input is ``None``) and the
+        ``StandardScaler`` used for the transformation.
+    """
+
+    scaler = scaler or StandardScaler()
+    y_np = np.asarray(y)
+    y_scaled = scaler.fit_transform(y_np)
+
+    y_noisy_scaled = None
+    if y_noisy is not None:
+        y_noisy_scaled = scaler.transform(np.asarray(y_noisy))
+
+    true_derivatives_scaled = None
+    if true_derivatives is not None:
+        deriv_np = np.asarray(true_derivatives)
+        new_shape = deriv_np.shape
+        true_derivatives_scaled = scaler.transform(
+            deriv_np.reshape(-1, new_shape[-1])
+        ).reshape(new_shape)
+
+    return y_scaled, y_noisy_scaled, true_derivatives_scaled, scaler

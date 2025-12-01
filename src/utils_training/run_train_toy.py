@@ -10,11 +10,11 @@ import torch
 import importlib
 
 # to import activation functions
-from flax import linen as nn 
+from flax import linen as nn
 
 from jax import random
 
-from utils.data_generation import generate_ode_data
+from utils.data_generation import generate_ode_data, scale_synthetic_data
 from utils.non_parametric_collocation import collocate_data
 from utils.collocation_obj import Collocation
 from models.nn_pyomo_base import NeuralODEPyomo as PyomoModel
@@ -32,7 +32,9 @@ class TrainerToy:
         self.end_time = params_data['end_time']
         self.spacing_type = params_data['spacing_type']
         self.init_state = params_data['initial_state']
-        self.detailed = params_data.get('detailed', False)        
+        self.detailed = params_data.get('detailed', False)
+        self.scale = params_data.get('scale', False)
+        self.scaler = None
         m = model_type
         if m in ['pyomo', 'jax_diffrax', 'pytorch']:
             self.model_type = m
@@ -47,9 +49,9 @@ class TrainerToy:
         
         # self.nodes will override t, start_time, end_time, spacing_type, n_points within generate_ode_data() function
         self.t, self.y, self.y_noisy, true_derivative = generate_ode_data(
-            self.N, self.noise_level, self.ode_type, self.data_param, 
+            self.N, self.noise_level, self.ode_type, self.data_param,
             initial_state = self.init_state, t = self.nodes)
-        
+
         self.true_derivative = true_derivative
         
         # preserve the same span for test data and deduce test nodes
@@ -62,12 +64,30 @@ class TrainerToy:
             self.nodes_test = jnp.linspace(self.start_time, self.end_time, self.N)
 
         self.init_state_test = self.y[-1]
-        t_test, y_test, _, _ = generate_ode_data(
-            self.N, self.noise_level, self.ode_type, self.data_param, 
+        t_test, y_test, y_noisy_test, true_derivative_test = generate_ode_data(
+            self.N, self.noise_level, self.ode_type, self.data_param,
             initial_state = self.init_state_test, t = self.nodes_test)
-        
+
         self.t_test = t_test
         self.y_test = y_test
+        self.y_noisy_test = y_noisy_test
+        self.true_derivative_test = true_derivative_test
+
+        if self.scale:
+            self.y, self.y_noisy, self.true_derivative, self.scaler = scale_synthetic_data(
+                self.y, self.y_noisy, self.true_derivative
+            )
+            (
+                self.y_test,
+                self.y_noisy_test,
+                self.true_derivative_test,
+                _
+            ) = scale_synthetic_data(
+                self.y_test,
+                self.y_noisy_test,
+                self.true_derivative_test,
+                scaler=self.scaler,
+            )
     
     def generate_nodes(self):
         collocation = Collocation(self.N, self.start_time, self.end_time, self.spacing_type)
@@ -467,6 +487,7 @@ class TrainerToy:
             'end_time': 10,
             'spacing_type': spacing_type,
             'initial_state': np.array([0.0, 1.0]),
+            'scale': False,
             'detailed': detailed
         }
 
@@ -479,6 +500,7 @@ class TrainerToy:
             'end_time': 15,
             'spacing_type': spacing_type,
             'initial_state': np.array([0.0, 1.0]),
+            'scale' : False,
             'detailed' : detailed
         }
 
@@ -491,6 +513,7 @@ class TrainerToy:
             'end_time': 10,
             'spacing_type': spacing_type,
             'initial_state': np.array([0.0, 1.0]),
+            'scale' : False,
             'detailed' : detailed
         }
 
