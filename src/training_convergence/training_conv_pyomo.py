@@ -67,7 +67,10 @@ def main():
         ts = time.strftime('%Y-%m-%d_%H-%M')
         # create a dated subfolder for this run
         if args.outdir:
-            subdir = os.path.join(args.outdir, f"pyomo_{args.data_type}_{args.layer_width[1]}")
+            if args.layer_width is None:
+                subdir = os.path.join(args.outdir, f"pyomo_{args.data_type}")
+            else:
+                subdir = os.path.join(args.outdir, f"pyomo_{args.data_type}_{args.layer_width[1]}")
             os.makedirs(subdir, exist_ok=True)
 
             # full filename for this seed
