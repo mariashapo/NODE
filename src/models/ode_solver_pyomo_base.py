@@ -62,13 +62,11 @@ class DirectODESolver:
         # First derivative matrix
         self.D = D
 
-    def build_model(self):
+    def build_model(self, lower_bound=-5.0, upper_bound=5.0):
         # Create a new model instance
         self.model = ConcreteModel()
 
         self.N = len(self.t)
-        lower_bound = -5.0
-        upper_bound = 5.0
 
         # Define sets for time points and dimensions
         self.model.t = RangeSet(0, self.N - 1)
@@ -163,13 +161,13 @@ class DirectODESolver:
 
         return outputs  # array/list of length 'dimensions'
 
-    def solve_model(self):
+    def solve_model(self, tee=False, logfile=None):
         # Solve the model using IPOPT
         solver = SolverFactory('ipopt')
         if self.params is not None:
             for key, value in self.params.items():
                 solver.options[key] = value
-        result = solver.solve(self.model, tee=True)
+        result = solver.solve(self.model, tee=tee, logfile=logfile)
 
         # Extract solver information
         solver_info = {
@@ -178,7 +176,9 @@ class DirectODESolver:
             'message': result.solver.message
         }
 
-        print(solver_info)
+        if tee:
+            # Only print when explicitly requested
+            print(solver_info)
         return solver_info
 
     def extract_solution(self):

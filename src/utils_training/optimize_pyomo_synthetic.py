@@ -12,6 +12,21 @@ logging.basicConfig(level=logging.ERROR, filename='error_log.txt')
 
 from utils_training.run_train_toy import TrainerToy
 
+# --- helpers ---
+def _hashable_key(param_comb):
+    """
+    Convert lists (and nested lists/tuples) in param_comb to tuples so it can
+    be used as a dict key without altering the original structure elsewhere.
+    """
+    def _convert(x):
+        if isinstance(x, list):
+            return tuple(_convert(v) for v in x)
+        if isinstance(x, tuple):
+            return tuple(_convert(v) for v in x)
+        return x
+    return _convert(param_comb)
+
+
 class ExperimentRunner:
     def __init__(self, config_file):
         # load the config file
@@ -79,6 +94,11 @@ class ExperimentRunner:
         trainer = TrainerToy(p_, model_type="pyomo")
         trainer.prepare_inputs()
         return trainer
+    
+    def analyse_collocation(self):
+        """Analyse the collocation points and derivative matrix used in the current trainer."""
+        trainer = self.load_trainer(self.data_type, self.data_params['spacing_type'])
+        pass
         
     def run(self, optimization_type, seed=None, data_type=None, layer_width=None, t_range=None, n_steps=None):
         if self.params_model['skip_collocation'] == 'inf':
@@ -86,6 +106,7 @@ class ExperimentRunner:
 
         self.data_params = self.config['data']
         self.data_type = data_type if data_type is not None else self.data_params['data_type']
+        self.params_model['layer_widths'] = layer_width if layer_width is not None else self.params_model['layer_widths']
         self.results = {}
 
         param_combinations = self.get_param_combinations(optimization_type, t_range=t_range, n_steps=n_steps)
@@ -112,16 +133,16 @@ class ExperimentRunner:
 
                 # extract -> try to keep only small scalars in results
                 try:
-                    r = trainer.extract_results_pyomo()
+                    r = trainer.extract_results_pyomo(detailed = True)
                 except Exception as e:
                     r = {'time_elapsed': np.nan, 'mse_train': np.nan, 'mse_test': np.nan}
                     logging.error(f"Failed to extract results: {e}")
 
 
-                self.results[param_comb] = r
+                self.results[_hashable_key(param_comb)] = r
 
             except Exception as e:
-                self.results[param_comb] = {'time_elapsed': np.nan, 'mse_train': np.nan, 'mse_test': np.nan}
+                self.results[_hashable_key(param_comb)] = {'time_elapsed': np.nan, 'mse_train': np.nan, 'mse_test': np.nan}
                 logging.error(f"Failed to complete training: {e}")
 
 

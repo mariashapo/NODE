@@ -92,6 +92,7 @@ class Collocation:
     # -------------------------------------------- Chebyshev Nodes --------------------------------------------
     @staticmethod
     def chebyshev_nodes_second_kind(n, start, stop):
+        """Generate Chebyshev nodes of the second kind in the interval [start, stop]."""
         k = jnp.arange(n, dtype=jnp.float64)  
         nodes = jnp.cos(jnp.pi * k / (n - 1))
         

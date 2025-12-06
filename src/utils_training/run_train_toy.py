@@ -2,15 +2,11 @@
 import numpy as np
 import jax
 import jax.numpy as jnp
-import sys
-import os
 import time
 import matplotlib.pyplot as plt
 import torch
-import importlib
-
-# to import activation functions
-from flax import linen as nn 
+from datetime import datetime
+import os
 
 from jax import random
 
@@ -163,7 +159,8 @@ class TrainerToy:
                         params = self.params,
                         reg_norm = self.reg_norm,
                         skip_collocation = self.skip_collocation,
-                        seed = seed
+                        seed = seed,
+                        init_state=self.init_state
                         )
         
         self.model.build_model()
@@ -184,43 +181,47 @@ class TrainerToy:
         mse_train = np.mean((self.y - odeint_pred)**2)
         mse_test = np.mean((self.y_test - odeint_pred_test)**2)
         
-        # -------------------------------------- COLLOCATION PREDICTION (TRAIN) --------------------------------------
-        trained_weights_biases = self.model.extract_weights()
-        direct_solver = DirectODESolver(self.t, self.layer_widths, trained_weights_biases, self.init_state, self.D, y_init_guess=odeint_pred)
-        direct_solver.build_model()
-        direct_solver.solve_model()
-        y_solution = direct_solver.extract_solution()     
-        mse_train_coll = np.mean(np.square(np.squeeze(self.y) - np.squeeze(y_solution)))
+        if self.detailed or detailed:
+            # -------------------------------------- COLLOCATION PREDICTION (TRAIN) --------------------------------------
+            trained_weights_biases = self.model.extract_weights()
+            direct_solver = DirectODESolver(self.t, self.layer_widths, trained_weights_biases, self.init_state, self.D, y_init_guess=odeint_pred)
+            direct_solver.build_model(lower_bound=-10.0, upper_bound=10.0)
+            direct_solver.solve_model()
+            y_solution = direct_solver.extract_solution()     
+            mse_train_coll = np.mean(np.square(np.squeeze(self.y) - np.squeeze(y_solution)))
 
-        # -------------------------------------- COLLOCATION PREDICTION (TEST) --------------------------------------
-        direct_solver = DirectODESolver(self.t_test, self.layer_widths, trained_weights_biases, self.init_state_test, self.D_test, y_init_guess=odeint_pred_test)
-        direct_solver.build_model()
-        direct_solver.solve_model()
-        y_solution_test = direct_solver.extract_solution()     
-        mse_test_coll = np.mean(np.square(np.squeeze(self.y_test) - np.squeeze(y_solution_test)))
+            # -------------------------------------- COLLOCATION PREDICTION (TEST) --------------------------------------
+            direct_solver = DirectODESolver(self.t_test, self.layer_widths, trained_weights_biases, self.init_state_test, self.D_test, y_init_guess=odeint_pred_test)
+            direct_solver.build_model(lower_bound=-10.0, upper_bound=10.0)
+            direct_solver.solve_model()
+            y_solution_test = direct_solver.extract_solution()     
+            mse_test_coll = np.mean(np.square(np.squeeze(self.y_test) - np.squeeze(y_solution_test)))
 
-        
         # ------------------------------------------------ FIGURES ---------------------------------------------------
+        # generate timestamp
+        # stamp = datetime.now().strftime("%y_%m_%d_%H_%M")
+        # seed_dir = f"results/{self.ode_type}_seed_{self.seed}"
+        # os.makedirs(seed_dir, exist_ok=True)
+        
         # plt.figure(figsize=(10, 6))
-        # plt.plot(self.t, self.y, label='True Data', alpha = 1, color = 'green', ls = '--')
-        # # plt.plot(ts_test, ys_test, alpha = 1, color = 'green', ls = '--')
-        # # plt.plot(ts_test, y_pred_test, color='blue', label='Model Prediction (Test) -  Odeint', alpha = 1)
+        # plt.plot(self.t, self.y, label='True Data', alpha = 1, color = 'green')
+        # plt.plot(self.t, self.y_noisy, label='Noisy Data', alpha = 1, color = 'green')
         # plt.plot(self.t, odeint_pred, color='#FF8C10', label='Model Prediction (Train) - Odeint', alpha = 1)
         # plt.plot(self.t, y_solution, color='blue', label='Model Prediction (Train) - Collocation', alpha = 1, ls = '--')
         # plt.title(f"Collocation-based training (DEV))")
         # plt.legend(loc ="lower right")
         # plt.grid(True)
-        # plt.savefig(f'results/colloc_solver_train_{self.seed}.png', format='png')  
+        # plt.savefig(f"{seed_dir}/colloc_solver_train_{stamp}.png", format="png") 
         # plt.close()
 
         # plt.figure(figsize=(10, 6))
-        # plt.plot(self.t_test, self.y_test, label='True Data', alpha = 1, color = 'green', ls = '--')
-        # plt.plot(self.t_test, odeint_pred_test, color='#FF8C10', label='Model Prediction (Train) - Odeint', alpha = 1)
-        # plt.plot(self.t_test, y_solution_test, color='blue', label='Model Prediction (Train) - Collocation', alpha = 1, ls = '--')
+        # plt.plot(self.t_test, self.y_test, label='True Data', alpha = 1, color = 'green')
+        # plt.plot(self.t_test, odeint_pred_test, color='#FF8C10', label='Model Prediction (Test) - Odeint', alpha = 1)
+        # plt.plot(self.t_test, y_solution_test, color='blue', label='Model Prediction (Test) - Collocation', alpha = 1, ls = '--')
         # plt.title(f"Collocation-based training (DEV))")
         # plt.legend(loc ="lower right")
         # plt.grid(True)
-        # plt.savefig(f'results/colloc_solver_test_{self.seed}.png', format='png')  
+        # plt.savefig(f"{seed_dir}/colloc_solver_train_{stamp}.png", format="png") 
         # plt.close()
 
         if self.detailed or detailed:
@@ -241,7 +242,10 @@ class TrainerToy:
                 'time_elapsed': self.time_elapsed,
                 'mse_train': mse_train,
                 'mse_test': mse_test,
-                'termination': self.termination
+                'mse_train_coll': mse_train_coll,
+                'mse_test_coll': mse_test_coll,
+                'termination': self.termination,
+                'seed': self.seed
             }
         
         return results

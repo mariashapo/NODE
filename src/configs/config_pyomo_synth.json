@@ -2,16 +2,16 @@
     "model_params": {
       "layer_widths": [2, 32, 2],
       "act_func": "tanh",
-      "penalty_lambda_reg": 0.001,
+      "penalty_lambda_reg": 0.01,
       "time_invariant": true,
       "w_init_method": "xavier",
-      "reg_norm": false,
+      "reg_norm": true,
       "skip_collocation": "inf",
       "redirect_logs": true,
       "params": {
-        "tol": 1e-15,
+        "tol": 1e-12,
         "print_level": 3,
-        "max_iter": 3000,
+        "max_iter": 6000,
         "constr_viol_tol": 1e-12,
         "compl_inf_tol": 1e-12,
         "dual_inf_tol": 1e-12,
@@ -50,15 +50,14 @@
         "n_steps": 50
       },
       "network_size_grid_search": {
-        "lw_list": [
-          [2, 8, 2],
-          [2, 16, 2],
-          [2, 32, 2],
-          [2, 64, 2],
-          [2, 128, 2]
-        ],
-        "reg_list": [0.0001, 0.001, 0.01],
-        "tol_list": [1e-4, 1e-6]
+      "lw_list": [
+        [2, 16, 2],
+        [2, 32, 2],
+        [2, 48, 2],
+        [2, 64, 2]
+      ],
+      "reg_list": [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1],
+      "tol_list": [1e-12, 1e-10, 1e-8, 1e-6]
       },
       "activation_function": {
         "act_func_list": ["tanh", "softplus", "sigmoid"],

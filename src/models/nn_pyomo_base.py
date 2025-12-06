@@ -18,7 +18,7 @@ class NeuralODEPyomo:
                  act_func="tanh", w_init_method="random", 
                  params = None, y_init = None, constraint = "l1",
                  y_collocation = None, reg_norm = False, 
-                 skip_collocation = np.inf, seed = None):
+                 skip_collocation = np.inf, seed = None, init_state=None):
         
         self.seed = 42 if seed is None else seed
         print(f'seed {seed}')
@@ -41,6 +41,7 @@ class NeuralODEPyomo:
         self.constraint = constraint
         self.reg_norm = reg_norm
         self.skip_collocation = skip_collocation
+        self.init_state = init_state
         
         if y_collocation is not None:
             self.y_collocation = y_collocation
@@ -113,12 +114,14 @@ class NeuralODEPyomo:
             raise ValueError("layer_sizes should have exactly 3 elements: [input_size, hidden_size, output_size].")
         
         # CONSTRAINTS
+        ic0 = np.asarray(self.init_state).reshape(-1) if self.init_state is not None else self.y_observed[0]
+
         if M == 1:
-            self.model.init_condition = Constraint(expr=(self.model.y[0] == self.y_observed[0][0])) # + self.model.slack
+            self.model.init_condition = Constraint(expr=(self.model.y[0] == ic0[0]))
         elif M == 2:
-            self.model.init_condition1 = Constraint(expr=(self.model.y1[0] == self.y_observed[0][0]))
-            self.model.init_condition2 = Constraint(expr=(self.model.y2[0] == self.y_observed[0][1]))
-        
+            self.model.init_condition1 = Constraint(expr=(self.model.y1[0] == ic0[0]))
+            self.model.init_condition2 = Constraint(expr=(self.model.y2[0] == ic0[1]))
+            
         self.model.ode = ConstraintList()
         
         # for each collocation data point
