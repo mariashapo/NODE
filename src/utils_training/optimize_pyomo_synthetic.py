@@ -287,7 +287,11 @@ class ExperimentRunner:
             lw, reg, tol = param_comb
             self.params_model['layer_widths'] = lw
             self.params_model['penalty_lambda_reg'] = reg
+            # Apply the same tolerance to all key IPOPT tolerance knobs for consistency
             self.params_model['params']['tol'] = tol
+            self.params_model['params']['constr_viol_tol'] = tol
+            self.params_model['params']['compl_inf_tol'] = tol
+            self.params_model['params']['dual_inf_tol'] = tol
 
         elif optimization_type == 'activation_function':
             act_func, data = param_comb

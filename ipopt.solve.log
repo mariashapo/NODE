@@ -1,4 +1,4 @@
-Solver command line: ['/Users/mariiashapo/anaconda3/envs/node_25/bin/ipopt', '/var/folders/2v/gfm3z1tn5fj8zss_r9hrgnv80000gn/T/tmpetp9y4ct.pyomo.nl', '-AMPL', 'tol=1e-12', 'print_level=3', 'max_iter=6000', 'constr_viol_tol=1e-12', 'compl_inf_tol=1e-12', 'dual_inf_tol=1e-12', 'acceptable_tol=1e-09', 'acceptable_constr_viol_tol=1e-09']
+Solver command line: ['/Users/mariiashapo/anaconda3/envs/node_25/bin/ipopt', '/var/folders/2v/gfm3z1tn5fj8zss_r9hrgnv80000gn/T/tmpl4c84h_j.pyomo.nl', '-AMPL', 'tol=1e-12', 'print_level=3', 'max_iter=6000', 'constr_viol_tol=1e-12', 'compl_inf_tol=1e-12', 'dual_inf_tol=1e-12', 'acceptable_tol=1e-09', 'acceptable_constr_viol_tol=1e-09']
 
 Ipopt 3.14.16: tol=1e-12
 print_level=3
@@ -27,25 +27,25 @@ Total number of inequality constraints...............:        0
         inequality constraints with only upper bounds:        0
 
 
-Number of Iterations....: 68
+Number of Iterations....: 78
 
                                    (scaled)                 (unscaled)
-Objective...............:   2.3035144258984133e-02    2.3035144258984133e-02
-Dual infeasibility......:   1.3364582804798940e-17    1.3364582804798940e-17
-Constraint violation....:   6.9933613149574198e-14    6.4932781373983062e-13
+Objective...............:   6.5672309504679921e-02    6.5672309504679921e-02
+Dual infeasibility......:   2.9770798945702411e-16    2.9770798945702411e-16
+Constraint violation....:   1.5184102297193898e-13    8.1235018711822704e-13
 Variable bound violation:   0.0000000000000000e+00    0.0000000000000000e+00
-Complementarity.........:   1.2544302826336153e-13    1.2544302826336153e-13
-Overall NLP error.......:   1.2544302826336153e-13    6.4932781373983062e-13
+Complementarity.........:   1.2571804634640592e-13    1.2571804634640592e-13
+Overall NLP error.......:   1.5184102297193898e-13    8.1235018711822704e-13
 
 
-Number of objective function evaluations             = 121
-Number of objective gradient evaluations             = 69
-Number of equality constraint evaluations            = 121
+Number of objective function evaluations             = 176
+Number of objective gradient evaluations             = 79
+Number of equality constraint evaluations            = 176
 Number of inequality constraint evaluations          = 0
-Number of equality constraint Jacobian evaluations   = 69
+Number of equality constraint Jacobian evaluations   = 79
 Number of inequality constraint Jacobian evaluations = 0
-Number of Lagrangian Hessian evaluations             = 68
-Total seconds in IPOPT                               = 13.687
+Number of Lagrangian Hessian evaluations             = 78
+Total seconds in IPOPT                               = 15.294
 
 EXIT: Optimal Solution Found.
 
