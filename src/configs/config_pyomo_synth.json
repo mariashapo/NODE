@@ -52,12 +52,11 @@
       "network_size_grid_search": {
       "lw_list": [
         [2, 32, 2],
-        [2, 48, 2],
         [2, 64, 2],
         [2, 96, 2]
       ],
       "reg_list": [0.075, 0.1, 0.5, 1.0],
-      "tol_list": [1e-12, 1e-10, 1e-8, 1e-6]
+      "tol_list": [1e-12, 1e-9, 1e-6]
       },
       "activation_function": {
         "act_func_list": ["tanh", "softplus", "sigmoid"],

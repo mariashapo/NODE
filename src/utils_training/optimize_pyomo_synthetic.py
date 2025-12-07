@@ -100,13 +100,28 @@ class ExperimentRunner:
         trainer = self.load_trainer(self.data_type, self.data_params['spacing_type'])
         pass
         
-    def run(self, optimization_type, seed=None, data_type=None, layer_width=None, t_range=None, n_steps=None):
+    def run(
+        self,
+        optimization_type,
+        seed=None,
+        data_type=None,
+        layer_width=None,
+        t_range=None,
+        n_steps=None,
+        penalty_lambda_reg=None,
+        tol=None,
+    ):
         if self.params_model['skip_collocation'] == 'inf':
             self.params_model['skip_collocation'] = np.inf
 
         self.data_params = self.config['data']
         self.data_type = data_type if data_type is not None else self.data_params['data_type']
         self.params_model['layer_widths'] = layer_width if layer_width is not None else self.params_model['layer_widths']
+        if penalty_lambda_reg is not None:
+            self.params_model['penalty_lambda_reg'] = penalty_lambda_reg
+        if tol is not None:
+            for k in ('tol', 'constr_viol_tol', 'compl_inf_tol', 'dual_inf_tol'):
+                self.params_model['params'][k] = tol
         self.results = {}
 
         param_combinations = self.get_param_combinations(optimization_type, t_range=t_range, n_steps=n_steps)

@@ -36,6 +36,8 @@ def main():
     p.add_argument("--outdir", default=None)
     p.add_argument("--data_type", default = "vdp")
     p.add_argument("--layer_width", type=json.loads, default=None)
+    p.add_argument("--penalty_lambda_reg", type=float, default=None)
+    p.add_argument("--tol", type=float, default=None)
     # training_convergence_wall_time specific arguments:
     p.add_argument("--t_range", type=json.loads, default=None)
     p.add_argument("--n_steps", type=int, default=1)
@@ -56,7 +58,16 @@ def main():
         print(f"EXECUTING SEED {seed} ({i}/{args.n_seeds})")
         print_memory("Memory use loop start: ")
         runner = PyomoExperimentRunner(args.config)
-        results, trainer = runner.run(args.exp, seed = seed, data_type = args.data_type, layer_width = args.layer_width, t_range = args.t_range, n_steps = args.n_steps)
+        results, trainer = runner.run(
+            args.exp,
+            seed=seed,
+            data_type=args.data_type,
+            layer_width=args.layer_width,
+            t_range=args.t_range,
+            n_steps=args.n_steps,
+            penalty_lambda_reg=args.penalty_lambda_reg,
+            tol=args.tol,
+        )
         i+=1
         
         print_memory("Training ended: ")
