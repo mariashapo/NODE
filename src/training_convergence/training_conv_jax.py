@@ -32,10 +32,11 @@ def main():
     p.add_argument("--max_iter", type=json.loads, default=[200, 200])
     p.add_argument("--pretrain", type=json.loads, default=[0.2, 1])
     p.add_argument("--log", type=json.loads, default = 100)
+    p.add_argument("--layer_width", type=json.loads, default=None)
     args = p.parse_args()
     
     params_model = {
-        'layer_widths': [2, 32, 2],
+        'layer_widths': args.layer_width if args.layer_width is not None else [2, 32, 2],
         'penalty_lambda_reg': 1e-3,
         'time_invariant': True,
         'learning_rate': 1e-3,

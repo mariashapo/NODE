@@ -20,10 +20,8 @@ micromamba run -n "$ENV" pip install pympler
 # --------------------------
 micromamba run -n "$ENV" python -m src.training_convergence.training_conv_pyomo \
   --layer_width '[2,64,2]' --penalty_lambda_reg 0.1 --tol 1e-6 \
-  --t_range '[0.01,30]' --n_steps 30 \
   --no_print False --n_seeds 1 --outdir "$OUTDIR" --data_type "$DATA_TYPE" \
   --exp "default"
-
 
 micromamba run -n "$ENV" python -m src.training_convergence.training_conv_pyomo \
   --layer_width '[2,64,2]' --penalty_lambda_reg 0.1 --tol 1e-6 \

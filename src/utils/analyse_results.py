@@ -298,7 +298,10 @@ class Results:
             if not isinstance(key, tuple):
                 key = [key]
             if key_list is not None and len(key_list) != len(key):
-                raise ValueError(f"If providing key_list, make sure the lengths match.")
+                # Skip entries whose key tuple does not match the expected length
+                # to avoid breaking downstream aggregation.
+                print(f"Skipping entry with key {key} (expected {len(key_list)} elements).")
+                continue
             for i, param in enumerate(key):
                 # each parameter from the key tuple is saved into the dataframe
                 if key_list is None:
