@@ -641,8 +641,49 @@ def plot_time_bands(
     grid=True,
     title=None,
     extrapolate=True,  # backward-only semantics (matches time_ci)
-    cutoff_missing_frac = 0.5
+    cutoff_missing_frac = 0.5,
+    figsize=(12, 7),
+    xlim=None,
+    ylim=None,
+    label_fontsize=None,
+    tick_fontsize=None,
+    legend_fontsize=None,
+    title_fontsize=None
 ):
+    """Plot mean/CI bands of convergence curves over training time.
+
+    Args:
+        df_map: Dict[label -> DataFrame] containing time/metric columns expected by ConvergenceCI.time_ci.
+        y_col: Metric column to plot (e.g., 'mse_train' or 'mse_test').
+        grid_points: Number of points in the interpolated time grid.
+        tmax_quantile: Float or dict per-label quantile for truncating long tails.
+        align_grid: If True, align all curves to a common time grid.
+        line_width: Line width for mean curves.
+        band_alpha: Fill opacity for confidence bands.
+        logy: Plot y-axis on log scale.
+        grid: Toggle background grid.
+        title: Optional plot title.
+        extrapolate: Allow backward extrapolation to cover pretrain regions.
+        cutoff_missing_frac: Drop regions with excessive missing coverage.
+        figsize: Figure size tuple passed to matplotlib.
+        xlim: Optional (min, max) for x-axis.
+        ylim: Optional (min, max) for y-axis.
+        label_fontsize: Optional font size for x/y labels.
+        tick_fontsize: Optional font size for tick labels.
+        legend_fontsize: Optional font size for legend text.
+        title_fontsize: Optional font size for the title.
+
+    Returns:
+        Matplotlib Axes with plotted bands and legend.
+    """
+    def _has_pretraining(df):
+        """Detect pretraining from common boolean columns."""
+        for col in ("pretrain", "pretraining", "pyomo_pretraining"):
+            if col in df.columns and df[col].astype(bool).any():
+                return True
+        return False
+
+    pretraining_present = any(_has_pretraining(df) for df in df_map.values())
     curves = {}
 
     # --- compute curves ---
@@ -684,7 +725,7 @@ def plot_time_bands(
             d["pre_mask"] = x_common < d["t_pre_end"]
 
     # --- plot ---
-    fig, ax = plt.subplots(figsize=(12, 7))
+    fig, ax = plt.subplots(figsize=figsize)
     eps = 1e-12 if logy else 0.0
 
     any_pre = False
@@ -716,21 +757,33 @@ def plot_time_bands(
     ylabel = "Training MSE" if y_col is None else y_col.replace("_", " ").title()
     ax.set_ylabel(ylabel + (" (log scale)" if logy else ""))
 
+    if label_fontsize is not None:
+        ax.xaxis.label.set_size(label_fontsize)
+        ax.yaxis.label.set_size(label_fontsize)
+    if tick_fontsize is not None:
+        ax.tick_params(labelsize=tick_fontsize)
+
     if grid:
         ax.grid(True, which="both", linestyle="--", linewidth=0.5, alpha=0.4)
 
     if title:
-        ax.set_title(title)
+        ax.set_title(title, fontsize=title_fontsize)
+
+    # Optional axis overrides to "zoom out" or focus a region.
+    if xlim is not None:
+        ax.set_xlim(xlim)
+    if ylim is not None:
+        ax.set_ylim(ylim)
 
     # Build legend with an extra entry for the dashed meaning.
-    if any_pre:
+    if any_pre and pretraining_present:
         pre_proxy = Line2D([0], [0], linestyle='--', color='black', label='pre-training')
         handles, labels = ax.get_legend_handles_labels()
         handles.append(pre_proxy)
         labels.append('pre-training')
-        ax.legend(handles, labels, frameon=False)
+        ax.legend(handles, labels, frameon=False, fontsize=legend_fontsize)
     else:
-        ax.legend(frameon=False)
+        ax.legend(frameon=False, fontsize=legend_fontsize)
 
     plt.tight_layout()
     plt.show()

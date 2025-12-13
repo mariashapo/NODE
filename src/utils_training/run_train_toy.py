@@ -117,13 +117,13 @@ class TrainerToy:
         elif self.model_type == 'pytorch':
             self.train_pytorch(params_model, params_solver, seed)
             
-    def extract_results(self):
+    def extract_results(self, detailed = False):
         if self.model_type == 'pyomo':
-            return self.extract_results_pyomo()
+            return self.extract_results_pyomo(detailed)
         elif self.model_type == 'jax_diffrax':
-            return self.extract_results_diffrax()
+            return self.extract_results_diffrax(detailed)
         elif self.model_type == 'pytorch':
-            return self.extract_results_pytorch()
+            return self.extract_results_pytorch(detailed)
     
     #----------------------------------------------------------------PYOMO TRAINING--------------------------------------------------- 
     def prepare_train_params_pyomo(self, params_model):

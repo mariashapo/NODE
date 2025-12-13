@@ -113,3 +113,10 @@ python -m pip install -e .
 python -m src.training_convergence.training_conv_pyomo
 python -m src.training_convergence.training_conv_pyomo --layer_width '[2,32,2]' --t_range '[0.01,7]' --n_steps 5 --no_print True
 ```
+
+## Quick commands (training convergence sweeps)
+- Pyomo batch (VDP): `bash run_experiments_pyomo.sh` or `bash run_exp_vdp.sh`
+- Regularization/width/tol grid (Pyomo VDP): `bash run_exp_pyomo_reg_width_tol.sh`
+- PyTorch batches (VDP): `bash run_experiments_pytorch.sh`
+- JAX/Diffrax batches (HO/VDP): `bash run_experiments_jax.sh`
+- Inspect results: notebooks under `src/analysis/synthetic/` (e.g., `00_training_convergence.ipynb`); aggregate Pyomo reg search via `python src/analysis/synthetic/aggregate_pyomo_reg_search.py`

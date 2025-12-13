@@ -5,7 +5,7 @@
 set -euo pipefail
 
 ENV="node25"
-OUTDIR="results/study_ho"
+OUTDIR="results/study_vdp"
 
 # Ensure required dirs exist (safe even if you redirect logs outside)
 mkdir -p "$OUTDIR" logs
@@ -18,19 +18,16 @@ micromamba run -n "$ENV" python -V
 # --------------------------
 
 micromamba run -n "$ENV" python -m src.training_convergence.training_conv_jax \
-  --max_iter '[200,1000]' --pretrain '[0.2,1]' \
+  --max_iter '[200,1000]' --pretrain '[0.2,1]' --layer_width "[2,64,2]"\
   --n_seeds 1 --outdir "$OUTDIR"
 
+# jax with 64 width layers
 micromamba run -n "$ENV" python -m src.training_convergence.training_conv_jax \
-  --max_iter '[15000]' --pretrain '[1]' \
-  --n_seeds 15 --outdir "$OUTDIR"
+  --max_iter '[30000]' --pretrain '[1]' --layer_width "[2,64,2]"\
+  --n_seeds 15 --outdir "$OUTDIR" --data_type "vdp"
+
 
 micromamba run -n "$ENV" python -m src.training_convergence.training_conv_jax \
-  --max_iter '[500,10000]' --pretrain '[0.2,1]' \
-  --n_seeds 15 --outdir "$OUTDIR"
-
-micromamba run -n "$ENV" python -m src.training_convergence.training_conv_jax \
-  --max_iter '[1000,10000]' --pretrain '[0.2,1]' \
-  --n_seeds 15 --outdir "$OUTDIR"
-
+  --max_iter '[1000,20000]' --pretrain '[0.2,1]' --layer_width "[2,64,2]"\
+  --n_seeds 15 --outdir "$OUTDIR" --data_type "vdp"
 
