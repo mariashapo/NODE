@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 import torch
 from datetime import datetime
 import os
+import json
+from pathlib import Path
 
 from jax import random
 
@@ -134,7 +136,7 @@ class TrainerToy:
         self.w_init_method = params_model['w_init_method']
         self.params = params_model['params']
         self.pre_initialize = params_model.get('pre_initialize', True)
-        self.reg_norm = params_model.get('reg_norm', False)
+        self.reg_norm = params_model.get('reg_norm', True)
         self.skip_collocation = params_model.get('skip_collocation', np.inf)
         self.redirect_logs = params_model.get('redirect_logs', False)
 
@@ -260,6 +262,7 @@ class TrainerToy:
     def prepare_train_params_diffrax(self, params_model):
         self.layer_widths = params_model['layer_widths']
         self.lambda_reg = params_model['penalty_lambda_reg']
+        self.reg_norm = params_model.get('reg_norm', True)
         self.time_invar = params_model['time_invariant']
         self.max_iter = params_model['max_iter']
         
@@ -303,7 +306,9 @@ class TrainerToy:
         print(f"Using seed {seed} for JAX training.")
         self.model = JaxDiffModel(self.layer_widths, self.time_invar, act_func = self.act_func)
         # initialize the training state
-        self.state = self.model.create_train_state(rng, self.lr, self.lambda_reg, self.rtol, self.atol, self.dt0, custom_params)
+        self.state = self.model.create_train_state(
+            rng, self.lr, self.lambda_reg, self.rtol, self.atol, self.dt0, custom_params, reg_norm=self.reg_norm
+        )
         
         start_time = time.time()
         
@@ -368,6 +373,7 @@ class TrainerToy:
     def prepare_train_params_pytorch(self, params_model):
         self.layer_widths = params_model['layer_widths']
         self.lambda_reg = params_model['penalty_lambda_reg']
+        self.reg_norm = params_model.get('reg_norm', True)
         self.time_invar = params_model['time_invariant']
         self.max_iter = params_model['max_iter']
         
@@ -397,7 +403,14 @@ class TrainerToy:
         self.prepare_train_params_pytorch(params_model)
         
         # Initialize the model
-        self.model = PytorchModel(self.layer_widths, self.lr, custom_weights = custom_params, time_invariant = self.time_invar, seed = seed)
+        # Normalize weight decay by param count if requested to mirror Pyomo
+        wd = self.lambda_reg
+        if self.reg_norm:
+            total_params = sum(self.layer_widths[i] * self.layer_widths[i + 1] for i in range(len(self.layer_widths) - 1))
+            total_params += sum(self.layer_widths[1:])  # biases
+            if total_params > 0:
+                wd = wd / total_params
+        self.model = PytorchModel(self.layer_widths, self.lr, weight_decay=wd, custom_weights = custom_params, time_invariant = self.time_invar, seed = seed)
         
         # Convert data to appropriate tensor format
         self.t = torch.tensor(self.t, dtype=torch.float32)
@@ -461,10 +474,20 @@ class TrainerToy:
     
     # default parameters for toy datasets
     @staticmethod
-    def load_trainer(type_, spacing_type="chebyshev", model_type = "pyomo", detailed = False):
+    def _default_noise_level(config_path: str = "src/configs/config_pyomo_synth.json", fallback: float = 0.1) -> float:
+        """Load default noise level from config; fallback if unavailable."""
+        try:
+            cfg = json.loads(Path(config_path).read_text())
+            return float(cfg.get("data", {}).get("noise_level", fallback))
+        except Exception:
+            return fallback
+
+    @staticmethod
+    def load_trainer(type_, spacing_type="chebyshev", model_type = "pyomo", detailed = False, noise_level: float = None):
+        noise = noise_level if noise_level is not None else TrainerToy._default_noise_level()
         data_params_ho = {
             'N': 200,
-            'noise_level': 0.2,
+            'noise_level': noise,
             'ode_type': "harmonic_oscillator",
             'data_param': {"omega_squared": 2},
             'start_time': 0,
@@ -476,7 +499,7 @@ class TrainerToy:
 
         data_params_vdp = {
             'N': 200,
-            'noise_level': 0.1,
+            'noise_level': noise,
             'ode_type': "van_der_pol",
             'data_param': {"mu": 1, "omega": 1},
             'start_time': 0,
@@ -488,7 +511,7 @@ class TrainerToy:
 
         data_params_do = {
             'N': 200,
-            'noise_level': 0.1,
+            'noise_level': noise,
             'ode_type': "damped_oscillation",
             'data_param': {"damping_factor": 0.1, "omega_squared": 1},
             'start_time': 0,

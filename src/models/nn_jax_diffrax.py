@@ -62,8 +62,9 @@ class NeuralODE(nn.Module):
         x = nn.Dense(self.layer_widths[-1], kernel_init=initializers.glorot_normal())(x)
         return x
 
-    def create_train_state(self, rng, learning_rate, regularizer=1e-5, rtol = 1e-3, atol = 1e-6, dt0 = 1e-3, custom_params = None):
+    def create_train_state(self, rng, learning_rate, regularizer=1e-5, rtol = 1e-3, atol = 1e-6, dt0 = 1e-3, custom_params = None, reg_norm=False):
         self.regularizer = regularizer
+        self.reg_norm = reg_norm
         self.rtol = rtol
         self.atol = atol
         self.dt0 = dt0
@@ -78,6 +79,7 @@ class NeuralODE(nn.Module):
         return train_state.TrainState.create(apply_fn=self.apply, params=params, tx=tx)
 
     def loss_fn(self, params, apply_fn, t, observed_data, y0, args):
+        """Loss function for training the neural ODE."""
         # func acts as a forward pass for the neural ODE
         def func(t, y, args):
             input = jnp.atleast_1d(y)
@@ -119,8 +121,12 @@ class NeuralODE(nn.Module):
 
         pred_solution = solution.ys
         loss_mse = jnp.mean(jnp.square(pred_solution - observed_data))
-        l2_regularization = sum(jnp.sum(param ** 2) for param in jax.tree_util.tree_leaves(params))
-        
+        leaves = jax.tree_util.tree_leaves(params)
+        l2_regularization = sum(jnp.sum(param ** 2) for param in leaves)
+        if self.reg_norm:
+            # normalize by total parameter count to mimic Pyomo's normalized reg
+            n_params = sum(param.size for param in leaves)
+            l2_regularization = l2_regularization / jnp.maximum(n_params, 1)
         return loss_mse + self.regularizer * l2_regularization
 
     def train_step(self, state, t, observed_data, y0, extra_args):

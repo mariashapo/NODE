@@ -14,7 +14,7 @@ mkdir -p "$OUTDIR" logs
 micromamba run -n "$ENV" python -V
 
 # --------------------------
-# PyTorch experiments
+# JAX experiments
 # --------------------------
 
 micromamba run -n "$ENV" python -m src.training_convergence.training_conv_jax \
@@ -23,11 +23,10 @@ micromamba run -n "$ENV" python -m src.training_convergence.training_conv_jax \
 
 # jax with 64 width layers
 micromamba run -n "$ENV" python -m src.training_convergence.training_conv_jax \
-  --max_iter '[30000]' --pretrain '[1]' --layer_width "[2,64,2]"\
+  --max_iter '[50000]' --pretrain '[1]' --layer_width "[2,64,2]"\
   --n_seeds 15 --outdir "$OUTDIR" --data_type "vdp"
 
-
 micromamba run -n "$ENV" python -m src.training_convergence.training_conv_jax \
-  --max_iter '[1000,20000]' --pretrain '[0.2,1]' --layer_width "[2,64,2]"\
+  --max_iter '[1000,40000]' --pretrain '[0.2,1]' --layer_width "[2,64,2]"\
   --n_seeds 15 --outdir "$OUTDIR" --data_type "vdp"
 
