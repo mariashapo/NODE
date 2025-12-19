@@ -13,12 +13,13 @@ def main():
     p.add_argument("--pretrain", type=json.loads, default=[0.2, 1])
     p.add_argument("--layer_width", type=json.loads, default=None)
     p.add_argument("--reg_norm", action="store_true", default=False)
+    p.add_argument("--penalty_lambda_reg", type=float, default=1e-3)
     p.add_argument("--meta", action="store_true", default=True, help="Write run_meta.json with args/params.")
     args = p.parse_args()
     
     params_model = {
         'layer_widths': args.layer_width if args.layer_width is not None else [2, 32, 2],
-        'penalty_lambda_reg': 1e-3,
+        'penalty_lambda_reg': args.penalty_lambda_reg,
         'time_invariant': True,
         'learning_rate': 1e-3,
         'max_iter': args.max_iter,

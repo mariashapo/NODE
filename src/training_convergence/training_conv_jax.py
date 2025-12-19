@@ -34,11 +34,12 @@ def main():
     p.add_argument("--log", type=json.loads, default = 100)
     p.add_argument("--layer_width", type=json.loads, default=None)
     p.add_argument("--reg_norm", action="store_true", default=False)
+    p.add_argument("--penalty_lambda_reg", type=float, default=1e-3)
     args = p.parse_args()
     
     params_model = {
         'layer_widths': args.layer_width if args.layer_width is not None else [2, 32, 2],
-        'penalty_lambda_reg': 1e-3,
+        'penalty_lambda_reg': args.penalty_lambda_reg,
         'time_invariant': True,
         'learning_rate': 1e-3,
         'max_iter': args.max_iter,
@@ -106,9 +107,8 @@ def main():
         os.makedirs(args.outdir, exist_ok=True)
 
         max_iter = str(args.max_iter).strip('[]').replace(',','_').replace(' ','')
-        run_date = time.strftime('%d%m%y')
         # Create a dated subfolder for this run
-        subdir = os.path.join(args.outdir, f"jax_{args.data_type}_{max_iter}_{run_date}")
+        subdir = os.path.join(args.outdir, f"jax_{args.data_type}_{max_iter}")
         os.makedirs(subdir, exist_ok=True)
 
         # Persist run metadata once per subdir for traceability
