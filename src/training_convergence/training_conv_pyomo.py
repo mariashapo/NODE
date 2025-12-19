@@ -41,6 +41,7 @@ def main():
     # training_convergence_wall_time specific arguments:
     p.add_argument("--t_range", type=json.loads, default=None)
     p.add_argument("--n_steps", type=int, default=1)
+    p.add_argument("--meta", action="store_true", default=True, help="Write run_meta.json with args/params.")
     args = p.parse_args()
 
     if args.no_print:
@@ -52,6 +53,7 @@ def main():
         os.makedirs(args.outdir, exist_ok=True)
 
     print("STARTING TRAINING")
+    run_date = time.strftime('%d%m%y')
     i = 1
     all_results = []
     for seed in generate_seeds(args.n_seeds):
@@ -79,10 +81,29 @@ def main():
         # create a dated subfolder for this run
         if args.outdir:
             if args.layer_width is None:
-                subdir = os.path.join(args.outdir, f"pyomo_{args.data_type}")
+                subdir = os.path.join(args.outdir, f"pyomo_{args.data_type}_{run_date}")
             else:
-                subdir = os.path.join(args.outdir, f"pyomo_{args.data_type}_{args.layer_width[1]}")
+                subdir = os.path.join(args.outdir, f"pyomo_{args.data_type}_{args.layer_width[1]}_{run_date}")
             os.makedirs(subdir, exist_ok=True)
+
+            if args.meta:
+                meta_path = os.path.join(subdir, "run_meta.json")
+                if not os.path.exists(meta_path):
+                    with open(meta_path, "w") as f:
+                        json.dump(
+                            {
+                                "args": vars(args),
+                                "timestamp": ts,
+                                "exp": args.exp,
+                                "layer_width": args.layer_width,
+                                "penalty_lambda_reg": args.penalty_lambda_reg,
+                                "tol": args.tol,
+                                "t_range": args.t_range,
+                                "n_steps": args.n_steps,
+                            },
+                            f,
+                            indent=2,
+                        )
 
             # full filename for this seed
             filename = os.path.join(subdir, f"{seed}_{ts}.pkl")
