@@ -1,0 +1,44 @@
+{
+  "args": {
+    "n_seeds": 15,
+    "outdir": "results/study_vdp",
+    "data_type": "vdp",
+    "max_iter": [
+      50000
+    ],
+    "pretrain": [
+      1
+    ],
+    "log": 100,
+    "layer_width": [
+      2,
+      64,
+      2
+    ],
+    "reg_norm": true,
+    "penalty_lambda_reg": 0.1
+  },
+  "params_model": {
+    "layer_widths": [
+      2,
+      64,
+      2
+    ],
+    "penalty_lambda_reg": 0.1,
+    "time_invariant": true,
+    "learning_rate": 0.001,
+    "max_iter": [
+      50000
+    ],
+    "pretrain": [
+      1
+    ],
+    "log": false,
+    "reg_norm": true,
+    "split_time": true,
+    "rtol": 0.001,
+    "atol": 1e-06,
+    "act_func": "tanh"
+  },
+  "timestamp": "2025-12-19_10-57"
+}
