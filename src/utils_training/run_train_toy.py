@@ -186,14 +186,30 @@ class TrainerToy:
         if self.detailed or detailed:
             # -------------------------------------- COLLOCATION PREDICTION (TRAIN) --------------------------------------
             trained_weights_biases = self.model.extract_weights()
-            direct_solver = DirectODESolver(self.t, self.layer_widths, trained_weights_biases, self.init_state, self.D, y_init_guess=odeint_pred)
+            direct_solver = DirectODESolver(
+                self.t,
+                self.layer_widths,
+                trained_weights_biases,
+                self.init_state,
+                self.D,
+                y_init_guess=odeint_pred,
+                time_invariant=self.time_invar,
+            )
             direct_solver.build_model(lower_bound=-10.0, upper_bound=10.0)
             direct_solver.solve_model()
             y_solution = direct_solver.extract_solution()     
             mse_train_coll = np.mean(np.square(np.squeeze(self.y) - np.squeeze(y_solution)))
 
             # -------------------------------------- COLLOCATION PREDICTION (TEST) --------------------------------------
-            direct_solver = DirectODESolver(self.t_test, self.layer_widths, trained_weights_biases, self.init_state_test, self.D_test, y_init_guess=odeint_pred_test)
+            direct_solver = DirectODESolver(
+                self.t_test,
+                self.layer_widths,
+                trained_weights_biases,
+                self.init_state_test,
+                self.D_test,
+                y_init_guess=odeint_pred_test,
+                time_invariant=self.time_invar,
+            )
             direct_solver.build_model(lower_bound=-10.0, upper_bound=10.0)
             direct_solver.solve_model()
             y_solution_test = direct_solver.extract_solution()     

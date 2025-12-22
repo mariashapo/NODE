@@ -388,6 +388,14 @@ class NeuralODEPyomo:
 # --------------------------------------------------------- ODE DIRECT SOLVERS --------------------------------------------
     
     def func_interpolated(self, y, t, args):
+        """
+        RHS for forward integration with interpolated extra inputs.
+
+        - Starts with the current state y, optionally appends time t if time_invariant=False.
+        - If extra_inputs are provided (and a corresponding time grid t_all), interpolate them to
+          the current t and append to the network input.
+        - Returns the network-predicted derivative at this (state, time, extras).
+        """
         input = jnp.atleast_1d(y)
         if not self.time_invariant:
             input = jnp.append(input, t)
@@ -408,36 +416,68 @@ class NeuralODEPyomo:
         return result
     
     def func_regular(self, y, t, args):
-            input = jnp.atleast_1d(y)
+        """
+        RHS for forward integration without interpolation of extra inputs.
+
+        - Starts with current state y and optional time t (if time_invariant=False).
+        - If extra_inputs are provided, picks nearest/available values and appends them directly
+          (no interpolation).
+        - Returns the network-predicted derivative.
+        """
+        input = jnp.atleast_1d(y)
+        
+        if not self.time_invariant:
+            input = jnp.append(input, t)
+        if args is not None:
+            extra_inputs, t_all = args
+        if isinstance(extra_inputs, (np.ndarray, jnp.ndarray)):    
+            if extra_inputs.ndim == 2:
+                # we have multiple datapoints
+                index = jnp.argmin(jnp.abs(t_all - t))
+                for extra_input in extra_inputs[index]:
+                        input = jnp.append(input, extra_input)            
+            elif extra_inputs.ndim == 1:
+                # we have a single datapoint so no need to slice the index
+                for extra_input in extra_inputs:
+                        input = jnp.append(input, extra_input)                   
+        else: # if a single value, simply append it
+            input = jnp.append(input, extra_inputs)
             
-            if not self.time_invariant:
-                input = jnp.append(input, t)
-            if args is not None:
-                extra_inputs, t_all = args
-            if isinstance(extra_inputs, (np.ndarray, jnp.ndarray)):    
-                if extra_inputs.ndim == 2:
-                    # we have multiple datapoints
-                    index = jnp.argmin(jnp.abs(t_all - t))
-                    for extra_input in extra_inputs[index]:
-                            input = jnp.append(input, extra_input)            
-                elif extra_inputs.ndim == 1:
-                    # we have a single datapoint so no need to slice the index
-                    for extra_input in extra_inputs:
-                            input = jnp.append(input, extra_input)                   
-            else: # if a single value, simply append it
-                input = jnp.append(input, extra_inputs)
-                
-            result = self.predict(input)
-            return result
+        result = self.predict(input)
+        return result
     
-    def neural_ode_odeint(self, y0, t, extra_args = None, interpolated = True): 
+    def neural_ode_odeint(self, y0, t, extra_args = None, interpolated = True):
+        """
+        Forward simulate the learned ODE using scipy/odeint.
+
+        Args:
+            y0: initial state.
+            t: time grid.
+            extra_args: optional tuple (extra_inputs, t_all) for interpolation.
+            interpolated: if True, use func_interpolated (interpolate extras); else func_regular.
+
+        Returns:
+            Array of states over t.
+        """
         if interpolated:
             return odeint(self.func_interpolated, y0, t, extra_args)
         else:
             return odeint(self.func_regular, y0, t, extra_args)
 
-    def neural_ode(self, y0, t, extra_args = None, interpolated = True, rtol = 1e-3, atol = 1e-6, dt0 = 1e-3): 
-        
+    def neural_ode(self, y0, t, extra_args = None, interpolated = True, rtol = 1e-3, atol = 1e-6, dt0 = 1e-3):
+        """
+        Forward simulate the learned ODE using diffrax (tsit5).
+
+        Args:
+            y0: initial state.
+            t: time grid.
+            extra_args: optional tuple (extra_inputs, t_all) for interpolation.
+            interpolated: if True, use func_interpolated; else func_regular.
+            rtol, atol, dt0: solver tolerances and initial step.
+
+        Returns:
+            Array of states over t.
+        """
         if interpolated:
             term = dfx.ODETerm(lambda t, y, args: self.func_interpolated(y, t, args))
         else:

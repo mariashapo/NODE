@@ -27,9 +27,19 @@ class _StreamToLogger(io.TextIOBase):
     def flush(self):
         pass
 
-def main():
+def _str2bool(v):
+    if isinstance(v, bool):
+        return v
+    val = str(v).lower()
+    if val in ("yes", "true", "t", "1"):
+        return True
+    if val in ("no", "false", "f", "0"):
+        return False
+    raise argparse.ArgumentTypeError(f"Boolean value expected, got {v!r}")
+
+def _build_parser():
     p = argparse.ArgumentParser()
-    p.add_argument("--no_print", type=bool, default = False)
+    p.add_argument("--no_print", type=_str2bool, default=False)
     p.add_argument("--config", default="src/configs/config_pyomo_synth.json")
     p.add_argument("--exp", default="training_convergence_wall_time") # "default" / "network_size_grid_search" / "training_convergence_wall_time"
     p.add_argument("--n_seeds", type=int, default=1)
@@ -38,11 +48,19 @@ def main():
     p.add_argument("--layer_width", type=json.loads, default=None)
     p.add_argument("--penalty_lambda_reg", type=float, default=None)
     p.add_argument("--tol", type=float, default=None)
+    p.add_argument("--time_invariant", type=_str2bool, default=True)
     # training_convergence_wall_time specific arguments:
     p.add_argument("--t_range", type=json.loads, default=None)
     p.add_argument("--n_steps", type=int, default=1)
     p.add_argument("--meta", action="store_true", default=True, help="Write run_meta.json with args/params.")
-    args = p.parse_args()
+    return p
+
+def parse_args(argv=None):
+    """Allow passing a custom argv list when debugging/tests; defaults to sys.argv."""
+    return _build_parser().parse_args(argv)
+
+def main(argv=None):
+    args = parse_args(argv)
 
     if args.no_print:
         print(f"Disabling print statements {args.no_print}.")
@@ -60,6 +78,7 @@ def main():
         print(f"EXECUTING SEED {seed} ({i}/{args.n_seeds})")
         print_memory("Memory use loop start: ")
         runner = PyomoExperimentRunner(args.config)
+        runner.params_model["time_invariant"] = args.time_invariant
         results, trainer = runner.run(
             args.exp,
             seed=seed,
@@ -125,4 +144,13 @@ def main():
         print(f"All results saved to {filename}")
 
 if __name__ == "__main__":
-    main()
+    bp = 1
+    main([
+        "--data_type", "do",
+        "--layer_width", "[3,8,2]",
+        "--penalty_lambda_reg", "0.1",
+        "--tol", "1e-3",
+        "--n_seeds", "1",
+        "--exp", "default",
+        "--time_invariant", "False",
+    ])

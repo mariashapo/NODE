@@ -858,3 +858,43 @@ deterministic order.  (deprecated in 5.7)
 2025-12-06 17:56:50,242 [WARNING] Setting Var 'y[197,0]' to a numeric value `-21.442191441553113` outside the bounds (-10.0, 10.0).
 2025-12-06 17:56:50,242 [WARNING] Setting Var 'y[198,0]' to a numeric value `-21.4546089408328` outside the bounds (-10.0, 10.0).
 2025-12-06 17:56:50,242 [WARNING] Setting Var 'y[199,0]' to a numeric value `-21.458748453021872` outside the bounds (-10.0, 10.0).
+2025-12-21 19:50:29,820 [INFO] STARTING TRAINING
+2025-12-21 19:50:29,827 [INFO] EXECUTING SEED 1583443253 (1/1)
+2025-12-21 19:50:29,827 [INFO] Memory use loop start: Memory usage: 346.20 MB
+2025-12-21 19:50:29,827 [INFO] PARAM COMBINATIONS GENERATED: [None]
+2025-12-21 19:51:17,952 [ERROR] /Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/non_parametric_collocation.py:95: UserWarning: Data transposed to match expected dimensions.
+2025-12-21 19:51:17,953 [ERROR]   warnings.warn("Data transposed to match expected dimensions.")
+2025-12-21 19:51:25,822 [INFO] seed 1583443253
+2025-12-21 19:51:25,823 [ERROR] /Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/models/nn_pyomo_base.py:86: UserWarning: y_init should be structured such that each row represents a new time point.
+2025-12-21 19:51:25,823 [ERROR]   warnings.warn("y_init should be structured such that each row represents a new time point.")
+2025-12-21 19:51:25,832 [ERROR] Failed to complete training: shapes (32,3) and (2,) not aligned: 3 (dim 1) != 2 (dim 0)
+2025-12-21 19:51:25,832 [INFO] Finished training: Memory usage: 1103.97 MB
+2025-12-21 19:51:25,832 [INFO] Stripping model components.
+2025-12-21 19:51:26,303 [INFO] Attempted clean up: Memory usage: 1104.02 MB
+2025-12-21 19:51:26,303 [INFO] Iteration: 1 / 1
+2025-12-21 19:51:26,303 [INFO] Training ended: Memory usage: 1104.02 MB
+2025-12-21 19:51:26,421 [INFO] Attempted clean up: Memory usage: 1104.02 MB
+2025-12-21 19:51:26,422 [INFO] Results saved to results/smoke_do_pyomo/pyomo_do_32_211225/1583443253_2025-12-21_19-51.pkl
+2025-12-21 19:53:11,270 [ERROR] Failed to complete training: shapes (32,3) and (2,) not aligned: 3 (dim 1) != 2 (dim 0)
+2025-12-21 19:58:20,540 [ERROR] Failed to complete training: shapes (32,3) and (2,) not aligned: 3 (dim 1) != 2 (dim 0)
+2025-12-21 20:05:55,134 [ERROR] Failed to complete training: shapes (32,3) and (2,) not aligned: 3 (dim 1) != 2 (dim 0)
+2025-12-21 20:21:55,418 [ERROR] Rule failed when generating expression for Objective obj with index None:
+ValueError: shapes (32,3) and (2,) not aligned: 3 (dim 1) != 2 (dim 0)
+2025-12-21 20:21:55,422 [ERROR] Constructing component 'obj' from data=None failed:
+    ValueError: shapes (32,3) and (2,) not aligned: 3 (dim 1) != 2 (dim 0)
+2025-12-21 20:21:55,422 [ERROR] Failed to extract results: shapes (32,3) and (2,) not aligned: 3 (dim 1) != 2 (dim 0)
+2025-12-22 10:43:46,285 [ERROR] Rule failed when generating expression for Objective obj with index None:
+ValueError: shapes (32,3) and (2,) not aligned: 3 (dim 1) != 2 (dim 0)
+2025-12-22 10:43:46,288 [ERROR] Constructing component 'obj' from data=None failed:
+    ValueError: shapes (32,3) and (2,) not aligned: 3 (dim 1) != 2 (dim 0)
+2025-12-22 10:43:46,289 [ERROR] Failed to extract results: shapes (32,3) and (2,) not aligned: 3 (dim 1) != 2 (dim 0)
+2025-12-22 11:19:47,068 [ERROR] Rule failed when generating expression for Objective obj with index None:
+ValueError: shapes (32,3) and (2,) not aligned: 3 (dim 1) != 2 (dim 0)
+2025-12-22 11:19:47,074 [ERROR] Constructing component 'obj' from data=None failed:
+    ValueError: shapes (32,3) and (2,) not aligned: 3 (dim 1) != 2 (dim 0)
+2025-12-22 11:19:47,075 [ERROR] Failed to extract results: shapes (32,3) and (2,) not aligned: 3 (dim 1) != 2 (dim 0)
+2025-12-22 11:25:55,015 [ERROR] Rule failed when generating expression for Objective obj with index None:
+ValueError: shapes (8,3) and (2,) not aligned: 3 (dim 1) != 2 (dim 0)
+2025-12-22 11:25:55,022 [ERROR] Constructing component 'obj' from data=None failed:
+    ValueError: shapes (8,3) and (2,) not aligned: 3 (dim 1) != 2 (dim 0)
+2025-12-22 11:25:55,023 [ERROR] Failed to extract results: shapes (8,3) and (2,) not aligned: 3 (dim 1) != 2 (dim 0)
