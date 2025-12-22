@@ -1,0 +1,32 @@
+{
+  "args": {
+    "no_print": false,
+    "config": "src/configs/config_pyomo_synth.json",
+    "exp": "default",
+    "n_seeds": 1,
+    "outdir": "results/study_do",
+    "data_type": "do",
+    "layer_width": [
+      3,
+      8,
+      2
+    ],
+    "penalty_lambda_reg": 0.1,
+    "tol": 0.001,
+    "time_invariant": false,
+    "t_range": null,
+    "n_steps": 1,
+    "meta": true
+  },
+  "timestamp": "2025-12-22_16-14",
+  "exp": "default",
+  "layer_width": [
+    3,
+    8,
+    2
+  ],
+  "penalty_lambda_reg": 0.1,
+  "tol": 0.001,
+  "t_range": null,
+  "n_steps": 1
+}

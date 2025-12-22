@@ -38,6 +38,7 @@ Examples:
     --model_type pyomo \
     --data_type ho \
     --layer_width "[2,32,2]" \
+    --spacing_type chebyshev \
     --tol 1e-6 \
     --seed 0 \
     --outdir results/plots
@@ -49,7 +50,6 @@ Examples:
     --model_types pyomo jax_diffrax pytorch \
     --data_type ho \
     --layer_width "[2,32,2]" \
-    --max_iter "[400,1000]" \
     --pretrain "[0.2,1]" \
     --plot_mode split_compare \
     --seed 0 \

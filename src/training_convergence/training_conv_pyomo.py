@@ -99,6 +99,7 @@ def main(argv=None):
         ts = time.strftime('%Y-%m-%d_%H-%M')
         # create a dated subfolder for this run
         if args.outdir:
+            print(f"LAYER WIDTH: {args.layer_width[1]}.")
             if args.layer_width is None:
                 subdir = os.path.join(args.outdir, f"pyomo_{args.data_type}_{run_date}")
             else:
@@ -144,13 +145,17 @@ def main(argv=None):
         print(f"All results saved to {filename}")
 
 if __name__ == "__main__":
-    bp = 1
-    main([
-        "--data_type", "do",
-        "--layer_width", "[3,8,2]",
-        "--penalty_lambda_reg", "0.1",
-        "--tol", "1e-3",
-        "--n_seeds", "1",
-        "--exp", "default",
-        "--time_invariant", "False",
-    ])
+    action = "prod"
+    if action == "dev":
+        main([
+            "--data_type", "do",
+            "--layer_width", "[3,8,2]",
+            "--penalty_lambda_reg", "0.1",
+            "--tol", "1e-3",
+            "--n_seeds", "1",
+            "--exp", "default",
+            "--time_invariant", "False",
+            "--outdir", "results/study_do",
+        ])
+    else:
+        main()
