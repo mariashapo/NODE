@@ -1,6 +1,6 @@
 """There no dedicated experiment runner for the synthetic Jax-diffrax model, the same way there is one for Pyomo (PyomoExperimentRunner)."""
 import argparse, os, time, pickle
-from utils.general import generate_seeds, print_memory
+from utils.general import generate_seeds, print_memory, str2bool
 import argparse, json
 from utils_training.run_train_toy import TrainerToy as Trainer
 import gc, ctypes
@@ -24,7 +24,7 @@ def _cleanup_trainer(tr):
             try: setattr(tr, attr, None)
             except Exception: pass
 
-def main():
+def _build_parser():
     p = argparse.ArgumentParser()
     p.add_argument("--n_seeds", type=int, default=1)
     p.add_argument("--outdir", default="results/jax")
@@ -33,14 +33,22 @@ def main():
     p.add_argument("--pretrain", type=json.loads, default=[0.2, 1])
     p.add_argument("--log", type=json.loads, default = 100)
     p.add_argument("--layer_width", type=json.loads, default=None)
-    p.add_argument("--reg_norm", action="store_true", default=False)
+    p.add_argument("--reg_norm", type=str2bool, default=False)
+    p.add_argument("--time_invariant", type=str2bool, default=True)
     p.add_argument("--penalty_lambda_reg", type=float, default=1e-3)
-    args = p.parse_args()
+    p.add_argument("--noise_level", type=float, default=None)
+    return p
+
+def parse_args(argv=None):
+    return _build_parser().parse_args(argv)
+
+def main(argv=None):
+    args = parse_args(argv)
     
     params_model = {
         'layer_widths': args.layer_width if args.layer_width is not None else [2, 32, 2],
         'penalty_lambda_reg': args.penalty_lambda_reg,
-        'time_invariant': True,
+        'time_invariant': args.time_invariant,
         'learning_rate': 1e-3,
         'max_iter': args.max_iter,
         'pretrain': args.pretrain,
@@ -61,7 +69,12 @@ def main():
         print_memory("Memory use loop start: ")
         try:
             if args.log > 0:
-                trainer = Trainer.load_trainer(args.data_type, spacing_type="uniform", model_type="jax_diffrax")
+                trainer = Trainer.load_trainer(
+                    args.data_type,
+                    spacing_type="uniform",
+                    model_type="jax_diffrax",
+                    noise_level=args.noise_level,
+                )
                 params_model["log"] = args.log
                 trainer.train(params_model, seed=seed)
                 results = trainer.extract_results() or {}
@@ -80,7 +93,12 @@ def main():
         print_memory("Memory after trainer use: ")
         # ---- timing run (no per-epoch logging logging) ----
         try:
-            trainer = Trainer.load_trainer(args.data_type, spacing_type="uniform", model_type="jax_diffrax")
+            trainer = Trainer.load_trainer(
+                args.data_type,
+                spacing_type="uniform",
+                model_type="jax_diffrax",
+                noise_level=args.noise_level,
+            )
             params_model["log"] = False
             trainer.train(params_model, seed=seed)
             results_no_log = trainer.extract_results() or {}
@@ -136,4 +154,17 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    action = "prod"
+    if action == "dev":
+        main([
+            "--data_type", "do",
+            "--layer_width", "[3,8,2]",
+            "--penalty_lambda_reg", "0.1",
+            "--n_seeds", "1",
+            "--time_invariant", "False",
+            "--outdir", "results/study_do",
+            "--max_iter", "[200,1000]",
+            "--pretrain", "[0.2,1]",
+        ])
+    else:
+        main()

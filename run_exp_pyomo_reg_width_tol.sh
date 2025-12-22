@@ -5,8 +5,8 @@
 set -euo pipefail
 
 ENV="node25"
-OUTDIR="results/study_vdp_reg"
-DATA_TYPE="vdp"
+OUTDIR="results/study_ho_reg"
+DATA_TYPE="ho"
 
 # Ensure required dirs exist (safe even if you redirect logs outside)
 mkdir -p "$OUTDIR" logs

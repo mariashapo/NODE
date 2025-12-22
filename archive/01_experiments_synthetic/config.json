@@ -46,14 +46,10 @@
       },
       "network_size_grid_search": {
         "lw_list": [
-          [2, 8, 2],
-          [2, 16, 2],
-          [2, 32, 2],
-          [2, 64, 2],
-          [2, 128, 2]
+          [2, 32, 2]
         ],
-        "reg_list": [0.0001, 0.001, 0.01],
-        "tol_list": [1e-4, 1e-6]
+        "reg_list": [0.0, 0.0, 0.0002, 0.001, 0.0046, 0.0215, 0.1, 0.4642, 2.1544, 10.0],
+        "tol_list": [1e-6]
       },
       "activation_function": {
         "act_func_list": ["tanh", "softplus", "sigmoid"],

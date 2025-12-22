@@ -62,6 +62,63 @@ class Graphs:
         plt.grid(True)
         plt.show()
 
+    @staticmethod
+    def plot_reg_curve_ci(
+        x, y, y_lo, y_hi, *,
+        title=None, xlabel=None, ylabel=None,
+        xscale="log", yscale="linear",
+        marker="o", linewidth=2, alpha_band=0.20,
+        show_points=True
+    ):
+        """
+        Regularization curve with shaded confidence interval band (#1).
+
+        Parameters
+        ----------
+        x : array-like
+            Regularization strengths (typically log-spaced).
+        y : array-like
+            Mean metric at each x.
+        y_lo, y_hi : array-like
+            Lower/upper CI bounds at each x (same length as y).
+        xscale, yscale : str
+            Axis scales (default: log x-axis).
+        alpha_band : float
+            Transparency for the CI band.
+        """
+
+        x = np.asarray(x, dtype=float)
+        y = np.asarray(y, dtype=float)
+        y_lo = np.asarray(y_lo, dtype=float)
+        y_hi = np.asarray(y_hi, dtype=float)
+
+        # Sort by x so the line/band render correctly for log-spaced grids
+        order = np.argsort(x)
+        x, y, y_lo, y_hi = x[order], y[order], y_lo[order], y_hi[order]
+
+        plt.figure(figsize=(8, 5))
+
+        # Mean curve
+        plt.plot(x, y, marker=marker if show_points else None, linewidth=linewidth)
+
+        # Shaded CI band
+        plt.fill_between(x, y_lo, y_hi, alpha=alpha_band)
+
+        if title:
+            plt.title(title)
+        if xlabel:
+            plt.xlabel(xlabel)
+        if ylabel:
+            plt.ylabel(ylabel)
+
+        plt.xscale(xscale)
+        plt.yscale(yscale)
+
+        plt.grid(True, which="both", linestyle="--", alpha=0.4)
+        plt.tight_layout()
+        plt.show()
+
+
 class GraphsTraining:
     def __init__(self):
         self.regular_pre_time = None

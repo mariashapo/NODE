@@ -3,6 +3,19 @@ import os, time, psutil
 import numpy as np
 import time
 
+def str2bool(v):
+    """Parse common string booleans into True/False."""
+    if isinstance(v, bool):
+        return v
+    if v is None:
+        return False
+    val = str(v).strip().lower()
+    if val in ("yes", "true", "t", "1"):
+        return True
+    if val in ("no", "false", "f", "0"):
+        return False
+    raise ValueError(f"Boolean value expected, got {v!r}")
+
 def generate_seeds(n_seeds: int, method: str = "random"):
     """
     Generate a list of unique NumPy seeds.

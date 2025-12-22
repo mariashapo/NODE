@@ -1,7 +1,7 @@
 # run_training.py
 import argparse, os, time, pickle, gc
 from utils_training.optimize_pyomo_synthetic import ExperimentRunner as PyomoExperimentRunner
-from utils.general import generate_seeds, print_memory
+from utils.general import generate_seeds, print_memory, str2bool
 import argparse, json
 import io, sys, logging, warnings
 
@@ -27,19 +27,9 @@ class _StreamToLogger(io.TextIOBase):
     def flush(self):
         pass
 
-def _str2bool(v):
-    if isinstance(v, bool):
-        return v
-    val = str(v).lower()
-    if val in ("yes", "true", "t", "1"):
-        return True
-    if val in ("no", "false", "f", "0"):
-        return False
-    raise argparse.ArgumentTypeError(f"Boolean value expected, got {v!r}")
-
 def _build_parser():
     p = argparse.ArgumentParser()
-    p.add_argument("--no_print", type=_str2bool, default=False)
+    p.add_argument("--no_print", type=str2bool, default=False)
     p.add_argument("--config", default="src/configs/config_pyomo_synth.json")
     p.add_argument("--exp", default="training_convergence_wall_time") # "default" / "network_size_grid_search" / "training_convergence_wall_time"
     p.add_argument("--n_seeds", type=int, default=1)
@@ -48,7 +38,7 @@ def _build_parser():
     p.add_argument("--layer_width", type=json.loads, default=None)
     p.add_argument("--penalty_lambda_reg", type=float, default=None)
     p.add_argument("--tol", type=float, default=None)
-    p.add_argument("--time_invariant", type=_str2bool, default=True)
+    p.add_argument("--time_invariant", type=str2bool, default=True)
     # training_convergence_wall_time specific arguments:
     p.add_argument("--t_range", type=json.loads, default=None)
     p.add_argument("--n_steps", type=int, default=1)
