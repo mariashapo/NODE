@@ -13,7 +13,7 @@ def _build_parser():
     p.add_argument("--max_iter", type=json.loads, default=[400, 1000])
     p.add_argument("--pretrain", type=json.loads, default=[0.2, 1])
     p.add_argument("--layer_width", type=json.loads, default=None)
-    p.add_argument("--reg_norm", type=str2bool, default=False)
+    p.add_argument("--reg_norm", type=str2bool, nargs="?", const=True, default=False)
     p.add_argument("--time_invariant", type=str2bool, default=True)
     p.add_argument("--penalty_lambda_reg", type=float, default=1e-3)
     p.add_argument("--noise_level", type=float, default=None)
