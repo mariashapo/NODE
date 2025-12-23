@@ -60,6 +60,7 @@ def main(argv=None):
         'act_func': 'tanh',
     }
     
+    run_date = time.strftime('%d%m%y')
     # all_results = []
     print("STARTING TRAINING")
     for seed in generate_seeds(args.n_seeds):
@@ -126,7 +127,7 @@ def main(argv=None):
 
         max_iter = str(args.max_iter).strip('[]').replace(',','_').replace(' ','')
         # Create a dated subfolder for this run
-        subdir = os.path.join(args.outdir, f"jax_{args.data_type}_{max_iter}")
+        subdir = os.path.join(args.outdir, f"jax_{args.data_type}_{max_iter}_{run_date}")
         os.makedirs(subdir, exist_ok=True)
 
         # Persist run metadata once per subdir for traceability

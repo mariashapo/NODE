@@ -96,7 +96,7 @@ def main(argv=None):
         print(f"Results saved to {filename}")
 
 if __name__ == "__main__":
-    action = "dev"
+    action = "prod"
     if action == "dev":
         main([
             "--data_type", "do",
