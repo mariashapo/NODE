@@ -898,3 +898,45 @@ ValueError: shapes (8,3) and (2,) not aligned: 3 (dim 1) != 2 (dim 0)
 2025-12-22 11:25:55,022 [ERROR] Constructing component 'obj' from data=None failed:
     ValueError: shapes (8,3) and (2,) not aligned: 3 (dim 1) != 2 (dim 0)
 2025-12-22 11:25:55,023 [ERROR] Failed to extract results: shapes (8,3) and (2,) not aligned: 3 (dim 1) != 2 (dim 0)
+2025-12-24 17:01:31,148 [INFO] STARTING TRAINING
+2025-12-24 17:01:31,152 [INFO] EXECUTING SEED 2815249169 (1/10)
+2025-12-24 17:01:31,153 [INFO] Memory use loop start: Memory usage: 345.45 MB
+2025-12-24 17:01:31,153 [INFO] PARAM COMBINATIONS GENERATED: [([2, 32, 2], 0.0, 1e-06), ([2, 32, 2], 0.0, 1e-06), ([2, 32, 2], 0.0002, 1e-06), ([2, 32, 2], 0.001, 1e-06), ([2, 32, 2], 0.0046, 1e-06), ([2, 32, 2], 0.0215, 1e-06), ([2, 32, 2], 0.1, 1e-06), ([2, 32, 2], 0.4642, 1e-06), ([2, 32, 2], 2.1544, 1e-06), ([2, 32, 2], 10.0, 1e-06)]
+2025-12-24 17:02:18,622 [ERROR] /Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils/non_parametric_collocation.py:95: UserWarning: Data transposed to match expected dimensions.
+2025-12-24 17:02:18,622 [ERROR]   warnings.warn("Data transposed to match expected dimensions.")
+2025-12-24 17:02:26,532 [INFO] seed 2815249169
+2025-12-24 17:02:26,532 [ERROR] /Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/models/nn_pyomo_base.py:86: UserWarning: y_init should be structured such that each row represents a new time point.
+2025-12-24 17:02:26,532 [ERROR]   warnings.warn("y_init should be structured such that each row represents a new time point.")
+2025-12-24 17:02:27,197 [INFO] Redirect logs: True
+2025-12-24 17:03:42,435 [ERROR] Traceback (most recent call last):
+2025-12-24 17:03:42,436 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+2025-12-24 17:03:42,437 [ERROR] return _run_code(code, main_globals, None,
+2025-12-24 17:03:42,437 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/runpy.py", line 87, in _run_code
+2025-12-24 17:03:42,437 [ERROR] exec(code, run_globals)
+2025-12-24 17:03:42,437 [ERROR]   File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 150, in <module>
+2025-12-24 17:03:42,437 [ERROR] main()
+2025-12-24 17:03:42,438 [ERROR]   File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/training_convergence/training_conv_pyomo.py", line 72, in main
+2025-12-24 17:03:42,438 [ERROR] results, trainer = runner.run(
+2025-12-24 17:03:42,438 [ERROR]   File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/optimize_pyomo_synthetic.py", line 141, in run
+2025-12-24 17:03:42,438 [ERROR] trainer.train_pyomo(self.params_model, seed)
+2025-12-24 17:03:42,438 [ERROR]   File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/utils_training/run_train_toy.py", line 169, in train_pyomo
+2025-12-24 17:03:42,438 [ERROR] result = self.model.solve_model(redirect_logs = self.redirect_logs)
+2025-12-24 17:03:42,438 [ERROR]   File "/Users/mariiashapo/Library/CloudStorage/OneDrive-Personal/project_2324/NODE/src/models/nn_pyomo_base.py", line 262, in solve_model
+2025-12-24 17:03:42,438 [ERROR] result = solver.solve(self.model, tee=False, logfile="ipopt.solve.log")
+2025-12-24 17:03:42,438 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/pyomo/opt/base/solvers.py", line 610, in solve
+2025-12-24 17:03:42,439 [ERROR] _status = self._apply_solver()
+2025-12-24 17:03:42,439 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/pyomo/opt/solver/shellcmd.py", line 266, in _apply_solver
+2025-12-24 17:03:42,439 [ERROR] self._rc, self._log = self._execute_command(self._command)
+2025-12-24 17:03:42,439 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/pyomo/opt/solver/shellcmd.py", line 334, in _execute_command
+2025-12-24 17:03:42,439 [ERROR] results = subprocess.run(
+2025-12-24 17:03:42,439 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/subprocess.py", line 507, in run
+2025-12-24 17:03:42,440 [ERROR] stdout, stderr = process.communicate(input, timeout=timeout)
+2025-12-24 17:03:42,440 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/subprocess.py", line 1126, in communicate
+2025-12-24 17:03:42,441 [ERROR] self.wait()
+2025-12-24 17:03:42,441 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/subprocess.py", line 1189, in wait
+2025-12-24 17:03:42,441 [ERROR] return self._wait(timeout=timeout)
+2025-12-24 17:03:42,441 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/subprocess.py", line 1933, in _wait
+2025-12-24 17:03:42,441 [ERROR] (pid, sts) = self._try_wait(0)
+2025-12-24 17:03:42,441 [ERROR]   File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/subprocess.py", line 1891, in _try_wait
+2025-12-24 17:03:42,441 [ERROR] (pid, sts) = os.waitpid(self.pid, wait_flags)
+2025-12-24 17:03:42,441 [ERROR] KeyboardInterrupt

@@ -54,3 +54,9 @@ python -m src.training_convergence.training_conv_pytorch \
   --pretrain pyomo \
   --outdir results/pytorch_pretrain_pyomo
 ```
+
+## Inspecting Pyomo pretrain bundles
+Show weights and metrics inside a bundle:
+```bash
+python -m src.training_convergence.preview_pyomo_weights results/pyomo_pretrain/pyomo_pretrain_vdp_w2-32-2_seed0_<timestamp>.pkl --suppress
+```
