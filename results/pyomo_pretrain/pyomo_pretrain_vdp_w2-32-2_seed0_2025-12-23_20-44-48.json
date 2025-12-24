@@ -1,0 +1,20 @@
+{
+  "bundle": "pyomo_pretrain_vdp_w2-32-2_seed0_2025-12-23_20-44-48.pkl",
+  "timestamp": "2025-12-23_20-44-48",
+  "data_type": "vdp",
+  "layer_widths": [
+    2,
+    32,
+    2
+  ],
+  "seed": 0,
+  "timing": {
+    "solver_time": 11.15128207206726,
+    "wall_time": 12.422666072845459
+  },
+  "termination": "optimal",
+  "metrics": {
+    "mse_train": 0.24285215669862903,
+    "mse_test": 2.3757539104873384
+  }
+}

@@ -16,23 +16,9 @@ from statsmodels.api import tsa # time series analysis
 import statsmodels.api as sm
 
 # collocation
-import sys
-import os
 import importlib
 
-p_ = os.path.abspath(os.path.join('..', 'utils'))
-if p_ not in sys.path:
-    sys.path.append(p_)
-    
-p_ = os.path.abspath(os.path.join('..', 'models'))
-if p_ not in sys.path:
-    sys.path.append(p_)
-    
-p_ = os.path.abspath(os.path.join('..', 'utils_training'))
-if p_ not in sys.path:
-    sys.path.append(p_)
-
-import run_train_diffrax_rl
+from utils_training import run_train_diffrax_rl
 
 
 class ExperimentRunner:

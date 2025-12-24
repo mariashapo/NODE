@@ -89,7 +89,6 @@ def main(argv=None):
         ts = time.strftime('%Y-%m-%d_%H-%M')
         # create a dated subfolder for this run
         if args.outdir:
-            print(f"LAYER WIDTH: {args.layer_width[1]}.")
             if args.layer_width is None:
                 subdir = os.path.join(args.outdir, f"pyomo_{args.data_type}_{run_date}")
             else:

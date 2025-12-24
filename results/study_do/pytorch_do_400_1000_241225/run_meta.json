@@ -1,0 +1,49 @@
+{
+  "args": {
+    "n_seeds": 20,
+    "outdir": "results/study_do",
+    "data_type": "do",
+    "max_iter": [
+      400,
+      1000
+    ],
+    "pretrain": [
+      0.2,
+      1
+    ],
+    "layer_width": [
+      3,
+      32,
+      2
+    ],
+    "reg_norm": false,
+    "time_invariant": false,
+    "penalty_lambda_reg": 0.001,
+    "noise_level": null,
+    "meta": true
+  },
+  "params_model": {
+    "layer_widths": [
+      3,
+      32,
+      2
+    ],
+    "penalty_lambda_reg": 0.001,
+    "time_invariant": false,
+    "learning_rate": 0.001,
+    "max_iter": [
+      400,
+      1000
+    ],
+    "pretrain": [
+      0.2,
+      1
+    ],
+    "split_time": true,
+    "rtol": 0.001,
+    "atol": 1e-06,
+    "reg_norm": false,
+    "log": false
+  },
+  "timestamp": "2025-12-24_00-21"
+}

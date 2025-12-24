@@ -1,0 +1,24 @@
+{
+  "args": {
+    "no_print": false,
+    "config": "src/configs/config_pyomo_synth.json",
+    "exp": "network_size_grid_search",
+    "n_seeds": 1,
+    "outdir": "results/study_ho_reg",
+    "data_type": "ho",
+    "layer_width": null,
+    "penalty_lambda_reg": null,
+    "tol": null,
+    "time_invariant": true,
+    "t_range": null,
+    "n_steps": 1,
+    "meta": true
+  },
+  "timestamp": "2025-12-24_11-24",
+  "exp": "network_size_grid_search",
+  "layer_width": null,
+  "penalty_lambda_reg": null,
+  "tol": null,
+  "t_range": null,
+  "n_steps": 1
+}

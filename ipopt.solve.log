@@ -1,4 +1,4 @@
-Solver command line: ['/Users/mariiashapo/anaconda3/envs/node_25/bin/ipopt', '/var/folders/2v/gfm3z1tn5fj8zss_r9hrgnv80000gn/T/tmpo3i7ajhv.pyomo.nl', '-AMPL', 'tol=1e-06', 'print_level=3', 'max_iter=6000', 'constr_viol_tol=1e-06', 'compl_inf_tol=1e-06', 'dual_inf_tol=1e-06', 'acceptable_tol=1e-09', 'acceptable_constr_viol_tol=1e-09']
+Solver command line: ['/Users/mariiashapo/anaconda3/envs/node_25/bin/ipopt', '/var/folders/2v/gfm3z1tn5fj8zss_r9hrgnv80000gn/T/tmpl_6idhc8.pyomo.nl', '-AMPL', 'tol=1e-06', 'print_level=3', 'max_iter=6000', 'constr_viol_tol=1e-06', 'compl_inf_tol=1e-06', 'dual_inf_tol=1e-06', 'acceptable_tol=1e-09', 'acceptable_constr_viol_tol=1e-09']
 
 Ipopt 3.14.16: tol=1e-06
 print_level=3
@@ -16,9 +16,9 @@ This program contains Ipopt, a library for large-scale nonlinear optimization.
          For more information visit https://github.com/coin-or/Ipopt
 ******************************************************************************
 
-Total number of variables............................:      594
+Total number of variables............................:      562
                      variables with only lower bounds:        0
-                variables with lower and upper bounds:      594
+                variables with lower and upper bounds:      562
                      variables with only upper bounds:        0
 Total number of equality constraints.................:      400
 Total number of inequality constraints...............:        0
@@ -27,25 +27,25 @@ Total number of inequality constraints...............:        0
         inequality constraints with only upper bounds:        0
 
 
-Number of Iterations....: 37
+Number of Iterations....: 28
 
                                    (scaled)                 (unscaled)
-Objective...............:   2.0020618503557026e-02    2.0020618503557026e-02
-Dual infeasibility......:   7.4323678131661277e-11    7.4323678131661277e-11
-Constraint violation....:   1.8868003061854599e-07    1.8868003061854599e-07
+Objective...............:   2.1793749233243405e-02    2.1793749233243405e-02
+Dual infeasibility......:   9.0446803538113959e-09    9.0446803538113959e-09
+Constraint violation....:   3.5672334528120964e-07    3.5672334528120964e-07
 Variable bound violation:   0.0000000000000000e+00    0.0000000000000000e+00
-Complementarity.........:   9.0909090909090928e-08    9.0909090909090928e-08
-Overall NLP error.......:   1.8868003061854599e-07    1.8868003061854599e-07
+Complementarity.........:   9.0909091569463423e-08    9.0909091569463423e-08
+Overall NLP error.......:   3.5672334528120964e-07    3.5672334528120964e-07
 
 
-Number of objective function evaluations             = 70
-Number of objective gradient evaluations             = 38
-Number of equality constraint evaluations            = 70
+Number of objective function evaluations             = 49
+Number of objective gradient evaluations             = 29
+Number of equality constraint evaluations            = 49
 Number of inequality constraint evaluations          = 0
-Number of equality constraint Jacobian evaluations   = 38
+Number of equality constraint Jacobian evaluations   = 29
 Number of inequality constraint Jacobian evaluations = 0
-Number of Lagrangian Hessian evaluations             = 37
-Total seconds in IPOPT                               = 10.010
+Number of Lagrangian Hessian evaluations             = 28
+Total seconds in IPOPT                               = 2.714
 
 EXIT: Optimal Solution Found.
 

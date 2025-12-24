@@ -1,29 +1,14 @@
 import numpy as np
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
-import sys
-import jax.numpy as jnp
 from jax import random
 import os
 import shutil
 import importlib
 import time
 
-path_ = os.path.abspath(os.path.join('..', 'utils'))
-if path_ not in sys.path:
-    sys.path.append(path_)
-
-path_ = os.path.abspath(os.path.join('..', 'models'))
-if path_ not in sys.path:
-    sys.path.append(path_)
-
-# preprocessing
-import preprocess
-DataPreprocessor = preprocess.DataPreprocessor_odeint
-
-# model
-import nn_jax_diffrax
-NeuralODE_JAX = nn_jax_diffrax.NeuralODE
+from utils.preprocess import DataPreprocessor_odeint as DataPreprocessor
+from models.nn_jax_diffrax import NeuralODE as NeuralODE_JAX
 
 
 class Trainer:
