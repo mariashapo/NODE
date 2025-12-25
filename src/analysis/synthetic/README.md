@@ -56,3 +56,14 @@ Examples:
     --outdir results/plots
   ```
 Outputs: PNG under `results/plots/` with train (clean/noisy/pred) and test (clean/pred) for each state.
+
+## Aggregate Pyomo regularization sweeps
+Example to aggregate and plot a reg curve with CIs (filters tol/layer width and drops combos with <3 runs):
+```bash
+python -m src.analysis.synthetic.aggregate_pyomo_reg_search \
+  --dir results/study_ho_reg/pyomo_ho_241225 \
+  --plot \
+  --metric mse_test_coll \
+  --tol 1e-6 \
+  --layer_width "[2,32,2]"
+```

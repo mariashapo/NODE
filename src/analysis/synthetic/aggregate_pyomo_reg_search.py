@@ -76,7 +76,7 @@ def aggregate_by_hparams(df: pd.DataFrame) -> pd.DataFrame:
             mse_train_ci=("mse_train", _ci),
             mse_test_ci=("mse_test", _ci),
             mse_train_coll_ci=("mse_train_coll", _ci),
-            mse_test_coll_ci=("mse_train_coll", _ci),
+            mse_test_coll_ci=("mse_test_coll", _ci),
             time_elapsed_ci=("time_elapsed", _ci),
             n_runs=("file", "count"),
         )
@@ -89,13 +89,17 @@ def aggregate_by_hparams(df: pd.DataFrame) -> pd.DataFrame:
     return agg_df
 
 
-def main():
+def main(argv=None):
     import argparse
+    import ast
 
     ap = argparse.ArgumentParser(description="Aggregate Pyomo reg/width/tol sweeps with CIs.")
-    ap.add_argument("--dir", default="results/study_vdp_reg/pyomo_vdp", help="Folder with .pkl results")
-    ap.add_argument("--plot", action="store_true", help="Plot mse_test with error bars")
-    args = ap.parse_args()
+    ap.add_argument("--dir", default="results/study_ho_reg/pyomo_ho_241225", help="Folder with .pkl results")
+    ap.add_argument("--plot", action="store_true", help="Plot a reg curve with CIs (pick metric/tol/layer_width).")
+    ap.add_argument("--metric", default="mse_test", choices=["mse_test", "mse_train", "mse_test_coll", "mse_train_coll"], help="Metric to plot when --plot is set.")
+    ap.add_argument("--tol", type=float, default=None, help="Filter tol value to plot; defaults to the first tol present.")
+    ap.add_argument("--layer_width", type=str, default=None, help="Optional layer width to filter, e.g. \"[2,32,2]\".")
+    args = ap.parse_args(argv)
 
     df = load_reg_search(args.dir)
     if df.empty:
@@ -112,26 +116,59 @@ def main():
         print(best[["layer_widths", "penalty_lambda_reg", "tol", "mse_test_mean", "mse_train_mean", "n_runs"]])
 
     if args.plot and not agg.empty:
-        # Example: plot mse_test vs reg for each layer_width, fixed tol
-        tol_vals = agg["tol"].unique()
-        tol = tol_vals[0]
-        sub = agg[agg["tol"] == tol]
-        plt.figure(figsize=(8, 5))
+        target_tol = args.tol if args.tol is not None else agg["tol"].iloc[0]
+        lw_filter = None
+        if args.layer_width is not None:
+            try:
+                lw_filter = tuple(ast.literal_eval(args.layer_width))
+            except Exception:
+                print(f"Could not parse --layer_width '{args.layer_width}', ignoring filter.")
+
+        sub = agg[agg["tol"] == target_tol]
+        if lw_filter is not None:
+            sub = sub[sub["layer_widths"] == lw_filter]
+        if sub.empty:
+            print(f"No rows for tol={target_tol} and layer_width={lw_filter or 'ANY'}.")
+            return
+
+        metric = args.metric
+        y_col = f"{metric}_mean"
+        lo_col = f"{metric}_ci_lo"
+        hi_col = f"{metric}_ci_hi"
+        if y_col not in sub.columns or lo_col not in sub.columns or hi_col not in sub.columns:
+            print(f"Columns for metric '{metric}' not found in aggregated data.")
+            return
+
+        # If multiple layer widths remain, plot each separately
         for lw, g in sub.groupby("layer_widths"):
+            # Drop rows with NA CIs/means and low run counts
+            g = g[(g["n_runs"] >= 3)].dropna(subset=[y_col, lo_col, hi_col])
+            if g.empty:
+                print(f"No valid rows to plot for lw={lw} (metric={metric}) after filtering n_runs>=3/NA.")
+                continue
             Graphs.plot_reg_curve_ci(
                 g["penalty_lambda_reg"],
-                g["mse_train_coll_mean"],
-                g["mse_train_coll_ci_lo"],
-                g["mse_test_coll_ci_hi"],
-                title=f"mse_test vs reg (tol={tol})",
+                g[y_col],
+                g[lo_col],
+                g[hi_col],
+                title=f"{metric} vs reg (tol={target_tol}, lw={lw})",
                 xlabel="penalty_lambda_reg",
-                ylabel="mse_test (mean ± 95% CI)",
+                ylabel=f"{metric} (mean ± 95% CI)",
                 xscale="log",
-                yscale="linear",
+                yscale="log",
+                add_errorbars=True,
             )
-            plt.legend([f"width {lw}"], frameon=False)
-        plt.show()
 
 
 if __name__ == "__main__":
-    main()
+    action = "dev"
+    if action == "dev":
+        main([
+            "--dir", "results/study_ho_reg/pyomo_ho_241225",
+            "--plot",
+            "--metric", "mse_test_coll",
+            "--tol", "1e-6",
+            "--layer_width", "[2,32,2]",
+        ])
+    else:    
+        main()

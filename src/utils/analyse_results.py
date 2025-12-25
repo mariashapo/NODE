@@ -68,7 +68,8 @@ class Graphs:
         title=None, xlabel=None, ylabel=None,
         xscale="log", yscale="linear",
         marker="o", linewidth=2, alpha_band=0.20,
-        show_points=True
+        show_points=True, add_errorbars=False,
+        y_min_clip=None, y_max=None, ax=None
     ):
         """
         Regularization curve with shaded confidence interval band (#1).
@@ -85,6 +86,14 @@ class Graphs:
             Axis scales (default: log x-axis).
         alpha_band : float
             Transparency for the CI band.
+        y_min_clip, y_max : float, optional
+            If provided, set y-limits and clip CI band to y_min_clip to avoid log underflow.
+            If None and yscale='log', y_min_clip defaults to 0.5 * min(y[y>0]) and
+            y_max defaults to 1.2 * max(y_hi).
+        add_errorbars : bool
+            Overlay symmetric error bars derived from y_lo/y_hi.
+        ax : matplotlib axis, optional
+            Plot onto an existing axis; if None, create a new figure/axis.
         """
 
         x = np.asarray(x, dtype=float)
@@ -96,27 +105,66 @@ class Graphs:
         order = np.argsort(x)
         x, y, y_lo, y_hi = x[order], y[order], y_lo[order], y_hi[order]
 
-        plt.figure(figsize=(8, 5))
+        created_new_ax = ax is None
+        ax = ax or plt.figure(figsize=(8, 5)).gca()
+
+        # For log scale, enforce multiplicative (symmetric in log space) bands
+        if yscale == "log":
+            eps = 1e-16
+            rel_lower = np.divide(y, y_lo, out=np.ones_like(y), where=(y_lo > eps))
+            rel_upper = np.divide(y_hi, y, out=np.ones_like(y), where=(y > eps))
+            rel = np.maximum(rel_lower, rel_upper)
+            rel[rel <= 0] = 1.0
+            y_lo_sym = y / rel
+            y_hi_sym = y * rel
+        else:
+            y_lo_sym = np.copy(y_lo)
+            y_hi_sym = np.copy(y_hi)
+
+        # Default clipping for log scale to avoid CI hitting zero
+        if y_min_clip is None and yscale == "log":
+            positive_vals = np.concatenate([y[y > 0], y_lo_sym[y_lo_sym > 0], y_hi_sym[y_hi_sym > 0]])
+            if positive_vals.size:
+                y_min_clip = 0.5 * positive_vals.min()
+        if y_max is None and yscale == "log":
+            y_max = 1.2 * np.nanmax(y_hi_sym)
+
+        y_lo_fill = np.copy(y_lo_sym)
+        y_hi_plot = np.copy(y_hi_sym)
+        if y_min_clip is not None:
+            y_lo_fill = np.maximum(y_lo_fill, y_min_clip)
 
         # Mean curve
-        plt.plot(x, y, marker=marker if show_points else None, linewidth=linewidth)
+        ax.plot(x, y, marker=marker if show_points else None, linewidth=linewidth)
 
         # Shaded CI band
-        plt.fill_between(x, y_lo, y_hi, alpha=alpha_band)
+        ax.fill_between(x, y_lo_fill, y_hi_plot, alpha=alpha_band)
+
+        # Optional error bars for visibility of small intervals
+        if add_errorbars:
+            if yscale == "log":
+                yerr = np.vstack([y - y_lo_sym, y_hi_sym - y])
+            else:
+                yerr = np.vstack([y - y_lo, y_hi - y])
+            ax.errorbar(x, y, yerr=yerr, fmt="none", capsize=4, zorder=5, color=ax.lines[-1].get_color())
 
         if title:
-            plt.title(title)
+            ax.set_title(title)
         if xlabel:
-            plt.xlabel(xlabel)
+            ax.set_xlabel(xlabel)
         if ylabel:
-            plt.ylabel(ylabel)
+            ax.set_ylabel(ylabel)
 
-        plt.xscale(xscale)
-        plt.yscale(yscale)
+        ax.set_xscale(xscale)
+        ax.set_yscale(yscale)
+        if y_min_clip is not None or y_max is not None:
+            ax.set_ylim(bottom=y_min_clip, top=y_max)
 
-        plt.grid(True, which="both", linestyle="--", alpha=0.4)
-        plt.tight_layout()
-        plt.show()
+        ax.grid(True, which="both", linestyle="--", alpha=0.4)
+        if ax.figure:
+            ax.figure.tight_layout()
+        if created_new_ax:
+            plt.show()
 
 
 class GraphsTraining:

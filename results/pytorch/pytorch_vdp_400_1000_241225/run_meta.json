@@ -1,0 +1,49 @@
+{
+  "args": {
+    "n_seeds": 1,
+    "outdir": "results/pytorch",
+    "data_type": "vdp",
+    "max_iter": [
+      400,
+      1000
+    ],
+    "pretrain": "[0.2,1]",
+    "layer_width": [
+      2,
+      64,
+      2
+    ],
+    "reg_norm": false,
+    "time_invariant": true,
+    "penalty_lambda_reg": 0.001,
+    "noise_level": null,
+    "pyomo_bundle_dir": "results/pyomo_pretrain",
+    "meta": true
+  },
+  "params_model": {
+    "layer_widths": [
+      2,
+      64,
+      2
+    ],
+    "penalty_lambda_reg": 0.001,
+    "time_invariant": true,
+    "learning_rate": 0.001,
+    "max_iter": [
+      400,
+      1000
+    ],
+    "pretrain": [
+      0.2,
+      1
+    ],
+    "split_time": true,
+    "rtol": 0.001,
+    "atol": 1e-06,
+    "reg_norm": false
+  },
+  "timestamp": "2025-12-24_17-57",
+  "pyomo_pretraining": false,
+  "pyomo_bundle": null,
+  "pyomo_pretraining_time": null
+}

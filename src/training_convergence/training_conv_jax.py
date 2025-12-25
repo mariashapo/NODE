@@ -29,19 +29,19 @@ def _format_width_tag(layer_widths) -> str:
     return "-".join(str(w) for w in layer_widths)
 
 
-def _find_latest_bundle(bundle_dir: Path, data_type: str, layer_widths, seed: int) -> Path:
-    pattern = f"pyomo_pretrain_{data_type}_w{_format_width_tag(layer_widths)}_seed{seed}_*.pkl"
+def _find_latest_bundle(bundle_dir: Path, data_type: str, layer_widths) -> Path:
+    pattern = f"pyomo_pretrain_{data_type}_w{_format_width_tag(layer_widths)}_*.pkl"
     candidates = sorted(bundle_dir.glob(pattern), key=lambda p: p.stat().st_mtime, reverse=True)
     return candidates[0] if candidates else None
 
 
-def _load_pyomo_bundle(pretrain_spec: str, bundle_dir: str, data_type: str, layer_widths, seed: int) -> Tuple[Path, dict]:
+def _load_pyomo_bundle(pretrain_spec: str, bundle_dir: str, data_type: str, layer_widths) -> Tuple[Path, dict]:
     bundle_path = None
     if ":" in pretrain_spec:
         _, path_str = pretrain_spec.split(":", 1)
         bundle_path = Path(path_str).expanduser()
     else:
-        bundle_path = _find_latest_bundle(Path(bundle_dir), data_type, layer_widths, seed)
+        bundle_path = _find_latest_bundle(Path(bundle_dir), data_type, layer_widths)
     if not bundle_path or not bundle_path.exists():
         raise FileNotFoundError(f"Pyomo bundle not found for spec '{pretrain_spec}'. Looked in {bundle_dir}.")
     with open(bundle_path, "rb") as f:
@@ -123,7 +123,7 @@ def main(argv=None):
         params_for_seed = params_model.copy()
         # Handle Pyomo pretraining bundle injection
         if _is_pyomo_pretrain(pretrain_value):
-            bundle_path, bundle = _load_pyomo_bundle(pretrain_value, args.pyomo_bundle_dir, args.data_type, params_for_seed["layer_widths"], seed)
+            bundle_path, bundle = _load_pyomo_bundle(pretrain_value, args.pyomo_bundle_dir, args.data_type, params_for_seed["layer_widths"])
             pyomo_bundle_time = _bundle_time(bundle)
             pyomo_bundle_name = str(bundle_path)
             custom_params = bundle.get("weights_jax")

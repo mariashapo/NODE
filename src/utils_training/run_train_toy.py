@@ -349,9 +349,10 @@ class TrainerToy:
                     self.time_elapsed.append(time.time() - start_time)
                     start_time = time.time()  # Reset start time for next segment
         else:
+            max_iter = self.max_iter[0] if isinstance(self.max_iter, (list, tuple)) else self.max_iter
             self.state, losses_ = self.model.train(self.state, self.t, 
                                           self.y_noisy, self.init_state,
-                                          num_epochs = self.max_iter,
+                                          num_epochs = max_iter,
                                           verbose = self.verbose,
                                           log = self.log)
             self.losses.append(losses_)
@@ -452,8 +453,9 @@ class TrainerToy:
                     self.time_elapsed.append(time.time() - start_time)
                     start_time = time.time()  # Reset start time for next segment
         else:
+            max_iter = self.max_iter[0] if isinstance(self.max_iter, (list, tuple)) else self.max_iter
             losses_ = self.model.train_model(self.t, self.y_noisy, self.init_state,
-                                num_epochs=self.max_iter,
+                                num_epochs=max_iter,
                                 rtol=self.rtol, atol=self.atol, log = self.log)
             
             self.losses.append(losses_)
