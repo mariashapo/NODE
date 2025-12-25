@@ -67,11 +67,13 @@ class Graphs:
         x, y, y_lo, y_hi, *,
         title=None, xlabel=None, ylabel=None,
         xscale="log", yscale="linear",
-        marker="o", linewidth=2, alpha_band=0.20,
+        marker="o", linewidth=1.5, alpha_band=0.20,
         show_points=True, add_errorbars=False,
         y_min_clip=None, y_max=None, ax=None,
         title_on=True,
         preserve_label_case=False,
+        label_fontsize=14,
+        title_fontsize=16,
     ):
         """
         Regularization curve with shaded confidence interval band (#1).
@@ -152,21 +154,32 @@ class Graphs:
                 yerr = np.vstack([y - y_lo_sym, y_hi_sym - y])
             else:
                 yerr = np.vstack([y - y_lo, y_hi - y])
-            ax.errorbar(x, y, yerr=yerr, fmt="none", capsize=4, zorder=5, color=ax.lines[-1].get_color())
+            ax.errorbar(
+                x,
+                y,
+                yerr=yerr,
+                fmt="none",
+                capsize=5,
+                elinewidth=2,
+                capthick=2,
+                zorder=6,
+                color=ax.lines[-1].get_color(),
+            )
 
         if title and title_on:
-            ax.set_title(title)
+            ax.set_title(title, fontsize=title_fontsize)
         if xlabel:
-            ax.set_xlabel(xlabel if preserve_label_case else xlabel.replace("_", " ").title())
+            ax.set_xlabel(xlabel if preserve_label_case else xlabel.replace("_", " ").title(), fontsize=label_fontsize)
         if ylabel:
-            ax.set_ylabel(ylabel if preserve_label_case else ylabel.replace("_", " ").title())
+            ax.set_ylabel(ylabel if preserve_label_case else ylabel.replace("_", " ").title(), fontsize=label_fontsize)
 
         ax.set_xscale(xscale)
         ax.set_yscale(yscale)
         if y_min_clip is not None or y_max is not None:
             ax.set_ylim(bottom=y_min_clip, top=y_max)
 
-        ax.grid(True, which="both", linestyle="--", alpha=0.4)
+        ax.grid(True, which="major", linestyle="--", alpha=0.35)
+        ax.grid(False, which="minor")
         if ax.figure:
             ax.figure.tight_layout()
         if created_new_ax:
