@@ -18,6 +18,9 @@ import numpy as np  # noqa: E402
 
 from utils_training.run_train_toy import TrainerToy  # noqa: E402
 
+LABEL_FONTSIZE = 14
+TITLE_FONTSIZE = 16
+
 
 def _to_np(x: Any) -> np.ndarray:
     """Convert torch/jax/np arrays to NumPy."""
@@ -77,9 +80,9 @@ def _plot_combined(
         ax.plot(t_test, ys, color=colors["test_clean"], linewidth=2.0, linestyle="-.", label=lbl_test_clean)
         ax.plot(t_test, yp_te, color=colors["test_pred"], linewidth=2.0, linestyle=":", label=lbl_test_pred)
 
-    ax.set_title(title)
-    ax.set_xlabel("time")
-    ax.set_ylabel("value")
+    ax.set_title(title, fontsize=TITLE_FONTSIZE)
+    ax.set_xlabel("time", fontsize=LABEL_FONTSIZE)
+    ax.set_ylabel("value", fontsize=LABEL_FONTSIZE)
     ax.grid(True, linestyle="--", alpha=0.4)
 
     handles, labels = ax.get_legend_handles_labels()
@@ -121,13 +124,13 @@ def _plot_split_compare(
     axes = np.atleast_2d(axes)
 
     # base styling
-    axes[0, 0].set_title("Train")
-    axes[0, 1].set_title("Test")
-    axes[-1, 0].set_xlabel("time")
-    axes[-1, 1].set_xlabel("time")
+    axes[0, 0].set_title("Train", fontsize=TITLE_FONTSIZE)
+    axes[0, 1].set_title("Test", fontsize=TITLE_FONTSIZE)
+    axes[-1, 0].set_xlabel("Time", fontsize=LABEL_FONTSIZE)
+    axes[-1, 1].set_xlabel("Time", fontsize=LABEL_FONTSIZE)
     for r in range(n_rows):
-        axes[r, 0].set_ylabel(f"state {r} value")
-        axes[r, 1].set_ylabel(f"state {r} value")
+        axes[r, 0].set_ylabel(f"State {r} Value", fontsize=LABEL_FONTSIZE)
+        axes[r, 1].set_ylabel(f"State {r} Value", fontsize=LABEL_FONTSIZE)
 
     # Plot data once
     # Track global y-limits for optional syncing

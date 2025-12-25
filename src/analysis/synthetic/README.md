@@ -67,3 +67,13 @@ python -m src.analysis.synthetic.aggregate_pyomo_reg_search \
   --tol 1e-6 \
   --layer_width "[2,32,2]"
 ```
+Same, but hide the title:
+```bash
+python -m src.analysis.synthetic.aggregate_pyomo_reg_search \
+  --dir results/study_ho_reg/pyomo_ho_241225 \
+  --plot \
+  --metric mse_test_coll \
+  --tol 1e-6 \
+  --layer_width "[2,32,2]" \
+  --no_title
+```

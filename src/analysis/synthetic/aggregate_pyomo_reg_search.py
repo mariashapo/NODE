@@ -89,6 +89,16 @@ def aggregate_by_hparams(df: pd.DataFrame) -> pd.DataFrame:
     return agg_df
 
 
+def _pretty_metric(name: str) -> str:
+    mapping = {
+        "mse_test": "MSE Test",
+        "mse_train": "MSE Train",
+        "mse_test_coll": "MSE Test",
+        "mse_train_coll": "MSE Train",
+    }
+    return mapping.get(name, name.replace("_", " ").title())
+
+
 def main(argv=None):
     import argparse
     import ast
@@ -96,9 +106,11 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description="Aggregate Pyomo reg/width/tol sweeps with CIs.")
     ap.add_argument("--dir", default="results/study_ho_reg/pyomo_ho_241225", help="Folder with .pkl results")
     ap.add_argument("--plot", action="store_true", help="Plot a reg curve with CIs (pick metric/tol/layer_width).")
-    ap.add_argument("--metric", default="mse_test", choices=["mse_test", "mse_train", "mse_test_coll", "mse_train_coll"], help="Metric to plot when --plot is set.")
+    ap.add_argument("--metric", required=True, choices=["mse_test", "mse_train", "mse_test_coll", "mse_train_coll"], help="Metric to plot when --plot is set.")
     ap.add_argument("--tol", type=float, default=None, help="Filter tol value to plot; defaults to the first tol present.")
     ap.add_argument("--layer_width", type=str, default=None, help="Optional layer width to filter, e.g. \"[2,32,2]\".")
+    ap.add_argument("--no_title", action="store_true", help="Disable title on the plot.")
+    ap.add_argument("--show_points", action="store_true", help="Show point markers (default hidden to highlight error bars).")
     args = ap.parse_args(argv)
 
     df = load_reg_search(args.dir)
@@ -131,7 +143,9 @@ def main(argv=None):
             print(f"No rows for tol={target_tol} and layer_width={lw_filter or 'ANY'}.")
             return
 
-        metric = args.metric
+        metric = args.metric.strip()
+        metric_pretty_global = _pretty_metric(metric)
+        print(f"Plotting metric: {metric_pretty_global} (raw: {metric})")
         y_col = f"{metric}_mean"
         lo_col = f"{metric}_ci_lo"
         hi_col = f"{metric}_ci_hi"
@@ -146,22 +160,26 @@ def main(argv=None):
             if g.empty:
                 print(f"No valid rows to plot for lw={lw} (metric={metric}) after filtering n_runs>=3/NA.")
                 continue
+            metric_pretty = _pretty_metric(metric)
             Graphs.plot_reg_curve_ci(
                 g["penalty_lambda_reg"],
                 g[y_col],
                 g[lo_col],
                 g[hi_col],
-                title=f"{metric} vs reg (tol={target_tol}, lw={lw})",
-                xlabel="penalty_lambda_reg",
-                ylabel=f"{metric} (mean ± 95% CI)",
+                title=f"{metric_pretty} vs Reg (tol={target_tol}, lw={lw})" if not args.no_title else None,
+                xlabel="Lambda Reg",
+                ylabel=f"{metric_pretty} (Mean ± 95% CI)",
                 xscale="log",
                 yscale="log",
                 add_errorbars=True,
+                show_points=args.show_points,
+                title_on=not args.no_title,
+                preserve_label_case=True,
             )
 
 
 if __name__ == "__main__":
-    action = "dev"
+    action = "prod"
     if action == "dev":
         main([
             "--dir", "results/study_ho_reg/pyomo_ho_241225",

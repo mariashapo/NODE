@@ -69,7 +69,9 @@ class Graphs:
         xscale="log", yscale="linear",
         marker="o", linewidth=2, alpha_band=0.20,
         show_points=True, add_errorbars=False,
-        y_min_clip=None, y_max=None, ax=None
+        y_min_clip=None, y_max=None, ax=None,
+        title_on=True,
+        preserve_label_case=False,
     ):
         """
         Regularization curve with shaded confidence interval band (#1).
@@ -94,6 +96,10 @@ class Graphs:
             Overlay symmetric error bars derived from y_lo/y_hi.
         ax : matplotlib axis, optional
             Plot onto an existing axis; if None, create a new figure/axis.
+        title_on : bool
+            If False, suppress the title even if provided.
+        preserve_label_case : bool
+            If True, use xlabel/ylabel as-is (no underscore/title casing).
         """
 
         x = np.asarray(x, dtype=float)
@@ -148,12 +154,12 @@ class Graphs:
                 yerr = np.vstack([y - y_lo, y_hi - y])
             ax.errorbar(x, y, yerr=yerr, fmt="none", capsize=4, zorder=5, color=ax.lines[-1].get_color())
 
-        if title:
+        if title and title_on:
             ax.set_title(title)
         if xlabel:
-            ax.set_xlabel(xlabel)
+            ax.set_xlabel(xlabel if preserve_label_case else xlabel.replace("_", " ").title())
         if ylabel:
-            ax.set_ylabel(ylabel)
+            ax.set_ylabel(ylabel if preserve_label_case else ylabel.replace("_", " ").title())
 
         ax.set_xscale(xscale)
         ax.set_yscale(yscale)
