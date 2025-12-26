@@ -9,6 +9,7 @@ import jax.numpy as jnp
 import os
 import pickle
 from matplotlib.lines import Line2D
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes, mark_inset
 
 class Graphs:
     @staticmethod
@@ -74,6 +75,10 @@ class Graphs:
         preserve_label_case=False,
         label_fontsize=14,
         title_fontsize=16,
+        inset=False,
+        inset_min_x=1e-2,
+        inset_max_x=None,
+        inset_loc="lower left",
     ):
         """
         Regularization curve with shaded confidence interval band (#1).
@@ -102,6 +107,12 @@ class Graphs:
             If False, suppress the title even if provided.
         preserve_label_case : bool
             If True, use xlabel/ylabel as-is (no underscore/title casing).
+        inset : bool
+            If True, draw a zoomed inset for x >= inset_min_x (and <= inset_max_x if provided).
+        inset_min_x, inset_max_x : float
+            X-range for inset (log scale assumed); inset_max_x defaults to no upper bound.
+        inset_loc : str
+            Location string for inset_axes (e.g., 'lower left').
         """
 
         x = np.asarray(x, dtype=float)
@@ -184,6 +195,41 @@ class Graphs:
             ax.figure.tight_layout()
         if created_new_ax:
             plt.show()
+
+        # Optional inset for high-lambda region
+        if inset:
+            mask = x >= inset_min_x
+            if inset_max_x is not None:
+                mask &= x <= inset_max_x
+            if np.any(mask):
+                axins = inset_axes(ax, width="45%", height="45%", loc=inset_loc)
+                axins.plot(x[mask], y[mask], marker=marker if show_points else None, linewidth=linewidth)
+                axins.fill_between(x[mask], y_lo_fill[mask], y_hi_plot[mask], alpha=alpha_band)
+                if add_errorbars:
+                    if yscale == "log":
+                        yerr_ins = np.vstack([y[mask] - y_lo_sym[mask], y_hi_sym[mask] - y[mask]])
+                    else:
+                        yerr_ins = np.vstack([y[mask] - y_lo[mask], y_hi[mask] - y[mask]])
+                    axins.errorbar(
+                        x[mask],
+                        y[mask],
+                        yerr=yerr_ins,
+                        fmt="none",
+                        capsize=5,
+                        elinewidth=2,
+                        capthick=2,
+                        zorder=6,
+                        color=ax.lines[-1].get_color(),
+                    )
+                axins.set_xscale(xscale)
+                axins.set_yscale(yscale)
+                axins.set_ylim(
+                    bottom=0.8 * np.nanmin(y_lo_sym[mask]),
+                    top=1.2 * np.nanmax(y_hi_sym[mask]),
+                )
+                axins.grid(True, which="major", linestyle="--", alpha=0.25)
+                axins.grid(False, which="minor")
+                mark_inset(ax, axins, loc1=2, loc2=4, fc="none", ec="0.5", linewidth=0.8)
 
 
 class GraphsTraining:

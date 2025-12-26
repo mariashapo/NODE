@@ -111,6 +111,9 @@ def main(argv=None):
     ap.add_argument("--layer_width", type=str, default=None, help="Optional layer width to filter, e.g. \"[2,32,2]\".")
     ap.add_argument("--no_title", action="store_true", help="Disable title on the plot.")
     ap.add_argument("--show_points", action="store_true", help="Show point markers (default hidden to highlight error bars).")
+    ap.add_argument("--inset", action="store_true", help="Add a zoomed inset for high lambda region.")
+    ap.add_argument("--inset_min_x", type=float, default=1e-2, help="Lower bound for inset mask on x (log scale).")
+    ap.add_argument("--inset_max_x", type=float, default=None, help="Upper bound for inset mask on x (log scale).")
     args = ap.parse_args(argv)
 
     df = load_reg_search(args.dir)
@@ -175,6 +178,9 @@ def main(argv=None):
                 show_points=args.show_points,
                 title_on=not args.no_title,
                 preserve_label_case=True,
+                inset=args.inset,
+                inset_min_x=args.inset_min_x,
+                inset_max_x=args.inset_max_x,
             )
 
 

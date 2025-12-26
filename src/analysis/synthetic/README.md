@@ -77,3 +77,14 @@ python -m src.analysis.synthetic.aggregate_pyomo_reg_search \
   --layer_width "[2,32,2]" \
   --no_title
 ```
+
+### Quick VDP reg plot (collocation metric, auto tol/width detection)
+```bash
+python -m src.analysis.synthetic.aggregate_pyomo_reg_search \
+  --dir results/study_vdp_reg/pyomo_vdp_251225 \
+  --plot \
+  --metric mse_test_coll
+```
+Notes:
+- The script will load all pickles in the folder. If you omit `--tol`/`--layer_width`, it selects the first tol found and plots each layer width separately.
+- If files are corrupt/truncated, they’ll be skipped; ensure the pickles are valid if you see “No records loaded.”
