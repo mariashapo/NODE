@@ -111,6 +111,7 @@ def main(argv=None):
     ap.add_argument("--layer_width", type=str, default=None, help="Optional layer width to filter, e.g. \"[2,32,2]\".")
     ap.add_argument("--no_title", action="store_true", help="Disable title on the plot.")
     ap.add_argument("--show_points", action="store_true", help="Show point markers (default hidden to highlight error bars).")
+    ap.add_argument("--boxplot", action="store_true", help="Plot per-reg boxplots for the chosen metric.")
     ap.add_argument("--inset", action="store_true", help="Add a zoomed inset for high lambda region.")
     ap.add_argument("--inset_min_x", type=float, default=1e-2, help="Lower bound for inset mask on x (log scale).")
     ap.add_argument("--inset_max_x", type=float, default=None, help="Upper bound for inset mask on x (log scale).")
@@ -130,7 +131,8 @@ def main(argv=None):
         print("\nTop 10 by mse_test_mean:")
         print(best[["layer_widths", "penalty_lambda_reg", "tol", "mse_test_mean", "mse_train_mean", "n_runs"]])
 
-    if args.plot and not agg.empty:
+    # Shared plotting parameters (used by plot/boxplot)
+    if (args.plot or args.boxplot) and not agg.empty:
         target_tol = args.tol if args.tol is not None else agg["tol"].iloc[0]
         lw_filter = None
         if args.layer_width is not None:
@@ -139,6 +141,41 @@ def main(argv=None):
             except Exception:
                 print(f"Could not parse --layer_width '{args.layer_width}', ignoring filter.")
 
+        metric = args.metric.strip()
+        metric_pretty_global = _pretty_metric(metric)
+        print(f"Plotting metric: {metric_pretty_global} (raw: {metric})")
+
+        if args.boxplot:
+            df_box = df[df["tol"] == target_tol]
+            if lw_filter is not None:
+                df_box = df_box[df_box["layer_widths"] == lw_filter]
+            if df_box.empty:
+                print(f"No records for boxplot at tol={target_tol} and layer_width={lw_filter or 'ANY'}.")
+                return
+            data = []
+            labels = []
+            for reg, grp in df_box.groupby("penalty_lambda_reg"):
+                vals = grp[metric].dropna().values
+                if vals.size == 0:
+                    continue
+                data.append(vals)
+                labels.append(reg)
+            if not data:
+                print("No data to plot boxplots after filtering.")
+                return
+            Graphs.plot_single_boxplot(
+                data,
+                labels,
+                title=None if args.no_title else f"{metric_pretty_global} vs λ (tol={target_tol}, lw={lw_filter or 'ALL'})",
+                ylabel=metric_pretty_global,
+                x_label="λ",
+                y_log=True,
+                color="C0",
+                label="",
+            )
+            return
+
+        # curve plot path
         sub = agg[agg["tol"] == target_tol]
         if lw_filter is not None:
             sub = sub[sub["layer_widths"] == lw_filter]
@@ -146,9 +183,6 @@ def main(argv=None):
             print(f"No rows for tol={target_tol} and layer_width={lw_filter or 'ANY'}.")
             return
 
-        metric = args.metric.strip()
-        metric_pretty_global = _pretty_metric(metric)
-        print(f"Plotting metric: {metric_pretty_global} (raw: {metric})")
         y_col = f"{metric}_mean"
         lo_col = f"{metric}_ci_lo"
         hi_col = f"{metric}_ci_hi"
@@ -170,11 +204,11 @@ def main(argv=None):
                 g[lo_col],
                 g[hi_col],
                 title=f"{metric_pretty} vs Reg (tol={target_tol}, lw={lw})" if not args.no_title else None,
-                xlabel="Lambda Reg",
+                xlabel="λ",
                 ylabel=f"{metric_pretty} (Mean ± 95% CI)",
                 xscale="log",
                 yscale="log",
-                add_errorbars=True,
+                add_errorbars=False,
                 show_points=args.show_points,
                 title_on=not args.no_title,
                 preserve_label_case=True,

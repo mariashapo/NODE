@@ -85,6 +85,13 @@ python -m src.analysis.synthetic.aggregate_pyomo_reg_search \
   --plot \
   --metric mse_test_coll
 ```
+Boxplot variant (per-reg distributions):
+```bash
+python -m src.analysis.synthetic.aggregate_pyomo_reg_search \
+  --dir results/study_vdp_reg/pyomo_vdp_251225 \
+  --boxplot \
+  --metric mse_test_coll
+```
 Notes:
 - The script will load all pickles in the folder. If you omit `--tol`/`--layer_width`, it selects the first tol found and plots each layer width separately.
 - If files are corrupt/truncated, they’ll be skipped; ensure the pickles are valid if you see “No records loaded.”
