@@ -1,0 +1,34 @@
+{
+  "args": {
+    "no_print": false,
+    "config": "src/configs/config_pyomo_synth.json",
+    "exp": "default",
+    "n_seeds": 1,
+    "outdir": "results/study_vdp",
+    "data_type": "vdp",
+    "layer_width": [
+      2,
+      4,
+      4,
+      2
+    ],
+    "penalty_lambda_reg": 0.1,
+    "tol": 1e-08,
+    "time_invariant": false,
+    "t_range": null,
+    "n_steps": 1,
+    "meta": true
+  },
+  "timestamp": "2025-12-29_20-27",
+  "exp": "default",
+  "layer_width": [
+    2,
+    4,
+    4,
+    2
+  ],
+  "penalty_lambda_reg": 0.1,
+  "tol": 1e-08,
+  "t_range": null,
+  "n_steps": 1
+}

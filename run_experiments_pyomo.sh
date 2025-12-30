@@ -24,7 +24,7 @@ micromamba run -n "$ENV" python -m src.training_convergence.training_conv_pyomo 
   --exp "default"
 
 micromamba run -n "$ENV" python -m src.training_convergence.training_conv_pyomo \
-  --layer_width '[3,32,2]' --penalty_lambda_reg 0.1 --tol 1e-8 --time_invariant False \
+  --layer_width '[2,32,2]' --penalty_lambda_reg 0.1 --tol 1e-8 --time_invariant False \
   --t_range '[0.01,30]' --n_steps 30 \
   --no_print True --n_seeds 15 --outdir "$OUTDIR" --data_type "$DATA_TYPE" \
-  --exp "training_convergence_wall_time"
+  --exp "network_size_grid_search"

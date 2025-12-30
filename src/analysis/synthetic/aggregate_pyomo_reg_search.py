@@ -10,9 +10,32 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from utils.analyse_results import Graphs
 from math import sqrt
+import numpy as np
+import json
 
 def load_reg_search(dir_path: str = "results/study_vdp_reg/pyomo_vdp") -> pd.DataFrame:
-    """Load all .pkl result files into a flat DataFrame (one row per run)."""
+    """Load all .pkl result files into a flat DataFrame (one row per run).
+
+    Handles both (layer_widths, reg, tol) keys and wall-time sweeps that use
+    (data_type, pre_initialize, max_wall_time) keys. For the latter, we also
+    pull defaults like layer_width/penalty_lambda_reg/tol from run_meta.json
+    if present in the folder so downstream plotting still has sensible columns.
+    """
+    # Optional defaults from a companion run_meta.json
+    meta_defaults = {}
+    meta_path = Path(dir_path) / "run_meta.json"
+    if meta_path.exists():
+        try:
+            with open(meta_path, "r") as f:
+                meta = json.load(f)
+            # promote a few handy fields if present
+            for k in ("layer_width", "penalty_lambda_reg", "tol", "data_type"):
+                if k in meta:
+                    meta_defaults[k] = meta[k]
+        except Exception as exc:  # pragma: no cover
+            print(f"Failed to read {meta_path}: {exc}")
+            meta_defaults = {}
+
     records = []
     for fp in sorted(Path(dir_path).glob("*.pkl")):
         try:
@@ -26,15 +49,32 @@ def load_reg_search(dir_path: str = "results/study_vdp_reg/pyomo_vdp") -> pd.Dat
             if not isinstance(key, (tuple, list)) or len(key) != 3:
                 print(f"Skipping unexpected key {key} in {fp}")
                 continue
-            lw, reg, tol = key
+
+            # Two known key layouts:
+            # 1) (layer_widths, reg, tol)
+            # 2) (data_type, pre_initialize, max_wall_time)
+            if isinstance(key[0], str) and isinstance(key[1], (bool, np.bool_)):
+                data_type, pre_init, max_wall_time = key
+                lw = meta_defaults.get("layer_width")
+                reg = meta_defaults.get("penalty_lambda_reg")
+                tol = meta_defaults.get("tol")
+            else:
+                lw, reg, tol = key
+                data_type = meta_defaults.get("data_type")
+                pre_init = None
+                max_wall_time = None
 
             def _get(name, default=float("nan")):
                 return val.get(name, default) if isinstance(val, dict) else default
 
+            lw_clean = tuple(lw) if isinstance(lw, (list, tuple)) else lw
             records.append(
                 {
                     "file": fp.name,
-                    "layer_widths": lw,
+                    "layer_widths": lw_clean,
+                    "data_type": data_type,
+                    "pre_initialize": pre_init,
+                    "max_wall_time": max_wall_time,
                     "penalty_lambda_reg": reg,
                     "tol": tol,
                     "mse_train": float(_get("mse_train")),
@@ -54,7 +94,7 @@ def aggregate_by_hparams(df: pd.DataFrame) -> pd.DataFrame:
     """Group by (layer_widths, penalty_lambda_reg, tol) and average metrics + 95% CIs."""
     if df.empty:
         return df
-    group_cols = ["layer_widths", "penalty_lambda_reg", "tol"]
+    group_cols = [c for c in ["layer_widths", "penalty_lambda_reg", "tol", "data_type", "pre_initialize", "max_wall_time"] if c in df.columns]
 
     def _ci(series: pd.Series):
         n = series.count()
@@ -98,6 +138,12 @@ def _pretty_metric(name: str) -> str:
     }
     return mapping.get(name, name.replace("_", " ").title())
 
+def _format_layer_width(lw) -> str:
+    """Human-readable layer width label."""
+    if isinstance(lw, (list, tuple)):
+        return "x".join(str(x) for x in lw)
+    return str(lw)
+
 
 def main(argv=None):
     import argparse
@@ -107,8 +153,10 @@ def main(argv=None):
     ap.add_argument("--dir", default="results/study_ho_reg/pyomo_ho_241225", help="Folder with .pkl results")
     ap.add_argument("--plot", action="store_true", help="Plot a reg curve with CIs (pick metric/tol/layer_width).")
     ap.add_argument("--metric", required=True, choices=["mse_test", "mse_train", "mse_test_coll", "mse_train_coll"], help="Metric to plot when --plot is set.")
-    ap.add_argument("--tol", type=float, default=None, help="Filter tol value to plot; defaults to the first tol present.")
+    ap.add_argument("--tol", type=float, default=None, help="Filter tol value (used unless --x_axis tol). Defaults to first tol present.")
+    ap.add_argument("--reg", type=float, default=None, help="Filter regularization value when plotting tol/width curves.")
     ap.add_argument("--layer_width", type=str, default=None, help="Optional layer width to filter, e.g. \"[2,32,2]\".")
+    ap.add_argument("--x_axis", choices=["reg", "tol", "width"], default="reg", help="Which hyperparameter to use on the x-axis.")
     ap.add_argument("--no_title", action="store_true", help="Disable title on the plot.")
     ap.add_argument("--show_points", action="store_true", help="Show point markers (default hidden to highlight error bars).")
     ap.add_argument("--boxplot", action="store_true", help="Plot per-reg boxplots for the chosen metric.")
@@ -133,7 +181,8 @@ def main(argv=None):
 
     # Shared plotting parameters (used by plot/boxplot)
     if (args.plot or args.boxplot) and not agg.empty:
-        target_tol = args.tol if args.tol is not None else agg["tol"].iloc[0]
+        target_tol = args.tol if args.tol is not None else (agg["tol"].iloc[0] if "tol" in agg.columns else None)
+        target_reg = args.reg if args.reg is not None else (agg["penalty_lambda_reg"].iloc[0] if "penalty_lambda_reg" in agg.columns else None)
         lw_filter = None
         if args.layer_width is not None:
             try:
@@ -146,29 +195,46 @@ def main(argv=None):
         print(f"Plotting metric: {metric_pretty_global} (raw: {metric})")
 
         if args.boxplot:
-            df_box = df[df["tol"] == target_tol]
-            if lw_filter is not None:
-                df_box = df_box[df_box["layer_widths"] == lw_filter]
+            if args.x_axis == "reg":
+                df_box = df[df["tol"] == target_tol]
+                if lw_filter is not None:
+                    df_box = df_box[df_box["layer_widths"] == lw_filter]
+                label_col = "penalty_lambda_reg"
+                title = None if args.no_title else f"{metric_pretty_global} vs λ (tol={target_tol}, lw={lw_filter or 'ALL'})"
+                x_label = "λ"
+            elif args.x_axis == "tol":
+                df_box = df[df["penalty_lambda_reg"] == target_reg]
+                if lw_filter is not None:
+                    df_box = df_box[df_box["layer_widths"] == lw_filter]
+                label_col = "tol"
+                title = None if args.no_title else f"{metric_pretty_global} vs tol (λ={target_reg}, lw={lw_filter or 'ALL'})"
+                x_label = "tol"
+            else:  # width boxplot
+                df_box = df[(df["penalty_lambda_reg"] == target_reg) & (df["tol"] == target_tol)]
+                label_col = "layer_widths"
+                title = None if args.no_title else f"{metric_pretty_global} vs width (λ={target_reg}, tol={target_tol})"
+                x_label = "Layer width"
+
             if df_box.empty:
-                print(f"No records for boxplot at tol={target_tol} and layer_width={lw_filter or 'ANY'}.")
+                print(f"No records for boxplot with filters reg={target_reg}, tol={target_tol}, lw={lw_filter or 'ANY'}.")
                 return
-            data = []
-            labels = []
-            for reg, grp in df_box.groupby("penalty_lambda_reg"):
+
+            data, labels = [], []
+            for lbl, grp in df_box.groupby(label_col):
                 vals = grp[metric].dropna().values
                 if vals.size == 0:
                     continue
                 data.append(vals)
-                labels.append(reg)
+                labels.append(_format_layer_width(lbl) if label_col == "layer_widths" else lbl)
             if not data:
                 print("No data to plot boxplots after filtering.")
                 return
             Graphs.plot_single_boxplot(
                 data,
                 labels,
-                title=None if args.no_title else f"{metric_pretty_global} vs λ (tol={target_tol}, lw={lw_filter or 'ALL'})",
+                title=title,
                 ylabel=metric_pretty_global,
-                x_label="λ",
+                x_label=x_label,
                 y_log=True,
                 color="C0",
                 label="",
@@ -176,43 +242,94 @@ def main(argv=None):
             return
 
         # curve plot path
-        sub = agg[agg["tol"] == target_tol]
-        if lw_filter is not None:
-            sub = sub[sub["layer_widths"] == lw_filter]
-        if sub.empty:
-            print(f"No rows for tol={target_tol} and layer_width={lw_filter or 'ANY'}.")
-            return
-
+        metric_pretty = _pretty_metric(metric)
         y_col = f"{metric}_mean"
         lo_col = f"{metric}_ci_lo"
         hi_col = f"{metric}_ci_hi"
-        if y_col not in sub.columns or lo_col not in sub.columns or hi_col not in sub.columns:
+        if y_col not in agg.columns or lo_col not in agg.columns or hi_col not in agg.columns:
             print(f"Columns for metric '{metric}' not found in aggregated data.")
             return
 
-        # If multiple layer widths remain, plot each separately
-        for lw, g in sub.groupby("layer_widths"):
-            # Drop rows with NA CIs/means and low run counts
-            g = g[(g["n_runs"] >= 3)].dropna(subset=[y_col, lo_col, hi_col])
+        x_axis = args.x_axis
+        if x_axis == "reg":
+            sub = agg[agg["tol"] == target_tol]
+            xlabel = "λ"
+            xscale = "log"
+            x_col = "penalty_lambda_reg"
+            title_suffix = f"tol={target_tol}"
+        elif x_axis == "tol":
+            sub = agg[agg["penalty_lambda_reg"] == target_reg]
+            xlabel = "tol"
+            xscale = "log"
+            x_col = "tol"
+            title_suffix = f"λ={target_reg}"
+        else:  # width on x-axis
+            sub = agg[(agg["penalty_lambda_reg"] == target_reg) & (agg["tol"] == target_tol)]
+            xlabel = "Layer width"
+            xscale = "linear"
+            x_col = "layer_widths"
+            title_suffix = f"λ={target_reg}, tol={target_tol}"
+
+        if lw_filter is not None and x_axis != "width":
+            sub = sub[sub["layer_widths"] == lw_filter]
+
+        if sub.empty:
+            print(f"No rows for plot with filters reg={target_reg}, tol={target_tol}, layer_width={lw_filter or 'ANY'}.")
+            return
+
+        if x_axis == "width":
+            g = sub[(sub["n_runs"] >= 3)].dropna(subset=[y_col, lo_col, hi_col]).sort_values("layer_widths")
             if g.empty:
-                print(f"No valid rows to plot for lw={lw} (metric={metric}) after filtering n_runs>=3/NA.")
-                continue
-            metric_pretty = _pretty_metric(metric)
+                print("No valid rows to plot after filtering n_runs>=3/NA for width axis.")
+                return
+            labels = [_format_layer_width(lw) for lw in g["layer_widths"]]
+            x_vals = np.arange(len(g))
+            fig, ax = plt.subplots(figsize=(8, 5))
             Graphs.plot_reg_curve_ci(
-                g["penalty_lambda_reg"],
+                x_vals,
                 g[y_col],
                 g[lo_col],
                 g[hi_col],
-                title=f"{metric_pretty} vs Reg (tol={target_tol}, lw={lw})" if not args.no_title else None,
-                xlabel="λ",
+                title=f"{metric_pretty} vs Width ({title_suffix})" if not args.no_title else None,
+                xlabel=xlabel,
                 ylabel=f"{metric_pretty} (Mean ± 95% CI)",
-                xscale="log",
+                xscale=xscale,
                 yscale="log",
                 add_errorbars=False,
                 show_points=args.show_points,
                 title_on=not args.no_title,
                 preserve_label_case=True,
-                inset=args.inset,
+                inset=False,
+                ax=ax,
+            )
+            ax.set_xticks(x_vals)
+            ax.set_xticklabels(labels, rotation=20, ha="right")
+            fig.tight_layout()
+            plt.show()
+            return
+
+        # If multiple layer widths remain, plot each separately for reg/tol curves
+        for lw, g in sub.groupby("layer_widths"):
+            # Drop rows with NA CIs/means and low run counts
+            g = g[(g["n_runs"] >= 3)].dropna(subset=[y_col, lo_col, hi_col])
+            if g.empty:
+                print(f"No valid rows to plot for lw={lw} (metric={metric}, x={x_axis}) after filtering n_runs>=3/NA.")
+                continue
+            Graphs.plot_reg_curve_ci(
+                g[x_col],
+                g[y_col],
+                g[lo_col],
+                g[hi_col],
+                title=f"{metric_pretty} vs {xlabel} ({title_suffix}, lw={lw})" if not args.no_title else None,
+                xlabel=xlabel,
+                ylabel=f"{metric_pretty} (Mean ± 95% CI)",
+                xscale=xscale,
+                yscale="log",
+                add_errorbars=False,
+                show_points=args.show_points,
+                title_on=not args.no_title,
+                preserve_label_case=True,
+                inset=args.inset if x_axis == "reg" else False,
                 inset_min_x=args.inset_min_x,
                 inset_max_x=args.inset_max_x,
             )
