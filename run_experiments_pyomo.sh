@@ -19,12 +19,12 @@ micromamba run -n "$ENV" pip install pympler
 # Pyomo experiments
 # --------------------------
 micromamba run -n "$ENV" python -m src.training_convergence.training_conv_pyomo \
-  --layer_width '[2,4,4,2]' --penalty_lambda_reg 0.1 --tol 1e-8 --time_invariant False \
+  --layer_width '[2,4,4,2]' --penalty_lambda_reg 0.1 --tol 1e-8 --time_invariant True \
   --no_print "False" --n_seeds 1 --outdir "$OUTDIR" --data_type "$DATA_TYPE" \
   --exp "default"
 
 micromamba run -n "$ENV" python -m src.training_convergence.training_conv_pyomo \
-  --layer_width '[2,32,2]' --penalty_lambda_reg 0.1 --tol 1e-8 --time_invariant False \
+  --layer_width '[2,32,2]' --penalty_lambda_reg 0.1 --tol 1e-8 --time_invariant True \
   --t_range '[0.01,30]' --n_steps 30 \
   --no_print True --n_seeds 15 --outdir "$OUTDIR" --data_type "$DATA_TYPE" \
   --exp "network_size_grid_search"

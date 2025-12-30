@@ -94,7 +94,10 @@ def aggregate_by_hparams(df: pd.DataFrame) -> pd.DataFrame:
     """Group by (layer_widths, penalty_lambda_reg, tol) and average metrics + 95% CIs."""
     if df.empty:
         return df
-    group_cols = [c for c in ["layer_widths", "penalty_lambda_reg", "tol", "data_type", "pre_initialize", "max_wall_time"] if c in df.columns]
+    group_cols = [
+        c for c in ["layer_widths", "penalty_lambda_reg", "tol", "data_type", "pre_initialize", "max_wall_time"]
+        if c in df.columns and not df[c].isna().all()
+    ]
 
     def _ci(series: pd.Series):
         n = series.count()
@@ -106,26 +109,45 @@ def aggregate_by_hparams(df: pd.DataFrame) -> pd.DataFrame:
         return (mean - half, mean + half)
 
     agg_df = (
-        df.groupby(group_cols)
-        .agg(
-            mse_train_mean=("mse_train", "mean"),
-            mse_test_mean=("mse_test", "mean"),
-            mse_train_coll_mean=("mse_train_coll", "mean"),
-            mse_test_coll_mean=("mse_test_coll", "mean"),
-            time_elapsed_mean=("time_elapsed", "mean"),
-            mse_train_ci=("mse_train", _ci),
-            mse_test_ci=("mse_test", _ci),
-            mse_train_coll_ci=("mse_train_coll", _ci),
-            mse_test_coll_ci=("mse_test_coll", _ci),
-            time_elapsed_ci=("time_elapsed", _ci),
-            n_runs=("file", "count"),
-        )
-        .reset_index()
+        df.groupby(group_cols, dropna=False)
+          .agg(
+              mse_train_mean=("mse_train", "mean"),
+              mse_test_mean=("mse_test", "mean"),
+              mse_train_coll_mean=("mse_train_coll", "mean"),
+              mse_test_coll_mean=("mse_test_coll", "mean"),
+              time_elapsed_mean=("time_elapsed", "mean"),
+              mse_train_ci=("mse_train", _ci),
+              mse_test_ci=("mse_test", _ci),
+              mse_train_coll_ci=("mse_train_coll", _ci),
+              mse_test_coll_ci=("mse_test_coll", _ci),
+              time_elapsed_ci=("time_elapsed", _ci),
+              n_runs=("file", "count"),
+          )
+          .reset_index()
     )
     # split CI tuples into separate columns for easier plotting
+    def _split_ci(colname: str):
+        vals = agg_df[colname]
+        # Normalize to (lo, hi) tuples; if malformed, use (nan, nan)
+        normed = []
+        for v in vals:
+            if isinstance(v, (tuple, list)) and len(v) == 2:
+                lo, hi = v
+                lo = np.nan if pd.isna(lo) else lo
+                hi = np.nan if pd.isna(hi) else hi
+                normed.append((lo, hi))
+            else:
+                normed.append((np.nan, np.nan))
+        arr = np.array(normed, dtype=float)
+        if arr.ndim == 1:
+            arr = np.stack([arr, arr], axis=-1) if arr.size == 2 else np.full((len(vals), 2), np.nan)
+        elif arr.shape[1] != 2:
+            arr = np.full((len(vals), 2), np.nan)
+        agg_df[[f"{colname}_lo", f"{colname}_hi"]] = pd.DataFrame(arr, index=agg_df.index)
+        agg_df.drop(columns=[colname], inplace=True)
+
     for col in ("mse_train_ci", "mse_test_ci", "time_elapsed_ci", "mse_train_coll_ci", "mse_test_coll_ci"):
-        agg_df[[f"{col}_lo", f"{col}_hi"]] = pd.DataFrame(agg_df[col].tolist(), index=agg_df.index)
-        agg_df.drop(columns=[col], inplace=True)
+        _split_ci(col)
     return agg_df
 
 

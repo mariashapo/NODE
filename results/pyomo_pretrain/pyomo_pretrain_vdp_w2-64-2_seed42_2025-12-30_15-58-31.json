@@ -1,6 +1,6 @@
 {
-  "bundle": "pyomo_pretrain_vdp_w2-64-2_seed42_2025-12-24_12-50-07.pkl",
-  "timestamp": "2025-12-24_12-50-07",
+  "bundle": "pyomo_pretrain_vdp_w2-64-2_seed42_2025-12-30_15-58-31.pkl",
+  "timestamp": "2025-12-30_15-58-31",
   "data_type": "vdp",
   "layer_widths": [
     2,
@@ -9,8 +9,8 @@
   ],
   "seed": 42,
   "timing": {
-    "solver_time": 23.41431188583374,
-    "wall_time": 25.00292420387268
+    "solver_time": 19.33062505722046,
+    "wall_time": 20.560693979263306
   },
   "termination": "optimal",
   "metrics": {
