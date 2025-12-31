@@ -94,6 +94,13 @@ def aggregate_by_hparams(df: pd.DataFrame) -> pd.DataFrame:
     """Group by (layer_widths, penalty_lambda_reg, tol) and average metrics + 95% CIs."""
     if df.empty:
         return df
+    # Drop rows where all key metrics are NaN so n_runs reflects valid entries
+    metric_cols = ["mse_train", "mse_test", "mse_train_coll", "mse_test_coll", "time_elapsed"]
+    metric_cols = [c for c in metric_cols if c in df.columns]
+    if metric_cols:
+        df = df.dropna(subset=metric_cols, how="all")
+    if df.empty:
+        return df
     group_cols = [
         c for c in ["layer_widths", "penalty_lambda_reg", "tol", "data_type", "pre_initialize", "max_wall_time"]
         if c in df.columns and not df[c].isna().all()
@@ -157,6 +164,7 @@ def _pretty_metric(name: str) -> str:
         "mse_train": "MSE Train",
         "mse_test_coll": "MSE Test",
         "mse_train_coll": "MSE Train",
+        "time_elapsed": "Time Elapsed (s)",
     }
     return mapping.get(name, name.replace("_", " ").title())
 
@@ -174,7 +182,12 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description="Aggregate Pyomo reg/width/tol sweeps with CIs.")
     ap.add_argument("--dir", default="results/study_ho_reg/pyomo_ho_241225", help="Folder with .pkl results")
     ap.add_argument("--plot", action="store_true", help="Plot a reg curve with CIs (pick metric/tol/layer_width).")
-    ap.add_argument("--metric", required=True, choices=["mse_test", "mse_train", "mse_test_coll", "mse_train_coll"], help="Metric to plot when --plot is set.")
+    ap.add_argument(
+        "--metric",
+        required=True,
+        choices=["mse_test", "mse_train", "mse_test_coll", "mse_train_coll", "time_elapsed"],
+        help="Metric to plot when --plot is set.",
+    )
     ap.add_argument("--tol", type=float, default=None, help="Filter tol value (used unless --x_axis tol). Defaults to first tol present.")
     ap.add_argument("--reg", type=float, default=None, help="Filter regularization value when plotting tol/width curves.")
     ap.add_argument("--layer_width", type=str, default=None, help="Optional layer width to filter, e.g. \"[2,32,2]\".")
@@ -185,6 +198,7 @@ def main(argv=None):
     ap.add_argument("--inset", action="store_true", help="Add a zoomed inset for high lambda region.")
     ap.add_argument("--inset_min_x", type=float, default=1e-2, help="Lower bound for inset mask on x (log scale).")
     ap.add_argument("--inset_max_x", type=float, default=None, help="Upper bound for inset mask on x (log scale).")
+    ap.add_argument("--min_runs", type=int, default=3, help="Minimum runs required per point (default: 3).")
     args = ap.parse_args(argv)
 
     df = load_reg_search(args.dir)
@@ -273,6 +287,7 @@ def main(argv=None):
             return
 
         x_axis = args.x_axis
+        yscale = "linear" if metric.startswith("time") else "log"
         if x_axis == "reg":
             sub = agg[agg["tol"] == target_tol]
             xlabel = "λ"
@@ -300,7 +315,11 @@ def main(argv=None):
             return
 
         if x_axis == "width":
-            g = sub[(sub["n_runs"] >= 3)].dropna(subset=[y_col, lo_col, hi_col]).sort_values("layer_widths")
+            g = sub[(sub["n_runs"] >= args.min_runs)].sort_values("layer_widths").copy()
+            # Keep rows even if CI has NaNs; fall back to mean
+            g[lo_col] = g[lo_col].fillna(g[y_col])
+            g[hi_col] = g[hi_col].fillna(g[y_col])
+            g = g.dropna(subset=[y_col])
             if g.empty:
                 print("No valid rows to plot after filtering n_runs>=3/NA for width axis.")
                 return
@@ -316,7 +335,7 @@ def main(argv=None):
                 xlabel=xlabel,
                 ylabel=f"{metric_pretty} (Mean ± 95% CI)",
                 xscale=xscale,
-                yscale="log",
+                yscale=yscale,
                 add_errorbars=False,
                 show_points=args.show_points,
                 title_on=not args.no_title,
@@ -333,9 +352,9 @@ def main(argv=None):
         # If multiple layer widths remain, plot each separately for reg/tol curves
         for lw, g in sub.groupby("layer_widths"):
             # Drop rows with NA CIs/means and low run counts
-            g = g[(g["n_runs"] >= 3)].dropna(subset=[y_col, lo_col, hi_col])
+            g = g[(g["n_runs"] >= args.min_runs)].dropna(subset=[y_col, lo_col, hi_col])
             if g.empty:
-                print(f"No valid rows to plot for lw={lw} (metric={metric}, x={x_axis}) after filtering n_runs>=3/NA.")
+                print(f"No valid rows to plot for lw={lw} (metric={metric}, x={x_axis}) after filtering n_runs>={args.min_runs}/NA.")
                 continue
             Graphs.plot_reg_curve_ci(
                 g[x_col],
@@ -346,7 +365,7 @@ def main(argv=None):
                 xlabel=xlabel,
                 ylabel=f"{metric_pretty} (Mean ± 95% CI)",
                 xscale=xscale,
-                yscale="log",
+                yscale=yscale,
                 add_errorbars=False,
                 show_points=args.show_points,
                 title_on=not args.no_title,
