@@ -9,6 +9,7 @@ DATA_TYPE="vdp"
 MAX_ITER="[1000,20000]"
 PRETRAIN='[0.2,1]'  # staged pretraining fractions
 N_SEEDS=5
+TIMING_ONLY=True
 WIDTHS=(
   "[2,4,2]"
   "[2,8,2]"
@@ -30,5 +31,5 @@ for W in "${WIDTHS[@]}"; do
     --pretrain "$PRETRAIN" \
     --outdir "$OUTDIR" \
     --n_seeds "$N_SEEDS" \
-    --no_print True
+    --timing_only "$TIMING_ONLY"
 done

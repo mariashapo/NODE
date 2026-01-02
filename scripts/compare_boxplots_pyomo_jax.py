@@ -12,6 +12,7 @@ Example:
 
 import argparse
 import pickle
+import json
 from pathlib import Path
 import numpy as np
 import matplotlib
@@ -19,8 +20,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
-from src.analysis.synthetic.aggregate_pyomo_reg_search import load_reg_search, aggregate_by_hparams, _format_layer_width
-from src.utils.analyse_results import Graphs
+from analysis.synthetic.aggregate_pyomo_reg_search import load_reg_search, aggregate_by_hparams, _format_layer_width
+from utils.analyse_results import Graphs
 
 
 def load_jax_folder(folder: Path):
@@ -31,26 +32,57 @@ def load_jax_folder(folder: Path):
             obj = pickle.load(fp.open("rb"))
         except Exception:
             continue
-        if isinstance(obj, dict):
-            vals.append(obj)
+        vals.append(obj)
     return vals
 
 
-def flatten_dict_of_dicts(objs, metric):
+def load_jax_meta(folder: Path):
+    meta_path = folder / "run_meta.json"
+    if not meta_path.exists():
+        return {}
+    try:
+        with meta_path.open("r") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def flatten_dict_of_dicts(objs, metric, default_lw=None):
     rows = []
     for obj in objs:
-        for k, v in obj.items():
-            if not isinstance(k, (tuple, list)) or len(k) < 3:
-                continue
-            lw, reg, tol = k[:3]
-            rows.append(
-                {
-                    "layer_widths": tuple(lw) if isinstance(lw, (list, tuple)) else lw,
-                    "penalty_lambda_reg": reg,
-                    "tol": tol,
-                    metric: v.get(metric, np.nan) if isinstance(v, dict) else np.nan,
-                }
-            )
+        if isinstance(obj, dict):
+            # dict-of-dicts keyed by (lw, reg, tol)
+            if all(isinstance(k, (tuple, list)) for k in obj.keys()):
+                for k, v in obj.items():
+                    if isinstance(k, (tuple, list)) and len(k) >= 3:
+                        lw, reg, tol = k[:3]
+                    else:
+                        lw = default_lw
+                        reg = tol = None
+                    rows.append(
+                        {
+                            "layer_widths": tuple(lw) if isinstance(lw, (list, tuple)) else lw,
+                            "penalty_lambda_reg": reg,
+                            "tol": tol,
+                            metric: v.get(metric, np.nan) if isinstance(v, dict) else np.nan,
+                        }
+                    )
+            else:
+                # flat dict with metrics
+                lw = obj.get("layer_widths") or obj.get("layer_width") or default_lw
+                reg = obj.get("penalty_lambda_reg")
+                tol = obj.get("tol")
+                rows.append(
+                    {
+                        "layer_widths": tuple(lw) if isinstance(lw, (list, tuple)) else lw,
+                        "penalty_lambda_reg": reg,
+                        "tol": tol,
+                        metric: obj.get(metric, np.nan),
+                    }
+                )
+        else:
+            # unsupported type; skip
+            continue
     return rows
 
 
@@ -69,8 +101,12 @@ def main(argv=None):
     agg_pyomo = agg_pyomo[(agg_pyomo["n_runs"] >= args.min_runs)]
 
     # JAX flat load
+    meta = load_jax_meta(args.jax_dir)
+    default_lw = None
+    if isinstance(meta, dict):
+        default_lw = meta.get("layer_width") or meta.get("args", {}).get("layer_width")
     jax_objs = load_jax_folder(args.jax_dir)
-    jax_rows = flatten_dict_of_dicts(jax_objs, args.metric)
+    jax_rows = flatten_dict_of_dicts(jax_objs, args.metric, default_lw=default_lw)
     import pandas as pd
 
     df_jax = pd.DataFrame(jax_rows)

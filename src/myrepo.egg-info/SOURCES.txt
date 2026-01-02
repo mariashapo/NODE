@@ -1,5 +1,6 @@
 README.md
 pyproject.toml
+src/analysis/synthetic/aggregate_pyomo_reg_search.py
 src/models/nn_jax_diffrax.py
 src/models/nn_pyomo_admm.py
 src/models/nn_pyomo_base.py
@@ -12,6 +13,9 @@ src/myrepo.egg-info/SOURCES.txt
 src/myrepo.egg-info/dependency_links.txt
 src/myrepo.egg-info/requires.txt
 src/myrepo.egg-info/top_level.txt
+src/training_convergence/plot_training_fit.py
+src/training_convergence/preview_pyomo_weights.py
+src/training_convergence/pyomo_pretrain.py
 src/training_convergence/training_conv_jax.py
 src/training_convergence/training_conv_pyomo.py
 src/training_convergence/training_conv_pytorch.py
@@ -23,6 +27,7 @@ src/utils/data_generation.py
 src/utils/general.py
 src/utils/interpolation.py
 src/utils/non_parametric_collocation.py
+src/utils/plot_utils.py
 src/utils/preprocess.py
 src/utils_training/__init__.py
 src/utils_training/optimize_diffrax_rl.py

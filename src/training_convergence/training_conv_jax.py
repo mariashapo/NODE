@@ -111,6 +111,8 @@ def main(argv=None):
     }
     
     run_date = time.strftime('%d%m%y')
+    layer_widths = args.layer_width if args.layer_width is not None else params_model["layer_widths"]
+    width_tag = _format_width_tag(layer_widths) if layer_widths is not None else "unknown"
     # all_results = []
     print("STARTING TRAINING")
     for seed in generate_seeds(args.n_seeds):
@@ -192,6 +194,9 @@ def main(argv=None):
         results["pyomo_pretraining"] = _is_pyomo_pretrain(pretrain_value)
         results["pyomo_pretraining_time"] = pyomo_bundle_time
         results["pyomo_bundle"] = pyomo_bundle_name
+        results["layer_widths"] = layer_widths
+        results["penalty_lambda_reg"] = params_model.get("penalty_lambda_reg")
+        results["reg_norm"] = params_model.get("reg_norm")
         print_memory("Current memory use: ")
         
         ts = time.strftime('%Y-%m-%d_%H-%M')
@@ -200,7 +205,7 @@ def main(argv=None):
 
         max_iter = str(args.max_iter).strip('[]').replace(',','_').replace(' ','')
         # Create a dated subfolder for this run
-        subdir = os.path.join(args.outdir, f"jax_{args.data_type}_{max_iter}_{run_date}")
+        subdir = os.path.join(args.outdir, f"jax_{args.data_type}_w{width_tag}_{max_iter}_{run_date}")
         os.makedirs(subdir, exist_ok=True)
 
         # Persist run metadata once per subdir for traceability
@@ -215,6 +220,9 @@ def main(argv=None):
                         "pyomo_pretraining": _is_pyomo_pretrain(pretrain_value),
                         "pyomo_bundle": pyomo_bundle_name,
                         "pyomo_pretraining_time": pyomo_bundle_time,
+                        "layer_width": layer_widths,
+                        "penalty_lambda_reg": params_model.get("penalty_lambda_reg"),
+                        "reg_norm": params_model.get("reg_norm"),
                     },
                     f,
                     indent=2,
