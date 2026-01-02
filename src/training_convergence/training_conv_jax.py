@@ -178,7 +178,7 @@ def main(argv=None):
             except Exception: pass
 
         if args.timing_only or not args.log:
-            results["train_loss"] = results_no_log.get("train_loss", getattr(trainer, "losses", None))
+            results["train_loss"] = results_no_log.get("train_loss")
             results["data_type"] = args.data_type
             results["pretrain"] = pretrain_value
             results["max_iter"] = args.max_iter
