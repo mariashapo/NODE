@@ -12,7 +12,6 @@ Example:
 
 import argparse
 import pickle
-import json
 from pathlib import Path
 import numpy as np
 import matplotlib
@@ -24,27 +23,17 @@ from analysis.synthetic.aggregate_pyomo_reg_search import load_reg_search, aggre
 from utils.analyse_results import Graphs
 
 
-def load_jax_folder(folder: Path):
+def load_jax_folder(folder: Path, recursive: bool = False):
     """Load JAX pickles (dict-of-dicts keyed by layer_widths/penalty/tol)."""
     vals = []
-    for fp in sorted(folder.glob("*.pkl")):
+    globber = folder.rglob if recursive else folder.glob
+    for fp in sorted(globber("*.pkl")):
         try:
             obj = pickle.load(fp.open("rb"))
         except Exception:
             continue
         vals.append(obj)
     return vals
-
-
-def load_jax_meta(folder: Path):
-    meta_path = folder / "run_meta.json"
-    if not meta_path.exists():
-        return {}
-    try:
-        with meta_path.open("r") as f:
-            return json.load(f)
-    except Exception:
-        return {}
 
 
 def flatten_dict_of_dicts(objs, metric, default_lw=None):
@@ -93,20 +82,21 @@ def main(argv=None):
     ap.add_argument("--metric", default="mse_test", help="Metric to compare (e.g., mse_test, mse_train).")
     ap.add_argument("--min_runs", type=int, default=3, help="Minimum runs per group to include.")
     ap.add_argument("--out", type=Path, default=None, help="Optional path to save the figure (png).")
+    ap.add_argument("--recursive", action="store_true", help="Recurse into subfolders when loading pickles.")
     args = ap.parse_args(argv)
 
     # Pyomo aggregate
     df_pyomo = load_reg_search(str(args.pyomo_dir))
     agg_pyomo = aggregate_by_hparams(df_pyomo)
+    if agg_pyomo.empty:
+        raise SystemExit("No Pyomo records found.")
+    if "n_runs" not in agg_pyomo.columns:
+        agg_pyomo["n_runs"] = 0
     agg_pyomo = agg_pyomo[(agg_pyomo["n_runs"] >= args.min_runs)]
 
     # JAX flat load
-    meta = load_jax_meta(args.jax_dir)
-    default_lw = None
-    if isinstance(meta, dict):
-        default_lw = meta.get("layer_width") or meta.get("args", {}).get("layer_width")
-    jax_objs = load_jax_folder(args.jax_dir)
-    jax_rows = flatten_dict_of_dicts(jax_objs, args.metric, default_lw=default_lw)
+    jax_objs = load_jax_folder(args.jax_dir, recursive=args.recursive)
+    jax_rows = flatten_dict_of_dicts(jax_objs, args.metric)
     import pandas as pd
 
     df_jax = pd.DataFrame(jax_rows)
@@ -118,6 +108,8 @@ def main(argv=None):
         )
         .reset_index()
     )
+    if "n_runs" not in agg_jax.columns:
+        agg_jax["n_runs"] = 0
     agg_jax = agg_jax[agg_jax["n_runs"] >= args.min_runs]
 
     # Align on layer_widths present in both

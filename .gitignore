@@ -10,3 +10,4 @@ data.txt
 *.png
 00_archive
 node_modules
+*.json
