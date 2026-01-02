@@ -120,3 +120,31 @@ python -m src.training_convergence.training_conv_pyomo --layer_width '[2,32,2]' 
 - PyTorch batches (VDP): `bash run_experiments_pytorch.sh`
 - JAX/Diffrax batches (HO/VDP): `bash run_experiments_jax.sh`
 - Inspect results: notebooks under `src/analysis/synthetic/` (e.g., `00_training_convergence.ipynb`); aggregate Pyomo reg search via `python src/analysis/synthetic/aggregate_pyomo_reg_search.py`
+
+## Regularization Study (Pyomo, VDP)
+- Launch sweep (reg/width/tol grid): `bash run_exp_pyomo_reg_width_tol.sh`
+- Aggregate/plot (reg on x-axis by default):
+  ```
+  python -m src.analysis.synthetic.aggregate_pyomo_reg_search \
+    --dir results/study_vdp_reg/pyomo_vdp \
+    --metric mse_test \
+    --plot \
+    --reg 0.1 --tol 1e-8 \
+    --x_axis reg
+  ```
+  Add `--boxplot` for boxplots; adjust `--metric`/`--reg`/`--tol` as needed.
+
+## Layer Width Study (Pyomo, VDP)
+- Launch sweep (width/reg/tol grid): `bash run_exp_pyomo_reg_width_tol.sh` (uses config lists for widths/regs/tols).
+- Aggregate/plot width on x-axis (works for `results/study_vdp/pyomo_vdp_*`):
+  ```
+  python -m src.analysis.synthetic.aggregate_pyomo_reg_search \
+    --dir results/study_vdp/pyomo_vdp_32_301225 \
+    --metric mse_test \
+    --plot \
+    --x_axis width \
+    --reg 0.1 \
+    --tol 1e-8 \
+    --min_runs 3
+  ```
+  Swap `--metric time_elapsed` to plot wall time; use `--boxplot` for boxplots; `--min_runs` controls the minimum seeds per point.

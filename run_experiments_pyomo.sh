@@ -5,8 +5,8 @@
 set -euo pipefail
 
 ENV="node25"
-OUTDIR="results/study_ho"
-DATA_TYPE="ho"
+OUTDIR="results/study_vdp"
+DATA_TYPE="vdp"
 
 # Ensure required dirs exist (safe even if you redirect logs outside)
 mkdir -p "$OUTDIR" logs
@@ -25,6 +25,5 @@ micromamba run -n "$ENV" python -m src.training_convergence.training_conv_pyomo 
 
 micromamba run -n "$ENV" python -m src.training_convergence.training_conv_pyomo \
   --penalty_lambda_reg 0.1 --time_invariant True \
-  # --t_range '[0.01,30]' --n_steps 30 --tol 1e-8 \
   --no_print True --n_seeds 15 --outdir "$OUTDIR" --data_type "$DATA_TYPE" \
   --exp "network_size_grid_search"

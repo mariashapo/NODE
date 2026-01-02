@@ -171,6 +171,9 @@ def _pretty_metric(name: str) -> str:
 def _format_layer_width(lw) -> str:
     """Human-readable layer width label."""
     if isinstance(lw, (list, tuple)):
+        # special-case [2, w, 2] -> just the middle width
+        if len(lw) == 3 and lw[0] == 2 and lw[-1] == 2:
+            return str(lw[1])
         return "x".join(str(x) for x in lw)
     return str(lw)
 
@@ -258,12 +261,12 @@ def main(argv=None):
             data, labels = [], []
             for lbl, grp in df_box.groupby(label_col):
                 vals = grp[metric].dropna().values
-                if vals.size == 0:
+                if vals.size < args.min_runs:
                     continue
                 data.append(vals)
                 labels.append(_format_layer_width(lbl) if label_col == "layer_widths" else lbl)
             if not data:
-                print("No data to plot boxplots after filtering.")
+                print(f"No data to plot boxplots after filtering (min_runs={args.min_runs}).")
                 return
             Graphs.plot_single_boxplot(
                 data,
@@ -331,8 +334,8 @@ def main(argv=None):
                 g[y_col],
                 g[lo_col],
                 g[hi_col],
-                title=f"{metric_pretty} vs Width ({title_suffix})" if not args.no_title else None,
-                xlabel=xlabel,
+                title=f"{metric_pretty} vs Width ({title_suffix}; arch=[2,w,2])" if not args.no_title else None,
+                xlabel="Width (architecture [2,w,2])",
                 ylabel=f"{metric_pretty} (Mean ± 95% CI)",
                 xscale=xscale,
                 yscale=yscale,

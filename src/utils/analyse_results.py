@@ -55,11 +55,6 @@ class Graphs:
             plt.yscale('log')
         
         plt.xticks(ticks=positions, labels=labels)
-        
-        patch = mpatches.Patch(color=color, label=label)  
-        
-        # plt.axhline(y=min_acc, color='r', linestyle='--', label='Minimum MSE')
-        plt.legend(handles=[patch], loc='upper left')
         plt.grid(True)
         plt.show()
 
