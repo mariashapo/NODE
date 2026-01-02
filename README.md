@@ -148,3 +148,15 @@ python -m src.training_convergence.training_conv_pyomo --layer_width '[2,32,2]' 
     --min_runs 3
   ```
   Swap `--metric time_elapsed` to plot wall time; use `--boxplot` for boxplots; `--min_runs` controls the minimum seeds per point.
+
+## Cross-model Boxplots (Pyomo vs JAX)
+- Compare metrics across layer widths:
+  ```
+  python scripts/compare_boxplots_pyomo_jax.py \
+    --pyomo_dir results/study_vdp/pyomo_vdp_32_301225 \
+    --jax_dir results/jax_pretrain_pyomo_vdp_w2-64-2/jax_vdp_5000_311225 \
+    --metric mse_test \
+    --min_runs 3 \
+    --out results/plots/pyomo_vs_jax_width.png
+  ```
+  Uses log-y for MSE; switch to `--metric time_elapsed` for wall-time (linear y).

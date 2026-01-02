@@ -40,21 +40,26 @@ class Graphs:
         plt.show()
         
     @staticmethod
-    def plot_single_boxplot(data, labels, title, ylabel, color='blue', label = 'Data Label',
-                            x_label = 'Model Size Configuration', y_log = True):
+    def plot_single_boxplot(
+        data, labels, title, ylabel,
+        color='blue', label='Data Label',
+        x_label='Model Size Configuration', y_log=True,
+        label_fontsize=14, tick_fontsize=12, title_fontsize=16,
+    ):
         n_groups = len(data)
         positions = [i + 1 for i in range(n_groups)]
         
         plt.figure(figsize=(10, 6))
         box = plt.boxplot(data, positions=positions, widths=0.6, patch_artist=True, boxprops=dict(facecolor=color))
         
-        plt.title(title)
-        plt.xlabel(x_label)
-        plt.ylabel(ylabel)
+        plt.title(title, fontsize=title_fontsize)
+        plt.xlabel(x_label, fontsize=label_fontsize)
+        plt.ylabel(ylabel, fontsize=label_fontsize)
         if y_log:
             plt.yscale('log')
         
-        plt.xticks(ticks=positions, labels=labels)
+        plt.xticks(ticks=positions, labels=labels, fontsize=tick_fontsize)
+        plt.tick_params(axis='y', labelsize=tick_fontsize)
         plt.grid(True)
         plt.show()
 
@@ -74,6 +79,7 @@ class Graphs:
         inset_min_x=1e-2,
         inset_max_x=None,
         inset_loc="lower left",
+        tick_fontsize=None,
     ):
         """
         Regularization curve with shaded confidence interval band (#1).
@@ -181,6 +187,8 @@ class Graphs:
 
         ax.set_xscale(xscale)
         ax.set_yscale(yscale)
+        if tick_fontsize is not None:
+            ax.tick_params(labelsize=tick_fontsize)
         if y_min_clip is not None or y_max is not None:
             ax.set_ylim(bottom=y_min_clip, top=y_max)
 

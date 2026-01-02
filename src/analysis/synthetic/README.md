@@ -92,6 +92,20 @@ python -m src.analysis.synthetic.aggregate_pyomo_reg_search \
   --boxplot \
   --metric mse_test_coll
 ```
+
+
+### Hidden layer widths
+```bash
+python -m src.analysis.synthetic.aggregate_pyomo_reg_search \
+  --dir results/study_vdp/pyomo_vdp_layer_width \
+  --metric mse_train_coll \
+  --plot \
+  --x_axis width \
+  --reg 0.1 \
+  --tol 1e-8 \
+  --min_runs 10 --boxplot --no_title
+```
+
 Notes:
 - The script will load all pickles in the folder. If you omit `--tol`/`--layer_width`, it selects the first tol found and plots each layer width separately.
 - If files are corrupt/truncated, they’ll be skipped; ensure the pickles are valid if you see “No records loaded.”

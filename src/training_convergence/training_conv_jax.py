@@ -78,7 +78,8 @@ def _build_parser():
     p.add_argument("--data_type", default = "ho")
     p.add_argument("--max_iter", type=json.loads, default=[200, 200])
     p.add_argument("--pretrain", type=str, default="[0.2,1]")
-    p.add_argument("--log", type=json.loads, default = 100)
+    p.add_argument("--log", type=json.loads, default=100)
+    p.add_argument("--timing_only", type=str2bool, default=False, help="Skip the logging run; run only the timing pass.")
     p.add_argument("--layer_width", type=json.loads, default=None)
     p.add_argument("--reg_norm", type=str2bool, nargs="?", const=True, default=False)
     p.add_argument("--time_invariant", type=str2bool, default=True)
@@ -132,7 +133,7 @@ def main(argv=None):
             params_for_seed["pretrain"] = False  # skip fractional pretraining; use weights instead
         print_memory("Memory use loop start: ")
         try:
-            if args.log > 0:
+            if (not args.timing_only) and args.log > 0:
                 trainer = Trainer.load_trainer(
                     args.data_type,
                     spacing_type="uniform",
@@ -174,7 +175,7 @@ def main(argv=None):
             try: ctypes.CDLL("libc.so.6").malloc_trim(0)
             except Exception: pass
 
-        if not args.log:
+        if args.timing_only or not args.log:
             results["train_loss"] = results_no_log.get("train_loss", getattr(trainer, "losses", None))
             results["data_type"] = args.data_type
             results["pretrain"] = pretrain_value

@@ -202,6 +202,9 @@ def main(argv=None):
     ap.add_argument("--inset_min_x", type=float, default=1e-2, help="Lower bound for inset mask on x (log scale).")
     ap.add_argument("--inset_max_x", type=float, default=None, help="Upper bound for inset mask on x (log scale).")
     ap.add_argument("--min_runs", type=int, default=3, help="Minimum runs required per point (default: 3).")
+    ap.add_argument("--label_fontsize", type=int, default=None, help="Axis label font size override.")
+    ap.add_argument("--tick_fontsize", type=int, default=None, help="Tick label font size override.")
+    ap.add_argument("--title_fontsize", type=int, default=None, help="Title font size override.")
     args = ap.parse_args(argv)
 
     df = load_reg_search(args.dir)
@@ -277,6 +280,9 @@ def main(argv=None):
                 y_log=True,
                 color="C0",
                 label="",
+                label_fontsize=args.label_fontsize or 14,
+                tick_fontsize=args.tick_fontsize or 12,
+                title_fontsize=args.title_fontsize or 16,
             )
             return
 
@@ -345,6 +351,9 @@ def main(argv=None):
                 preserve_label_case=True,
                 inset=False,
                 ax=ax,
+                label_fontsize=args.label_fontsize or 14,
+                title_fontsize=args.title_fontsize or 16,
+                tick_fontsize=args.tick_fontsize,
             )
             ax.set_xticks(x_vals)
             ax.set_xticklabels(labels, rotation=20, ha="right")
@@ -376,6 +385,9 @@ def main(argv=None):
                 inset=args.inset if x_axis == "reg" else False,
                 inset_min_x=args.inset_min_x,
                 inset_max_x=args.inset_max_x,
+                label_fontsize=args.label_fontsize or 14,
+                title_fontsize=args.title_fontsize or 16,
+                tick_fontsize=args.tick_fontsize,
             )
 
 
