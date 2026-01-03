@@ -39,6 +39,7 @@ def _build_parser():
     p.add_argument("--penalty_lambda_reg", type=float, default=None)
     p.add_argument("--tol", type=float, default=None)
     p.add_argument("--time_invariant", type=str2bool, default=True)
+    p.add_argument("--max_wall_time", type=float, default=None, help="Optional wall-time limit (seconds) for Pyomo solve.")
     # training_convergence_wall_time specific arguments:
     p.add_argument("--t_range", type=json.loads, default=None)
     p.add_argument("--n_steps", type=int, default=1)
@@ -69,6 +70,8 @@ def main(argv=None):
         print_memory("Memory use loop start: ")
         runner = PyomoExperimentRunner(args.config)
         runner.params_model["time_invariant"] = args.time_invariant
+        if args.max_wall_time is not None:
+            runner.params_model["params"]["max_wall_time"] = args.max_wall_time
         results, trainer = runner.run(
             args.exp,
             seed=seed,

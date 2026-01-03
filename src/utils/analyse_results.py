@@ -497,22 +497,35 @@ class Results:
     @staticmethod
     def parse_sequential_training(one_seed_result):
         """Parse results coming from the sequential training."""
-        # compute time for one iteration
-        # assume that the last iteration is the actual training & everything beforehand is just pre-training
-        t_elapsed = one_seed_result["time_elapsed"][-1]
-        n_records = len(one_seed_result["train_loss"][-1][0])
-        t_per_iter = t_elapsed / n_records
-        
-        iters = np.array(range(1, n_records + 1))
-        t_before = np.sum(one_seed_result["time_elapsed"][:-1])
-        t_iters = iters * t_per_iter + t_before
-        training_loss = np.array(one_seed_result["train_loss"][-1][0])
-        testing_loss = np.array(one_seed_result["train_loss"][-1][1])
+        # For older logs: time_elapsed was a list (possibly multiple stages).
+        # For newer JAX timing-only runs: time_elapsed is a scalar float.
+        t_info = one_seed_result.get("time_elapsed")
+        pre_time = float(one_seed_result.get("pyomo_pretraining_time", 0.0) or 0.0)
+        if isinstance(t_info, (list, tuple, np.ndarray)):
+            total_elapsed = t_info[-1]
+            t_before = np.sum(t_info[:-1]) if len(t_info) > 1 else 0.0
+        else:
+            total_elapsed = float(t_info)
+            t_before = 0.0
+        # Shift the timeline by any recorded Pyomo pretraining time so the
+        # training curve starts after pretraining.
+        t_before += pre_time
 
-        df = pd.DataFrame({"time_elapsed" : t_iters, "mse_train": training_loss, "mse_test" : testing_loss})
-        df["system"] = one_seed_result["data_type"]
-        df["pretrain"] = len(one_seed_result["time_elapsed"]) > 1
-        df["max_iter"] = str(one_seed_result["max_iter"])
+        train_loss_raw = one_seed_result["train_loss"]
+        # train_loss is stored as [train_losses, test_losses]
+        training_loss = np.array(train_loss_raw[-1][0])
+        testing_loss = np.array(train_loss_raw[-1][1])
+
+        n_records = len(training_loss)
+        t_per_iter = total_elapsed / max(n_records, 1)
+        
+        iters = np.arange(1, n_records + 1)
+        t_iters = iters * t_per_iter + t_before
+
+        df = pd.DataFrame({"time_elapsed": t_iters, "mse_train": training_loss, "mse_test": testing_loss})
+        df["system"] = one_seed_result.get("data_type")
+        df["pretrain"] = bool(t_before > 0)
+        df["max_iter"] = str(one_seed_result.get("max_iter"))
         
         return df
         

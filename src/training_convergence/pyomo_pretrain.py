@@ -61,6 +61,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p.add_argument("--redirect_logs", type=str2bool, default=False, help="Redirect IPOPT logs to file.")
     p.add_argument("--spacing_type", default=None, help="Node spacing: chebyshev/gauss_legendre/gauss_radau/gauss_lobatto.")
     p.add_argument("--noise_level", type=float, default=None, help="Noise level for synthetic data.")
+    p.add_argument("--max_wall_time", type=float, default=None, help="Optional wall-time limit (seconds) for the Pyomo solve.")
     p.add_argument("--seed", type=int, default=0)
     return p
 
@@ -79,6 +80,8 @@ def _build_model_params(args: argparse.Namespace, cfg: Dict[str, Any]) -> Tuple[
     solver_params = solver_cfg.copy()
     if tol is not None:
         solver_params["tol"] = tol
+    if args.max_wall_time is not None:
+        solver_params["max_wall_time"] = args.max_wall_time
 
     model_params = {
         "layer_widths": layer_widths,
@@ -147,6 +150,18 @@ def main(argv=None):
     outdir.mkdir(parents=True, exist_ok=True)
     stamp = time.strftime("%Y-%m-%d_%H-%M-%S")
     lw_tag = "-".join(str(w) for w in model_params["layer_widths"])
+    # Remove previous bundles for the same config (data/layer_width/seed) to avoid clutter.
+    existing = sorted(outdir.glob(f"pyomo_pretrain_{args.data_type}_w{lw_tag}_seed{args.seed}_*.pkl"))
+    for old in existing:
+        try:
+            old.unlink()
+            meta_candidate = outdir / f"{old.stem}.json"
+            if meta_candidate.exists():
+                meta_candidate.unlink()
+            print(f"[pyomo-pretrain] Removed previous bundle {old.name}")
+        except Exception as e:
+            print(f"[pyomo-pretrain] ⚠️ Could not remove {old}: {e}")
+
     fname = outdir / f"pyomo_pretrain_{args.data_type}_w{lw_tag}_seed{args.seed}_{stamp}.pkl"
 
     with open(fname, "wb") as f:
