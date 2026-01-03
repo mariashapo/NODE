@@ -37,7 +37,15 @@ def _load_pyomo_bundle(pretrain_spec: str, bundle_dir: str, data_type: str, laye
     bundle_path = None
     if ":" in pretrain_spec:
         _, path_str = pretrain_spec.split(":", 1)
-        bundle_path = Path(path_str).expanduser()
+        path_candidate = Path(path_str).expanduser()
+        if path_candidate.is_file():
+            bundle_path = path_candidate
+        else:
+            # treat as a tag/prefix inside bundle_dir, pick latest match
+            tag = path_candidate.name
+            pattern = f"{tag}*.pkl"
+            candidates = sorted(Path(bundle_dir).glob(pattern), key=lambda p: p.stat().st_mtime, reverse=True)
+            bundle_path = candidates[0] if candidates else None
     else:
         bundle_path = _find_latest_bundle(Path(bundle_dir), data_type, layer_widths)
     if not bundle_path or not bundle_path.exists():
