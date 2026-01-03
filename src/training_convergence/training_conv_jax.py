@@ -107,7 +107,7 @@ def main(argv=None):
         'layer_widths': args.layer_width if args.layer_width is not None else [2, 32, 2],
         'penalty_lambda_reg': args.penalty_lambda_reg,
         'time_invariant': args.time_invariant,
-        'learning_rate': 1e-3,
+        'learning_rate': 1e-7,
         'max_iter': args.max_iter,
         'pretrain': pretrain_value,
         'log': args.log,

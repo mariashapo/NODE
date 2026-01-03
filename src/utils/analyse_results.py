@@ -628,6 +628,7 @@ class ConvergenceCI:
         extrapolate=True,  # backward-only extrapolation
         alpha=0.05, logspace=True, eps=1e-12,
         cutoff_missing_frac=0.5,  # new parameter
+        min_support_abs=3,
     ):
         curves, tmax_list, tmin_list = [], [], []
         for _, g in df.groupby(seed_col):
@@ -673,8 +674,6 @@ class ConvergenceCI:
         counts = np.sum(finite_mask, axis=0).astype(float)
         n_seeds = len(curves)
         avail_frac = counts / n_seeds
-
-        min_support_abs = 3
 
         too_sparse_frac = avail_frac < (1 - cutoff_missing_frac)
         too_sparse_abs  = counts < min_support_abs
@@ -831,6 +830,7 @@ def plot_time_bands(
     figsize=(12, 7),
     xlim=None,
     ylim=None,
+    min_support_abs=3,
     label_fontsize=None,
     tick_fontsize=None,
     legend_fontsize=None,
@@ -885,7 +885,8 @@ def plot_time_bands(
             y_col=y_col,
             extrapolate=extrapolate,  # backward-only extrapolation
             logspace=logy,
-            cutoff_missing_frac = cutoff_missing_frac
+            cutoff_missing_frac = cutoff_missing_frac,
+            min_support_abs=min_support_abs,
         )
         curves[label] = dict(
             x=x, mean=mean, lo=lo, hi=hi,
