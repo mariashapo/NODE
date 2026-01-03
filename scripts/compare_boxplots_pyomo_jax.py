@@ -14,10 +14,6 @@ import argparse
 import pickle
 from pathlib import Path
 import numpy as np
-import matplotlib
-
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
 
 from analysis.synthetic.aggregate_pyomo_reg_search import load_reg_search, aggregate_by_hparams, _format_layer_width
 from utils.analyse_results import Graphs
@@ -37,6 +33,12 @@ def load_jax_folder(folder: Path, recursive: bool = False):
 
 
 def flatten_dict_of_dicts(objs, metric, default_lw=None):
+    def _scalarize(val):
+        if isinstance(val, (list, tuple)):
+            nums = [x for x in val if isinstance(x, (int, float))]
+            return float(np.sum(nums)) if nums else np.nan
+        return val
+
     rows = []
     for obj in objs:
         if isinstance(obj, dict):
@@ -50,12 +52,12 @@ def flatten_dict_of_dicts(objs, metric, default_lw=None):
                         reg = tol = None
                     rows.append(
                         {
-                            "layer_widths": tuple(lw) if isinstance(lw, (list, tuple)) else lw,
-                            "penalty_lambda_reg": reg,
-                            "tol": tol,
-                            metric: v.get(metric, np.nan) if isinstance(v, dict) else np.nan,
-                        }
-                    )
+                        "layer_widths": tuple(lw) if isinstance(lw, (list, tuple)) else lw,
+                        "penalty_lambda_reg": reg,
+                        "tol": tol,
+                        metric: _scalarize(v.get(metric, np.nan) if isinstance(v, dict) else np.nan),
+                    }
+                )
             else:
                 # flat dict with metrics
                 lw = obj.get("layer_widths") or obj.get("layer_width") or default_lw
@@ -66,7 +68,7 @@ def flatten_dict_of_dicts(objs, metric, default_lw=None):
                         "layer_widths": tuple(lw) if isinstance(lw, (list, tuple)) else lw,
                         "penalty_lambda_reg": reg,
                         "tol": tol,
-                        metric: obj.get(metric, np.nan),
+                        metric: _scalarize(obj.get(metric, np.nan)),
                     }
                 )
         else:
@@ -83,11 +85,24 @@ def main(argv=None):
     ap.add_argument("--min_runs", type=int, default=3, help="Minimum runs per group to include.")
     ap.add_argument("--out", type=Path, default=None, help="Optional path to save the figure (png).")
     ap.add_argument("--recursive", action="store_true", help="Recurse into subfolders when loading pickles.")
+    ap.add_argument(
+        "--only_single_hidden",
+        action="store_true",
+        help="Filter to architectures with a single hidden layer (len(widths)==3).",
+    )
     args = ap.parse_args(argv)
+
+    # Set backend based on whether we're saving or showing
+    import matplotlib
+    if args.out:
+        matplotlib.use("Agg")
+    import matplotlib.pyplot as plt  # noqa: E402
 
     # Pyomo aggregate
     df_pyomo = load_reg_search(str(args.pyomo_dir))
     agg_pyomo = aggregate_by_hparams(df_pyomo)
+    if args.only_single_hidden and "layer_widths" in agg_pyomo.columns:
+        agg_pyomo = agg_pyomo[agg_pyomo["layer_widths"].apply(lambda w: isinstance(w, (list, tuple)) and len(w) == 3)]
     if agg_pyomo.empty:
         raise SystemExit("No Pyomo records found.")
     if "n_runs" not in agg_pyomo.columns:
@@ -100,6 +115,9 @@ def main(argv=None):
     import pandas as pd
 
     df_jax = pd.DataFrame(jax_rows)
+    if args.only_single_hidden and not df_jax.empty:
+        df_jax = df_jax[df_jax["layer_widths"].apply(lambda w: isinstance(w, (list, tuple)) and len(w) == 3)]
+
     agg_jax = (
         df_jax.groupby(["layer_widths"])
         .agg(
@@ -120,22 +138,27 @@ def main(argv=None):
         raise SystemExit("No overlapping layer_widths with sufficient runs.")
 
     # Build data lists aligned by sorted widths
-    widths_sorted = sorted(common, key=lambda w: (_format_layer_width(w), w))
-    labels = [_format_layer_width(w) for w in widths_sorted]
+    def _width_key(w):
+        if isinstance(w, (list, tuple)) and len(w) == 3 and w[0] == 2 and w[-1] == 2:
+            return w[1]
+        if isinstance(w, (list, tuple)):
+            return tuple(w)
+        return _format_layer_width(w)
 
+    widths_sorted = sorted(common, key=lambda w: (_width_key(w), w))
+    labels = []
     pyomo_vals = []
     jax_vals = []
     for w in widths_sorted:
         py_vals = df_pyomo[df_pyomo["layer_widths"] == w][args.metric].dropna().values
         j_vals = df_jax[df_jax["layer_widths"] == w][args.metric].dropna().values
         if py_vals.size >= args.min_runs and j_vals.size >= args.min_runs:
-            pyomo_vals.append(py_vals)
-            jax_vals.append(j_vals)
-        else:
-            labels = [lbl for lbl, lw in zip(labels, widths_sorted) if lw != w]
+            pyomo_vals.append(np.asarray(py_vals, dtype=float))
+            jax_vals.append(np.asarray(j_vals, dtype=float))
+            labels.append(_format_layer_width(w))
 
     if not pyomo_vals or not jax_vals:
-        raise SystemExit("No data left to plot after filtering min_runs.")
+        raise SystemExit("No data left to plot after filtering min_runs/common widths.")
 
     plt.figure(figsize=(10, 6))
     Graphs.plot_boxplots(
