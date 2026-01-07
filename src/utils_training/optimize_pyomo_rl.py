@@ -13,19 +13,8 @@ import importlib
 import pickle
 import itertools
 
-path_ = os.path.abspath(os.path.join('..', 'utils'))
-if path_ not in sys.path:
-    sys.path.append(path_)
 
-path_ = os.path.abspath(os.path.join('..', 'models'))
-if path_ not in sys.path:
-    sys.path.append(path_)
-
-path_ = os.path.abspath(os.path.join('..', 'utils_training'))
-if path_ not in sys.path:
-    sys.path.append(path_)
-
-import run_train_pyomo_rl
+from utils_training.run_train_pyomo_rl import Trainer
 
 import logging
 logging.basicConfig(level=logging.ERROR, filename='error_log.txt')
@@ -59,11 +48,15 @@ class ExperimentRunner:
         if optimization_aim == 'convergence':
             self.convergence_step = self.extra_inputs.get('convergence_steps', 5)
         
+        elif optimization_aim == "converge_wall_time":
+            self.n_steps = self.extra_inputs.get('n_steps', 50)
+            self.t_start = self.extra_inputs.get('t_start', 0.1)
+            self.t_end = self.extra_inputs.get('t_end', 20.0)
+
         self.param_combinations = self.define_param_combinations()
         self.metrics = self.initialize_metrics()
         
-        importlib.reload(run_train_pyomo_rl)
-        self.Trainer = run_train_pyomo_rl.Trainer
+        self.Trainer = Trainer
         
         if 'param_combinations' in self.extra_inputs.keys():
             self.param_combinations = self.extra_inputs['param_combinations']
@@ -157,7 +150,14 @@ class ExperimentRunner:
             iters *= self.convergence_step
             param_combinations = np.concatenate((np.array([1]), iters))
             self.optimal = {d:False for d in self.date_sequences}
-            
+        
+        elif self.opt_aim == "converge_wall_time":
+            # Nonlinear spacing — more dense near t_start
+            exponent = 2.0  # >1 means denser near t_start
+            base = np.linspace(0, 1, self.n_steps)
+            wall_times = self.t_start + (self.t_end - self.t_start) * base**exponent
+            param_combinations = [round(float(t), 5) for t in wall_times]
+        
         elif self.opt_aim == 'default':
             param_combinations = [1]
             
@@ -202,7 +202,11 @@ class ExperimentRunner:
             
         elif self.opt_aim == 'convergence':
             self.params_solver['max_iter'] = param_comb
-            
+
+        elif self.opt_aim == "converge_wall_time":
+            # Nonlinear spacing — more dense near t_start
+            self.params_solver['max_wall_time'] = param_comb
+
         elif self.opt_aim == 'network_size':
             self.ls = param_comb[0]
             self.penalty = param_comb[1]

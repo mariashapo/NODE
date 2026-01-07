@@ -13,16 +13,14 @@ class DirectODESolver:
         self.t = t
         self.layer_sizes = layer_sizes
         self.initial_state = initial_state  
+
+        self.initial_state = np.atleast_1d(np.array(self.initial_state, dtype=float))
+        self.dimensions = self.initial_state.shape[0]
+        
         self.act_func = act_func
         self.time_invariant = time_invariant
         self.extra_input = extra_input
         self.params = params
-
-        # determine the number of dimensions
-        if isinstance(self.initial_state, np.ndarray):
-            self.dimensions = self.initial_state.shape[0]
-        else:
-            self.dimensions = 1
 
         # model weights
         self.W1 = trained_weights_biases['W1']

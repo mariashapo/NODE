@@ -57,7 +57,8 @@ class TrainerToy:
         if self.model_type == 'pyomo':
             self.generate_nodes_test()
         else:
-            self.nodes_test = jnp.linspace(self.start_time, self.end_time, self.N)
+            # For non-Pyomo models, test window continues after the train window.
+            self.nodes_test = jnp.linspace(self.start_time_test, self.end_time_test, self.N)
 
         self.init_state_test = self.y[-1]
         t_test, y_test, _, _ = generate_ode_data(
@@ -260,8 +261,6 @@ class TrainerToy:
                 'time_elapsed': self.time_elapsed,
                 'mse_train': mse_train,
                 'mse_test': mse_test,
-                'mse_train_coll': mse_train_coll,
-                'mse_test_coll': mse_test_coll,
                 'termination': self.termination,
                 'seed': self.seed
             }

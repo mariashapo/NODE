@@ -1,0 +1,8 @@
+ERROR:pyomo.core:Rule failed when generating expression for Constraint init_condition with index 0:
+IndexError: invalid index to scalar variable.
+ERROR:pyomo.core:Constructing component 'init_condition' from data=None failed:
+    IndexError: invalid index to scalar variable.
+ERROR:pyomo.core:Rule failed when generating expression for Constraint init_condition with index 0:
+IndexError: invalid index to scalar variable.
+ERROR:pyomo.core:Constructing component 'init_condition' from data=None failed:
+    IndexError: invalid index to scalar variable.

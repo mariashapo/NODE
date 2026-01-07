@@ -35,7 +35,10 @@ class Trainer:
         self.params_solver = params_solver
         self.params_ode = params_ode
         
-        self.plot_directory = '../00_plots/pyomo'
+        # Save plots under repo-root/results/plots/pyomo (resolve relative to repo root)
+        repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir))
+        self.plot_directory = os.path.join(repo_root, 'results', 'plots', 'pyomo')
+        os.makedirs(self.plot_directory, exist_ok=True)
         self.plot_collocation = params_results['plot_collocation']
         self.plot_odeint = params_results['plot_odeint']
         

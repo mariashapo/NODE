@@ -97,7 +97,7 @@ python -m src.analysis.synthetic.aggregate_pyomo_reg_search \
 ### Hidden layer widths
 ```bash
 python -m src.analysis.synthetic.aggregate_pyomo_reg_search \
-  --dir results/study_vdp/pyomo_vdp_layer_width \
+  --dir results/study_vdp/pyomo_layer_width \
   --metric mse_train_coll \
   --plot \
   --x_axis width \
@@ -106,6 +106,37 @@ python -m src.analysis.synthetic.aggregate_pyomo_reg_search \
   --min_runs 10 --boxplot --no_title
 ```
 
-Notes:
-- The script will load all pickles in the folder. If you omit `--tol`/`--layer_width`, it selects the first tol found and plots each layer width separately.
-- If files are corrupt/truncated, they’ll be skipped; ensure the pickles are valid if you see “No records loaded.”
+### To plot Boxplots comparing Pyomo and JAX models
+```bash
+python scripts/compare_boxplots_pyomo_jax.py \
+  --pyomo_dir results/study_vdp/pyomo_layer_width \
+  --jax_dir results/study_vdp/jax_layer_width \
+  --metric mse_test \
+  --min_runs 3 \
+  --recursive \
+  --only_single_hidden
+```
+
+### To plot pareto frontier plots 
+```bash
+python scripts/pareto_pyomo_jax.py \
+  --pyomo_dir results/study_vdp/pyomo_layer_width \
+  --jax_dir results/study_vdp/jax_layer_width \
+  --metric mse_test \
+  --min_runs 1 \
+  --only_single_hidden \
+  --recursive \
+  --out results/plots/pareto_pyomo_jax.png
+```
+
+### Pareto with only specified width printed
+```bash
+python scripts/pareto_pyomo_jax.py \
+  --pyomo_dir results/study_vdp/pyomo_layer_width \
+  --jax_dir results/study_vdp/jax_layer_width \
+  --metric mse_test \
+  --min_runs 1 \
+  --only_single_hidden \
+  --recursive \
+  --label_widths '4,16,64,128'
+```

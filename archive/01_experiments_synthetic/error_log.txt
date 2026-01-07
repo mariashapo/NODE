@@ -1,3 +1,5 @@
 ERROR:pyomo.opt:Solver (ipopt) returned non-zero return code (-6)
 ERROR:pyomo.opt:See the solver log above for diagnostic information.
 ERROR:root:Failed to complete training: Solver (ipopt) did not exit normally
+ERROR:root:Failed to complete training: train_pyomo() missing 1 required positional argument: 'seed'
+ERROR:root:Failed to complete training: train_pyomo() missing 1 required positional argument: 'seed'

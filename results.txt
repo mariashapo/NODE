@@ -1,0 +1,4 @@
+Running iteration 1 with parameters: 0.1
+param_comb: 0.1, date: 2015-01-15, results: {'result': {'solver_time': 0.23849201202392578, 'termination_condition': <TerminationCondition.maxIterations: 'maxIterations'>, 'message': 'Ipopt 3.14.16\\x3a Maximum Wallclock Time Exceeded.'}, 'times_elapsed': 0.23849201202392578, 'mse_odeint': 0.43007154171260736, 'mse_coll_ode': 0.43788997437728466, 'mse_odeint_test': 12.8018579931991, 'mse_coll_ode_test': 12.448609607422767}
+Running iteration 2 with parameters: 20.0
+param_comb: 20.0, date: 2015-01-15, results: {'result': {'solver_time': 9.784926891326904, 'termination_condition': <TerminationCondition.optimal: 'optimal'>, 'message': 'Ipopt 3.14.16\\x3a Optimal Solution Found'}, 'times_elapsed': 9.784926891326904, 'mse_odeint': 0.008492861742993279, 'mse_coll_ode': 0.009048825787987255, 'mse_odeint_test': 0.15129431465648754, 'mse_coll_ode_test': 0.15347257208614792}
