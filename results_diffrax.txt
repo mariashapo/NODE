@@ -1,0 +1,2 @@
+Running iteration 1 with parameters: 1
+param_comb: 1, date: 2015-01-15, results: {'times_elapsed': 3.6406607627868652, 'mse_diffrax': 0.9556974563216059, 'mse_diffrax_test': 2.8844384753618253}

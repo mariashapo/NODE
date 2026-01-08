@@ -32,7 +32,9 @@ class Trainer:
         self.num_epochs = params_model.get('num_epochs', 5000)
         self.pretrain = params_model.get('pretrain', False)
         # output parameters
-        self.plot_directory = '../00_plots/diffrax'
+        repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir))
+        self.plot_directory = os.path.join(repo_root, 'results', 'plots', 'diffrax')
+        os.makedirs(self.plot_directory, exist_ok=True)
         self.plot = params_results['plot']
         self.log = params_results.get('log', False)
         self.split_time = params_results.get('split_time', False)
@@ -46,6 +48,7 @@ class Trainer:
     def clear_directory(self):
         """ Clear all files in the folder without deleting the folder itself. """
         folder_path = self.plot_directory
+        os.makedirs(folder_path, exist_ok=True)
         for filename in os.listdir(folder_path):
             file_path = os.path.join(folder_path, filename)
             try:
@@ -131,12 +134,17 @@ class Trainer:
         
         if self.pretrain == [1] or not (self.log or self.split_time):    
             self.time_elapsed = time.time() - start_time        
-        
+
         # ---------------------------------------------------- PREDICTION ------------------------------------------------
         y_train_pred = node_model.neural_ode(state.params, y0, ts, state, extra_args)
         
         self.experiment_results = {}
-        self.experiment_results['times_elapsed'] = self.time_elapsed
+        # store a scalar runtime so downstream averaging doesn't get lists
+        if isinstance(self.time_elapsed, (list, tuple, np.ndarray)):
+            runtime_total = float(np.sum(self.time_elapsed))
+        else:
+            runtime_total = float(self.time_elapsed)
+        self.experiment_results['times_elapsed'] = runtime_total
         self.experiment_results['mse_diffrax'] = np.mean(np.square(np.squeeze(y_train_pred) - np.squeeze(ys)))
         
         y_test_pred = node_model.neural_ode(state.params, y0_test, ts_test, state, extra_args_test)      
@@ -161,7 +169,7 @@ class Trainer:
             #plt.legend(loc ="lower right", bbox_to_anchor=(0.5, -0.3))
             plt.legend(loc ="lower right")
             plt.grid(True)
-            plt.savefig(f'../00_plots/diffrax/diffrax_solver_train_{self.start_date}.png', format='png')  
+            plt.savefig(os.path.join(self.plot_directory, f'diffrax_solver_train_{self.start_date}.png'), format='png')  
             plt.close() 
             
         return self.experiment_results

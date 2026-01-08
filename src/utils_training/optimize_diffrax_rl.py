@@ -19,6 +19,7 @@ import statsmodels.api as sm
 import importlib
 
 from utils_training import run_train_diffrax_rl
+from pathlib import Path
 
 
 class ExperimentRunner:
@@ -27,8 +28,15 @@ class ExperimentRunner:
         self.opt_aim = optimization_aim
         self.extra_inputs = extra_inputs
         
-        self.params_data = self.extra_inputs.get('params_data', ExperimentRunner.default_data_params(start_date))
-        self.params_model = self.extra_inputs.get('params_model', ExperimentRunner.default_model_params())
+        if 'params_data' in self.extra_inputs:
+            self.params_data = self.extra_inputs['params_data']
+        else:
+            self.params_data = ExperimentRunner.default_data_params(start_date)
+
+        if 'params_model' in self.extra_inputs:
+            self.params_model = self.extra_inputs['params_model']
+        else:
+            self.params_model = ExperimentRunner.default_model_params()
         
         if 'params_sequence' in self.extra_inputs.keys():
             self.sequence_len = self.extra_inputs['params_sequence']['sequence_len']
@@ -136,7 +144,9 @@ class ExperimentRunner:
     @staticmethod
     def default_data_params(start_date):
         print("Generating default parameters for data")
-        params_data = {'file_path': '../00_data/df_train.csv', 'start_date': start_date, 
+        repo_root = Path(__file__).resolve().parents[2]
+        params_data = {'file_path': str(repo_root / 'data' / 'df_train.csv'),
+                'start_date': start_date, 
                 'n_points': 400, 'split': 200, 'n_days': 1, 'm': 0, 
                 'prev_hour': True, 'prev_week': True, 'prev_year': False,
                 'spacing': 'uniform',
@@ -222,8 +232,10 @@ class ExperimentRunner:
                 iter += 1
         
             try:
-                if self.opt_aim != 'convergence':
+                if self.opt_aim != 'convergence' and self.metrics['times_elapsed']:
                     self.results_avg[param_comb] = ExperimentRunner.compute_averages(self.metrics)
+                elif self.opt_aim != 'convergence':
+                    print("Skipping averages for this parameter set because no metrics were collected.")
             except Exception as e:
                 print(f"Failed to compute averages: {e}")
                 continue
