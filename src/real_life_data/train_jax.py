@@ -69,7 +69,7 @@ def main():
         },
     }
 
-    extra_inputs["params_sequence"] = {"sequence_len": 1, "frequency": 3}
+    extra_inputs["params_sequence"] = {"sequence_len": 15, "frequency": 3}
     extra_inputs["params_results"] = {"plot": True, "log": True, "split_time": True}
     # extra_inputs['trained_wb'] = trained_wb
 
