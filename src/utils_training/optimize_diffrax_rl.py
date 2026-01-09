@@ -20,7 +20,8 @@ import importlib
 
 from utils_training import run_train_diffrax_rl
 from pathlib import Path
-
+from utils_training.run_train_diffrax_rl import Trainer
+import jax, gc
 
 class ExperimentRunner:
     def __init__(self, start_date, optimization_aim, extra_inputs = {}):
@@ -64,10 +65,6 @@ class ExperimentRunner:
         
         self.trained_wb = self.extra_inputs.get('trained_wb', None)
         
-        # reload the training module
-        importlib.reload(run_train_diffrax_rl)
-        self.Trainer = run_train_diffrax_rl.Trainer
-    
     def initialize_metrics(self):
         metrics = {
             'times_elapsed': [],
@@ -203,7 +200,7 @@ class ExperimentRunner:
                 self.update_date(date, param_comb, file, iter)
                 
                 try:
-                    trainer = self.Trainer(self.params_results, self.params_data, self.params_model, self.trained_wb)
+                    trainer = Trainer(self.params_results, self.params_data, self.params_model, self.trained_wb)
                     if iter == 1:
                         trainer.clear_directory()
                     experiment_results = trainer.train()
@@ -230,6 +227,13 @@ class ExperimentRunner:
                 file.flush() 
                 print (f"Iteration i: {iter}/{len(self.param_combinations)*len(self.date_sequences)} completed")
                 iter += 1
+
+                # after you're done saving what you need
+                del trainer
+                del experiment_results
+                jax.clear_caches()
+                gc.collect()
+
         
             try:
                 if self.opt_aim != 'convergence' and self.metrics['times_elapsed']:

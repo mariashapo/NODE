@@ -70,7 +70,7 @@ def main():
     }
 
     extra_inputs["params_sequence"] = {"sequence_len": 15, "frequency": 3}
-    extra_inputs["params_results"] = {"plot": True, "log": True, "split_time": True}
+    extra_inputs["params_results"] = {"plot": True, "log": 50, "split_time": True}
     # extra_inputs['trained_wb'] = trained_wb
 
     runner = ExperimentRunner(start_date, "default", extra_inputs)
