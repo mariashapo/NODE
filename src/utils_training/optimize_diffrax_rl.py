@@ -243,6 +243,8 @@ class ExperimentRunner:
             except Exception as e:
                 print(f"Failed to compute averages: {e}")
                 continue
+            
+        # all of the training losses are being appended at the end of the run
         if self.params_results['log'] > 0 :
             self.results_full['training_losses'] = self.losses
         

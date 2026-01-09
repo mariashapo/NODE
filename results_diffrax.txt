@@ -1,1 +1,7 @@
 Running iteration 1 with parameters: 1
+param_comb: 1, date: 2015-01-15, results: {'times_elapsed': 183.5510470867157, 'mse_diffrax': 0.015272080264516867, 'mse_diffrax_test': 0.15222811644723597}
+Running iteration 2 with parameters: 1
+param_comb: 1, date: 2015-01-18, results: {'times_elapsed': 179.36762380599976, 'mse_diffrax': 0.009871965213542076, 'mse_diffrax_test': 0.13347619479707026}
+Running iteration 3 with parameters: 1
+param_comb: 1, date: 2015-01-21, results: {'times_elapsed': 185.19263887405396, 'mse_diffrax': 0.019690566810535815, 'mse_diffrax_test': 0.2414987016385566}
+Running iteration 4 with parameters: 1
