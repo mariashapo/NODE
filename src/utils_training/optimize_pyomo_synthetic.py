@@ -59,12 +59,12 @@ class ExperimentRunner:
         }
 
         data_params_vdp = {
-            'N': 200,
+            'N': 300,
             'noise_level': self.data_params['noise_level'],
             'ode_type': "van_der_pol",
             'data_param': {"mu": 1, "omega": 1},
             'start_time': 0,
-            'end_time': 15,
+            'end_time': 30,
             'spacing_type': spacing_type,
             'initial_state': np.array([0.0, 1.0]),
             'detailed' : detailed

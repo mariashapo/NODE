@@ -23,6 +23,7 @@ from models.ode_solver_pyomo_base import DirectODESolver # direct solver for pos
 class TrainerToy:
     def __init__(self, params_data, model_type):
         self.N = params_data['N']
+        self.N_test = params_data.get('N_test', max(1, self.N // 2))
         self.noise_level = params_data['noise_level']
         self.ode_type = params_data['ode_type']
         self.data_param = params_data['data_param']
@@ -58,11 +59,11 @@ class TrainerToy:
             self.generate_nodes_test()
         else:
             # For non-Pyomo models, test window continues after the train window.
-            self.nodes_test = jnp.linspace(self.start_time_test, self.end_time_test, self.N)
+            self.nodes_test = jnp.linspace(self.start_time_test, self.end_time_test, self.N_test)
 
         self.init_state_test = self.y[-1]
         t_test, y_test, _, _ = generate_ode_data(
-            self.N, self.noise_level, self.ode_type, self.data_param, 
+            self.N_test, self.noise_level, self.ode_type, self.data_param, 
             initial_state = self.init_state_test, t = self.nodes_test)
         
         self.t_test = t_test
@@ -74,7 +75,7 @@ class TrainerToy:
         self.collocation = collocation
 
     def generate_nodes_test(self):
-        collocation_test = Collocation(self.N, self.start_time_test, self.end_time_test, self.spacing_type)
+        collocation_test = Collocation(self.N_test, self.start_time_test, self.end_time_test, self.spacing_type)
         self.nodes_test = collocation_test.compute_nodes()
         self.collocation_test = collocation_test
 
