@@ -16,14 +16,17 @@ class NeuralODEPyomoADMM:
     # --------------------------------------------- CLASS INITIALIZATION ------------------------------------------- #
     def __init__(self, y_observed, t, first_derivative_matrix, layer_sizes, time_invariant=True, extra_input=None, rho = 1.0,
                  penalty_lambda_reg=0.01, penalty_lambda_smooth=0.0, act_func="tanh", w_init_method="random", params=None, y_init=None, test_data = None,
-                 seed=42):
+                 seed=42, full_train=None, use_full_train=False):
 
         # class parameters
         np.random.seed(seed)
+        self.seed = seed
         self.initialize_data_params(y_observed, t, extra_input, y_init, first_derivative_matrix)
         self.initialize_model_params(penalty_lambda_reg, act_func, w_init_method, 
                                 layer_sizes, time_invariant, params, penalty_lambda_smooth, rho)
         self.initialize_admm_variables()
+        self.full_train = full_train
+        self.use_full_train = use_full_train
         
         self.iter = 0
         
@@ -33,10 +36,10 @@ class NeuralODEPyomoADMM:
         
         if test_data is not None:
             self.test_data = test_data
-            self.test_ys = test_data['y']
-            self.test_ts = test_data['t']
-            self.test_Xs = test_data.get('X', None)
-            self.test_Ds = test_data.get('D', None)
+            self.test_ys = test_data.get('y')
+            self.test_ts = test_data.get('t')
+            self.test_Xs = test_data.get('X')
+            self.test_Ds = test_data.get('D')
             self.record_test_mse = True
         else:
             self.record_test_mse = False
@@ -303,18 +306,31 @@ class NeuralODEPyomoADMM:
     def record_admm_info(self, time_elapsed):
         if not hasattr(self, 'admm_info'):
             self.admm_info = {'primal_residual': [], 'mse_diffrax': [], 'iter': [], 'time_elapsed': []}
+            self.admm_info['seed'] = self.seed
 
             if self.record_test_mse:
                 self.admm_info["mse_test_diffrax"] = []
+            self.admm_info["mse_collocation_train"] = []
+            if self.record_test_mse:
+                self.admm_info["mse_collocation_test"] = []
             
         self.admm_info['primal_residual'].append(self.compute_primal_residual())
         
-        # diffax predictions
-        y_solution_1 = self.node_diffrax_pred(y0 = jnp.array(self.y_observed1[0]), t = jnp.array(self.t1), extra_input = None)
-        y_solution_2 = self.node_diffrax_pred(y0 = jnp.array(self.y_observed2[0]), t = jnp.array(self.t2), extra_input = None)
-        
-        solution = np.squeeze(np.concatenate([y_solution_1, y_solution_2]))
-        observed = np.squeeze(np.concatenate([self.y_observed1, self.y_observed2]))
+        # diffrax predictions (train)
+        use_full = self.use_full_train and self.full_train is not None
+
+        if use_full:
+            t_train = jnp.array(self.full_train["t"])
+            y_train_obs = np.squeeze(np.array(self.full_train["y"]))
+            y0_train = jnp.array(y_train_obs[0])
+            y_solution_train = self.node_diffrax_pred(y0=y0_train, t=t_train, extra_input=None)
+            solution = np.squeeze(np.array(y_solution_train))
+            observed = y_train_obs
+        else:
+            y_solution_1 = self.node_diffrax_pred(y0 = jnp.array(self.y_observed1[0]), t = jnp.array(self.t1), extra_input = None)
+            y_solution_2 = self.node_diffrax_pred(y0 = jnp.array(self.y_observed2[0]), t = jnp.array(self.t2), extra_input = None)
+            solution = np.squeeze(np.concatenate([y_solution_1, y_solution_2]))
+            observed = np.squeeze(np.concatenate([self.y_observed1, self.y_observed2]))
         
         if solution.shape != observed.shape:
             raise ValueError("Solution and observed data do not have the same shape.")
@@ -324,6 +340,23 @@ class NeuralODEPyomoADMM:
         self.admm_info['mse_diffrax'].append(mse_diffrax)
         self.admm_info['iter'].append(self.iter)
         self.admm_info['time_elapsed'].append(time_elapsed)
+
+        # collocation prediction (train)
+        trained_weights_biases = self.extract_weights()
+        if use_full:
+            t_coll = np.array(self.full_train["t"])
+            D_coll = np.array(self.full_train["D"])
+            y0_coll = np.array(self.full_train["y"][0])
+            direct_solver = DirectODESolver(t_coll, self.layer_sizes, trained_weights_biases, y0_coll, 
+                                            D=D_coll, act_func=self.act_func, time_invariant=self.time_invariant, 
+                                            extra_input=None, params=self.params)
+            direct_solver.build_model()
+            direct_solver.solve_model()
+            y_coll_pred = np.squeeze(direct_solver.extract_solution())
+            y_coll_obs = np.squeeze(np.array(self.full_train["y"]))
+            self.admm_info["mse_collocation_train"].append(float(np.mean((y_coll_pred - y_coll_obs) ** 2)))
+        else:
+            self.admm_info["mse_collocation_train"].append(np.nan)
         
         if self.record_test_mse:
             y_test_pred = self.node_diffrax_pred(
@@ -342,6 +375,25 @@ class NeuralODEPyomoADMM:
 
             mse_test_diffrax = float(np.mean((test_pred - test_obs) ** 2))
             self.admm_info["mse_test_diffrax"].append(mse_test_diffrax)
+            # collocation test prediction if D provided
+            if use_full and self.test_Ds is not None:
+                direct_solver = DirectODESolver(
+                    np.array(self.test_ts),
+                    self.layer_sizes,
+                    trained_weights_biases,
+                    np.array(self.test_ys[0]),
+                    D=np.array(self.test_Ds),
+                    act_func=self.act_func,
+                    time_invariant=self.time_invariant,
+                    extra_input=None,
+                    params=self.params,
+                )
+                direct_solver.build_model()
+                direct_solver.solve_model()
+                y_coll_test = np.squeeze(direct_solver.extract_solution())
+                self.admm_info["mse_collocation_test"].append(float(np.mean((y_coll_test - test_obs) ** 2)))
+            else:
+                self.admm_info["mse_collocation_test"].append(np.nan)
               
     # --------------------------------------------- ADMM UPDATES ---------------------------------------------- # 
     def update_dual_variables(self):

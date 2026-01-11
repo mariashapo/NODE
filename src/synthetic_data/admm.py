@@ -1,3 +1,7 @@
+import pickle
+import time
+from pathlib import Path
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -6,20 +10,19 @@ import random
 # jax
 import jax.numpy as jnp
 
-from utils.data_generation import DataPreprocessor
-# from utils.non_parametric_collocation import collocate_data
-# from utils.collocation_obj import Collocation
+from utils_training.run_train_toy import TrainerToy
 from models.nn_pyomo_admm import NeuralODEPyomoADMM
 
 
 def generate_admm_data(initial_state, include_test=False):
-    data_params_vdp = {
-        'N': 150, 'noise_level': 0.1,
-        'ode_type': "van_der_pol",
-        'extra_param': {"mu": 1, "omega": 1},
-        'spacing_type': 'gauss_radau',
-        'initial_state': initial_state,
-        'detailed' : False
+    base_params = {
+        "N": 150,
+        "noise_level": 0.1,
+        "ode_type": "van_der_pol",
+        "data_param": {"mu": 1, "omega": 1},
+        "spacing_type": "gauss_radau",
+        "initial_state": initial_state,
+        "detailed": False,
     }
 
     time_intervals = [(0, 15), (15, 30)]
@@ -27,51 +30,57 @@ def generate_admm_data(initial_state, include_test=False):
     t_list, y_true_list, y_noisy_list = [], [], []
     D_list = []
     est_sol_list = []
+    test_t, test_y, test_D = None, None, None
 
-    # --------------------------------------------- GENERATE DATA FOR EACH INTERVAL --------------------------------------------- #
-    test_t, test_y = None, None
     for idx, (start_time, end_time) in enumerate(time_intervals):
-        # update initial state for subsequent intervals
+        params_data = base_params.copy()
+        params_data["start_time"] = start_time
+        params_data["end_time"] = end_time
         if idx > 0:
-            data_params_vdp['initial_state'] = y_true_list[-1][-1] 
-        
-        data_params_vdp['start_time'] = start_time
-        data_params_vdp['end_time'] = end_time
-        
-        data_prep = DataPreprocessor(data_params_vdp)
-        data_prep.load_data()
-        data_prep.prepare_collocation()
-        data_prep.estimate_derivative()
-        test_t, test_y = getattr(data_prep, "t_test", None), getattr(data_prep, "y_test", None)
-        
-        # training
-        y_noisy_list.append(data_prep.y_noisy)
-        t_list.append(data_prep.t)
-        D_list.append(data_prep.D)
-        y_true_list.append(data_prep.y)
-        est_sol_list.append(data_prep.est_sol)
-        
-    # --------------------------------------------- MERGE DATA FROM ALL INTERVALS --------------------------------------------- #
-    ts = np.concatenate(t_list)      
-    ys = np.vstack(y_noisy_list)     
-    y_est = np.hstack(est_sol_list)  
-    Ds = D_list          
+            params_data["initial_state"] = y_true_list[-1][-1]
 
-    ys = np.array(ys)
-    ts = np.array(ts)
-    y_est = np.array(y_est).T
-    
-    if include_test:
-        test_data = None
-        if test_t is not None and test_y is not None:
-            test_data = {"t": np.array(test_t), "y": np.array(test_y)}
-        return ts, ys, y_est, Ds, test_data
-    
-    return ts, ys, y_est, Ds
+        toy = TrainerToy(params_data, model_type="pyomo")
+        toy.prepare_inputs()
+
+        t_list.append(np.array(toy.t))
+        y_noisy_list.append(np.array(toy.y_noisy))
+        y_true_list.append(np.array(toy.y))
+        D_list.append(np.array(toy.D))
+        est_sol_list.append(np.array(toy.est_sol))
+
+        if include_test:
+            test_t = np.array(toy.t_test)
+            test_y = np.array(toy.y_test)
+            test_D = np.array(toy.D_test)
+
+    ts = np.concatenate(t_list)
+    ys = np.vstack(y_noisy_list)
+    y_est = np.hstack(est_sol_list).T
+
+    test_data = None
+    if include_test and test_t is not None and test_y is not None:
+        test_data = {"t": test_t, "y": test_y, "D": test_D}
+
+    # Optional full-train collocation over entire span
+    params_full = base_params.copy()
+    params_full["N"] = base_params["N"] * len(time_intervals)
+    params_full["start_time"] = time_intervals[0][0]
+    params_full["end_time"] = time_intervals[-1][1]
+    toy_full = TrainerToy(params_full, model_type="pyomo")
+    toy_full.prepare_inputs()
+    full_train_data = {
+        "t": np.array(toy_full.t),
+        "y": np.array(toy_full.y_noisy),
+        "D": np.array(toy_full.D),
+        "y_est": np.array(toy_full.est_sol),
+    }
+
+    return {"ts": ts, "ys": ys, "y_est": y_est, "Ds": D_list, "test_data": test_data, "full_train": full_train_data}
 
 
 def main():
     seeds = [random.randint(0, 10_000_000) for _ in range(30)]
+    use_full_train = False
     tol = 1e-8
     params = {
         "tol": tol,
@@ -83,7 +92,13 @@ def main():
     results = []
 
     for seed in seeds:
-        ts, ys, y_est, Ds, test_data = generate_admm_data(np.array([0.0, 1.0]), include_test=True)
+        data = generate_admm_data(np.array([0.0, 1.0]), include_test=True)
+        ts = data["ts"]
+        ys = data["ys"]
+        y_est = data["y_est"]
+        Ds = data["Ds"]
+        test_data = data["test_data"]
+        full_train = data["full_train"]
 
         ode_model = NeuralODEPyomoADMM(
             y_observed=ys,
@@ -100,11 +115,22 @@ def main():
             params=params,
             test_data=test_data,
             seed=seed,
+            full_train=full_train,
+            use_full_train=use_full_train,
         )
 
-        results.append(ode_model.admm_solve(iterations=20, tol_primal=1e-2, record=True))
+        res = ode_model.admm_solve(iterations=20, tol_primal=1e-2, record=True)
+        res["seed"] = seed
+        results.append(res)
 
-    bp = 1
+    # … after the for-loop finishes
+    ts = time.strftime("%Y-%m-%d_%H-%M-%S")
+    outdir = Path(__file__).resolve().parents[2] / "results" / "admm_runs"
+    outdir.mkdir(parents=True, exist_ok=True)
+    with (outdir / f"admm_results_{ts}.pkl").open("wb") as f:
+        pickle.dump(results, f, protocol=pickle.HIGHEST_PROTOCOL)
+
+    print(f"Saved ADMM results to {outdir}")
 
 
 if __name__ == "__main__":
