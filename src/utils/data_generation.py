@@ -3,6 +3,8 @@ from jax.experimental.ode import odeint
 from jax import random, jit, vmap
 import numpy as np
 
+from utils.collocation_obj import Collocation
+from utils.non_parametric_collocation import collocate_data
 #-----------------------------------ODE DEFINITIONS-----------------------------------#
 @jit
 def harmonic_oscillator(y, t, omega_squared):
@@ -120,3 +122,59 @@ def generate_ode_data(n_points, noise_level, ode_type, params, start_time=0, end
     y_noisy = y + noise_level * random.normal(key, y.shape)
     
     return t, y, y_noisy, true_derivatives
+
+
+class DataPreprocessor:
+    def __init__(self, data_param):
+        self.model_type = 'pyomo'
+        self.N = data_param['N']
+        self.noise_level = data_param['noise_level']
+        self.ode_type = data_param['ode_type']
+        self.data_param = data_param['extra_param']
+        self.spacing_type = data_param['spacing_type']
+        self.start_time = data_param['start_time']
+        self.end_time = data_param['end_time']
+        self.init_state = data_param['initial_state']
+        self.test_size = getattr(data_param, 'test_size', None)
+        
+    def load_data(self):
+        if self.model_type == 'pyomo':
+            self.generate_nodes()
+        else:
+            self.nodes = jnp.linspace(self.start_time, self.end_time, self.N)
+        
+        # training    
+        self.t, self.y, self.y_noisy, true_derivative = generate_ode_data(
+            self.N, self.noise_level, self.ode_type, self.data_param, 
+            min(self.nodes), max(self.nodes), 
+            initial_state = self.init_state, t = self.nodes)
+        
+        self.true_derivative = true_derivative
+        
+        if self.test_size is not None:
+            test_end_time = self.end_time + self.test_size
+        else:
+            test_end_time = max(self.nodes) + (max(self.nodes) - min(self.nodes))
+        
+        # testing
+        self.init_state_test = self.y[-1]
+        t_test, y_test, _, _ = generate_ode_data(
+            self.N*2, self.noise_level, self.ode_type, self.data_param, 
+            max(self.nodes), test_end_time, 
+            spacing_type = "uniform", 
+            initial_state = self.init_state_test)
+        
+        self.t_test = t_test
+        self.y_test = y_test
+
+    def generate_nodes(self):
+        collocation = Collocation(self.N, self.start_time, self.end_time, self.spacing_type)
+        self.nodes = collocation.compute_nodes()
+        self.collocation = collocation
+       
+    def prepare_collocation(self):
+        self.D = np.array(self.collocation.compute_derivative_matrix())
+        
+    def estimate_derivative(self):
+        est_der, est_sol = collocate_data(self.y_noisy, self.t, 'EpanechnikovKernel', bandwidth=0.5)
+        self.est_sol = np.array(est_sol)

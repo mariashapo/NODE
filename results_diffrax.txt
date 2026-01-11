@@ -1,7 +1,30 @@
 Running iteration 1 with parameters: 1
-param_comb: 1, date: 2015-01-15, results: {'times_elapsed': 183.5510470867157, 'mse_diffrax': 0.015272080264516867, 'mse_diffrax_test': 0.15222811644723597}
+param_comb: 1, date: 2015-01-15, results: {'times_elapsed_split': [4.2396111488342285, 1.7911090850830078], 'times_elapsed': 6.030720233917236, 'mse_diffrax': 3.8538156150660345, 'mse_diffrax_test': 2.7270025092788184}
 Running iteration 2 with parameters: 1
-param_comb: 1, date: 2015-01-18, results: {'times_elapsed': 179.36762380599976, 'mse_diffrax': 0.009871965213542076, 'mse_diffrax_test': 0.13347619479707026}
+param_comb: 1, date: 2015-01-18, results: {'times_elapsed_split': [4.3481879234313965, 1.8455450534820557], 'times_elapsed': 6.193732976913452, 'mse_diffrax': 1.7546592769364038, 'mse_diffrax_test': 1.9490367213095245}
 Running iteration 3 with parameters: 1
-param_comb: 1, date: 2015-01-21, results: {'times_elapsed': 185.19263887405396, 'mse_diffrax': 0.019690566810535815, 'mse_diffrax_test': 0.2414987016385566}
+param_comb: 1, date: 2015-01-21, results: {'times_elapsed_split': [4.329604864120483, 1.772346019744873], 'times_elapsed': 6.1019508838653564, 'mse_diffrax': 17.627969963521004, 'mse_diffrax_test': 2.897390157702339}
 Running iteration 4 with parameters: 1
+param_comb: 1, date: 2015-01-24, results: {'times_elapsed_split': [4.8731420040130615, 1.819234848022461], 'times_elapsed': 6.6923768520355225, 'mse_diffrax': 4.0994715332887255, 'mse_diffrax_test': 4.00502477974178}
+Running iteration 5 with parameters: 1
+param_comb: 1, date: 2015-01-27, results: {'times_elapsed_split': [4.458861827850342, 1.9406211376190186], 'times_elapsed': 6.39948296546936, 'mse_diffrax': 10.77124996628212, 'mse_diffrax_test': 10.627077662623396}
+Running iteration 6 with parameters: 1
+param_comb: 1, date: 2015-01-30, results: {'times_elapsed_split': [4.468344211578369, 1.943410873413086], 'times_elapsed': 6.411755084991455, 'mse_diffrax': 6.988859535079814, 'mse_diffrax_test': 4.357055938751913}
+Running iteration 7 with parameters: 1
+param_comb: 1, date: 2015-02-02, results: {'times_elapsed_split': [4.581173896789551, 1.8253529071807861], 'times_elapsed': 6.406526803970337, 'mse_diffrax': 2.4647168974944282, 'mse_diffrax_test': 2.635182768202771}
+Running iteration 8 with parameters: 1
+param_comb: 1, date: 2015-02-05, results: {'times_elapsed_split': [4.54205584526062, 1.8507678508758545], 'times_elapsed': 6.392823696136475, 'mse_diffrax': 30.147558929867518, 'mse_diffrax_test': 19.546111803471646}
+Running iteration 9 with parameters: 1
+param_comb: 1, date: 2015-02-08, results: {'times_elapsed_split': [5.0418267250061035, 1.9254882335662842], 'times_elapsed': 6.967314958572388, 'mse_diffrax': 1.5441264228821052, 'mse_diffrax_test': 3.095240936820181}
+Running iteration 10 with parameters: 1
+param_comb: 1, date: 2015-02-11, results: {'times_elapsed_split': [4.655696868896484, 2.0018551349639893], 'times_elapsed': 6.657552003860474, 'mse_diffrax': 24.32378181284751, 'mse_diffrax_test': 14.740207014317978}
+Running iteration 11 with parameters: 1
+param_comb: 1, date: 2015-02-14, results: {'times_elapsed_split': [5.014723062515259, 1.8990139961242676], 'times_elapsed': 6.913737058639526, 'mse_diffrax': 1.0284636390210737, 'mse_diffrax_test': 0.8019503673104014}
+Running iteration 12 with parameters: 1
+param_comb: 1, date: 2015-02-17, results: {'times_elapsed_split': [5.043607950210571, 1.9075462818145752], 'times_elapsed': 6.9511542320251465, 'mse_diffrax': 4.900872313990406, 'mse_diffrax_test': 10.83504595738796}
+Running iteration 13 with parameters: 1
+param_comb: 1, date: 2015-02-20, results: {'times_elapsed_split': [4.795095205307007, 1.9870820045471191], 'times_elapsed': 6.782177209854126, 'mse_diffrax': 3.6880845532406297, 'mse_diffrax_test': 2.763107063129317}
+Running iteration 14 with parameters: 1
+param_comb: 1, date: 2015-02-23, results: {'times_elapsed_split': [4.936100006103516, 1.972508192062378], 'times_elapsed': 6.9086081981658936, 'mse_diffrax': 5.826825139041521, 'mse_diffrax_test': 1.8888167669707097}
+Running iteration 15 with parameters: 1
+param_comb: 1, date: 2015-02-26, results: {'times_elapsed_split': [4.8064799308776855, 1.9452860355377197], 'times_elapsed': 6.751765966415405, 'mse_diffrax': 7.236733929410994, 'mse_diffrax_test': 3.9021993940295654}

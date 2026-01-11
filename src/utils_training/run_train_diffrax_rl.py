@@ -103,22 +103,17 @@ class Trainer:
         state = node_model.create_train_state(self.rng, self.learning_rate, self.penalty, 
                                               rtol = 1e-3, atol = 1e-6, dt0 = 1e-3, custom_params = self.trained_wb)
         
-        start_time = time.time()
-        
+        total_start = time.time()
         self.losses = [] 
-        self.time_elapsed = []
+        self.time_elapsed_parts = []
         
         if not self.pretrain:
             self.pretrain = [1]
             self.num_epochs = [self.num_epochs]
           
         for i, pretrain in enumerate(self.pretrain):
+            stage_start = time.time()
             
-            if self.pretrain != [1] and (self.log or self.split_time):
-                # if we are pretraining, and want to log 
-                # the time & losses for each pretrain separately
-                start_time = time.time()
-                
             n = int(len(ts)* pretrain)
             state, losses = node_model.train(state, ts[:n] 
                                     , ys[:n], y0
@@ -128,20 +123,22 @@ class Trainer:
             
             
             self.losses.append(losses)
-            
-            if self.pretrain != [1] and (self.log or self.split_time):
-                self.time_elapsed.append(time.time() - start_time)
+            if self.split_time:
+                self.time_elapsed_parts.append(time.time() - stage_start)
         
-        if self.pretrain == [1] or not (self.log or self.split_time):    
-            self.time_elapsed = time.time() - start_time        
+        if not self.split_time:
+            self.time_elapsed = time.time() - total_start
+        else:
+            self.time_elapsed = list(self.time_elapsed_parts)
 
         # ---------------------------------------------------- PREDICTION ------------------------------------------------
         y_train_pred = node_model.neural_ode(state.params, y0, ts, state, extra_args)
         
         self.experiment_results = {}
-        # store a scalar runtime so downstream averaging doesn't get lists
+        # store scalar total, and keep per-stage breakdown if split_time requested
         if isinstance(self.time_elapsed, (list, tuple, np.ndarray)):
             runtime_total = float(np.sum(self.time_elapsed))
+            self.experiment_results['times_elapsed_split'] = list(self.time_elapsed)
         else:
             runtime_total = float(self.time_elapsed)
         self.experiment_results['times_elapsed'] = runtime_total

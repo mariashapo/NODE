@@ -7,7 +7,7 @@ import jax.numpy as jnp
 import diffrax as dfx
 import time
 
-from ode_solver_pyomo_opt import DirectODESolver
+from models.ode_solver_pyomo_opt import DirectODESolver
 
 np.random.seed(42)
 
@@ -15,9 +15,11 @@ class NeuralODEPyomoADMM:
 
     # --------------------------------------------- CLASS INITIALIZATION ------------------------------------------- #
     def __init__(self, y_observed, t, first_derivative_matrix, layer_sizes, time_invariant=True, extra_input=None, rho = 1.0,
-                 penalty_lambda_reg=0.01, penalty_lambda_smooth=0.0, act_func="tanh", w_init_method="random", params=None, y_init=None, test_data = None):
+                 penalty_lambda_reg=0.01, penalty_lambda_smooth=0.0, act_func="tanh", w_init_method="random", params=None, y_init=None, test_data = None,
+                 seed=42):
 
         # class parameters
+        np.random.seed(seed)
         self.initialize_data_params(y_observed, t, extra_input, y_init, first_derivative_matrix)
         self.initialize_model_params(penalty_lambda_reg, act_func, w_init_method, 
                                 layer_sizes, time_invariant, params, penalty_lambda_smooth, rho)
@@ -33,8 +35,11 @@ class NeuralODEPyomoADMM:
             self.test_data = test_data
             self.test_ys = test_data['y']
             self.test_ts = test_data['t']
-            self.test_Xs = test_data['X']
-            self.test_Ds = test_data['D']
+            self.test_Xs = test_data.get('X', None)
+            self.test_Ds = test_data.get('D', None)
+            self.record_test_mse = True
+        else:
+            self.record_test_mse = False
 
     def initialize_data_params(self, y_observed, t, extra_input, y_init, first_derivative_matrix):        
         self.midpoint = len(t) // 2
@@ -298,6 +303,9 @@ class NeuralODEPyomoADMM:
     def record_admm_info(self, time_elapsed):
         if not hasattr(self, 'admm_info'):
             self.admm_info = {'primal_residual': [], 'mse_diffrax': [], 'iter': [], 'time_elapsed': []}
+
+            if self.record_test_mse:
+                self.admm_info["mse_test_diffrax"] = []
             
         self.admm_info['primal_residual'].append(self.compute_primal_residual())
         
@@ -312,9 +320,28 @@ class NeuralODEPyomoADMM:
             raise ValueError("Solution and observed data do not have the same shape.")
         mse_diffrax = np.mean((solution - observed)**2)
 
+        # record training MSE
         self.admm_info['mse_diffrax'].append(mse_diffrax)
         self.admm_info['iter'].append(self.iter)
         self.admm_info['time_elapsed'].append(time_elapsed)
+        
+        if self.record_test_mse:
+            y_test_pred = self.node_diffrax_pred(
+                y0=jnp.array(self.test_ys[0]),
+                t=jnp.array(self.test_ts),
+                extra_input=None,          # keep it simple, same as train
+                weights="consensus",
+            )
+
+            test_pred = np.squeeze(np.array(y_test_pred))
+            test_obs = np.squeeze(np.array(self.test_ys))
+
+            # optional sanity check (keep or remove)
+            if test_pred.shape != test_obs.shape:
+                raise ValueError(f"Test pred shape {test_pred.shape} != obs shape {test_obs.shape}")
+
+            mse_test_diffrax = float(np.mean((test_pred - test_obs) ** 2))
+            self.admm_info["mse_test_diffrax"].append(mse_test_diffrax)
               
     # --------------------------------------------- ADMM UPDATES ---------------------------------------------- # 
     def update_dual_variables(self):
@@ -469,4 +496,3 @@ class NeuralODEPyomoADMM:
         solver_info = direct_solver.solve_model()
 
         return direct_solver.extract_solution()
-

@@ -16,7 +16,7 @@ mkdir -p "$OUTDIR" logs
 
 micromamba run -n "$ENV" python -V
 
-micromamba run -n "$ENV" python -m src.training_convergence.pyomo_pretrain \
+micromamba run -n "$ENV" python -m src.synthetic_data.pyomo_pretrain \
   --data_type "$DATA_TYPE" \
   --layer_width "$LAYER_WIDTH" \
   --penalty_lambda_reg 0.1 \
@@ -26,7 +26,7 @@ micromamba run -n "$ENV" python -m src.training_convergence.pyomo_pretrain \
   --seed 42 \
   --outdir results/pyomo_pretrain
 
-micromamba run -n "$ENV" python -m src.training_convergence.training_conv_pytorch \
+micromamba run -n "$ENV" python -m src.synthetic_data.training_conv_pytorch \
   --data_type "$DATA_TYPE" \
   --layer_width "$LAYER_WIDTH" \
   --max_iter "$MAX_ITER" \

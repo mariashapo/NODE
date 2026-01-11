@@ -19,10 +19,10 @@ micromamba run -n "$ENV" pip install pympler
 # Pyomo experiments
 # --------------------------
 
-micromamba run -n "$ENV" python -m src.training_convergence.training_conv_pyomo \
+micromamba run -n "$ENV" python -m src.synthetic_data.training_conv_pyomo \
   --no_print True --n_seeds 1 --outdir "$OUTDIR" --data_type "$DATA_TYPE" --exp "default"
 
-micromamba run -n "$ENV" python -m src.training_convergence.training_conv_pyomo \
+micromamba run -n "$ENV" python -m src.synthetic_data.training_conv_pyomo \
   --no_print True --n_seeds 5 --outdir "$OUTDIR" --data_type "$DATA_TYPE" --exp "network_size_grid_search"
 
 

@@ -21,13 +21,18 @@ def main():
     parser = argparse.ArgumentParser(description="Run JAX/diffrax experiments.")
     parser.add_argument(
         "--num-epochs",
-        default="1000,10000",
+        default="1000,1000",
         help="Comma-separated epochs per stage (e.g. 100,10).",
     )
     parser.add_argument(
         "--pretrain",
         default="0.2,1",
         help="Comma-separated fractions of data per stage (e.g. 0.2,1).",
+    )
+    parser.add_argument(
+        "--skip-logging-run",
+        action="store_true",
+        help="If set, skip the first run with logging enabled (default: run both logged and no-log passes).",
     )
     args = parser.parse_args()
 
@@ -70,21 +75,18 @@ def main():
     }
 
     extra_inputs["params_sequence"] = {"sequence_len": 15, "frequency": 3}
-    extra_inputs["params_results"] = {"plot": False, "log": 50, "split_time": True}
-    # extra_inputs['trained_wb'] = trained_wb
-
-    runner = ExperimentRunner(start_date, "default", extra_inputs)
-    runner.run()
-
     # Persist results similarly to training_convergence style
     ts = time.strftime("%Y-%m-%d_%H-%M-%S")
     subdir = OUTDIR / f"jax_rl_{ts}"
     subdir.mkdir(parents=True, exist_ok=True)
 
-    with (subdir / "results_WITH_logging.pkl").open("wb") as f:
-        pickle.dump(runner.results_full, f)
-
-    print(f"Saved results to {subdir}")
+    if not args.skip_logging_run:
+        extra_inputs["params_results"] = {"plot": False, "log": 50, "split_time": True}
+        runner = ExperimentRunner(start_date, "default", extra_inputs)
+        runner.run()
+        with (subdir / "results_WITH_logging.pkl").open("wb") as f:
+            pickle.dump(runner.results_full, f)
+        print(f"Saved WITH logging results to {subdir}")
 
     # rerun the same but no logging
     extra_inputs["params_results"] = {"plot": False, "log": False, "split_time": True}
@@ -95,7 +97,7 @@ def main():
     with (subdir / "results_NO_logging.pkl").open("wb") as f:
         pickle.dump(runner.results_full, f)
 
-    print(f"Saved results to {subdir}")
+    print(f"Saved NO logging results to {subdir}")
 
 
 if __name__ == "__main__":

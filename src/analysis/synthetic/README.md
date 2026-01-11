@@ -3,13 +3,13 @@
 Quick helpers for inspecting synthetic experiments.
 
 ## Plot training data vs predictions
-Script: `python -m src.training_convergence.plot_training_fit`
+Script: `python -m src.synthetic_data.plot_training_fit`
 
 Examples:
 
 - JAX VDP (two-stage pretrain):
   ```bash
-  python -m src.training_convergence.plot_training_fit \
+  python -m src.synthetic_data.plot_training_fit \
     --model_type jax_diffrax \
     --data_type vdp \
     --layer_width "[2,32,2]" \
@@ -22,7 +22,7 @@ Examples:
 
 - PyTorch HO:
   ```bash
-  python -m src.training_convergence.plot_training_fit \
+  python -m src.synthetic_data.plot_training_fit \
     --model_type pytorch \
     --data_type ho \
     --max_iter "[400,1000]" \
@@ -34,7 +34,7 @@ Examples:
 
 - Pyomo HO (Chebyshev spacing by default; adjust tol/reg as needed):
   ```bash
-  python -m src.training_convergence.plot_training_fit \
+  python -m src.synthetic_data.plot_training_fit \
     --model_type pyomo \
     --data_type ho \
     --layer_width "[2,32,2]" \
@@ -46,7 +46,7 @@ Examples:
 
 - Multiple models:
   ```bash
-  python -m src.training_convergence.plot_training_fit \
+  python -m src.synthetic_data.plot_training_fit \
     --model_types pyomo jax_diffrax pytorch \
     --data_type ho \
     --layer_width "[2,32,2]" \

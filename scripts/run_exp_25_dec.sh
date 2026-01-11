@@ -16,5 +16,5 @@ micromamba run -n "$ENV" python -V
 # --------------------------
 # Pyomo regularization experiments
 # --------------------------
-micromamba run -n "$ENV" python -m src.training_convergence.training_conv_pyomo \
+micromamba run -n "$ENV" python -m src.synthetic_data.training_conv_pyomo \
   --no_print True --n_seeds 15 --outdir "$OUTDIR" --data_type "vdp" --exp "network_size_grid_search"

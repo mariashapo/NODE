@@ -1,7 +1,7 @@
 # Training Convergence Helpers
 
 ## Pyomo Pretraining Bundle
-`python -m src.training_convergence.pyomo_pretrain` trains a Pyomo collocation model and saves weights ready for sequential models.
+`python -m src.synthetic_data.pyomo_pretrain` trains a Pyomo collocation model and saves weights ready for sequential models.
 
 ### What it produces
 - `weights_jax`: dict formatted for `nn_jax_diffrax` / TrainerToy JAX.
@@ -12,7 +12,7 @@
 
 ### Quick VDP example (matches the JAX/PyTorch default width)
 ```bash
-python -m src.training_convergence.pyomo_pretrain \
+python -m src.synthetic_data.pyomo_pretrain \
   --data_type vdp \
   --layer_width "[2,32,2]" \
   --penalty_lambda_reg 0.01 \
@@ -37,7 +37,7 @@ After it finishes, use `weights_jax` for JAX runs or `weights_pytorch` for PyTor
 
 ### Example: JAX with Pyomo pretraining (VDP)
 ```bash
-python -m src.training_convergence.training_conv_jax \
+python -m src.synthetic_data.training_conv_jax \
   --data_type vdp \
   --layer_width "[2,32,2]" \
   --max_iter "[50000]" \
@@ -47,7 +47,7 @@ python -m src.training_convergence.training_conv_jax \
 
 ### Example: PyTorch with Pyomo pretraining (VDP)
 ```bash
-python -m src.training_convergence.training_conv_pytorch \
+python -m src.synthetic_data.training_conv_pytorch \
   --data_type vdp \
   --layer_width "[2,32,2]" \
   --max_iter "[1000]" \
@@ -58,5 +58,5 @@ python -m src.training_convergence.training_conv_pytorch \
 ## Inspecting Pyomo pretrain bundles
 Show weights and metrics inside a bundle:
 ```bash
-python -m src.training_convergence.preview_pyomo_weights results/pyomo_pretrain/pyomo_pretrain_vdp_w2-32-2_seed0_<timestamp>.pkl --suppress
+python -m src.synthetic_data.preview_pyomo_weights results/pyomo_pretrain/pyomo_pretrain_vdp_w2-32-2_seed0_<timestamp>.pkl --suppress
 ```

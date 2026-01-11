@@ -201,7 +201,8 @@ def main():
             experiment_results_with_logs[date] = {
                 "mse_train": mse_numpy(y_pred, ys),
                 "mse_test": mse_numpy(y_pred_test, ys_test),
-                "time_elapsed": times_elapsed,
+                "time_elapsed": float(np.sum(times_elapsed)),
+                "time_elapsed_split": times_elapsed,
                 "training_losses": ode_model.losses,
             }
 
@@ -228,7 +229,8 @@ def main():
         experiment_results_no_logs[date] = {
             "mse_train": mse_numpy(y_pred, ys),
             "mse_test": mse_numpy(y_pred_test, ys_test),
-            "time_elapsed": times_elapsed,
+            "time_elapsed": float(np.sum(times_elapsed)),
+            "time_elapsed_split": times_elapsed,
             "training_losses": ode_model.losses,
         }
         

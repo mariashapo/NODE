@@ -24,7 +24,7 @@ mkdir -p "$OUTDIR" logs
 micromamba run -n "$ENV" python -V
 
 for W in "${WIDTHS[@]}"; do
-  micromamba run -n "$ENV" python -m src.training_convergence.training_conv_jax \
+  micromamba run -n "$ENV" python -m src.synthetic_data.training_conv_jax \
     --data_type "$DATA_TYPE" \
     --layer_width "$W" \
     --max_iter "$MAX_ITER" \

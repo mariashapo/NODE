@@ -60,6 +60,7 @@ class ExperimentRunner:
             self.params_results['log'] = False
             self.params_results['split_time'] = False
         
+        print(f"Split time: {self.params_results['split_time']}")
         self.param_combinations = self.define_param_combinations()
         self.metrics = self.initialize_metrics()
         
