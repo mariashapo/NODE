@@ -20,6 +20,7 @@ def summarize_runs(results, source_name):
         mse_test = run.get("mse_test_diffrax", [])
         mse_coll_test = run.get("mse_collocation_test", [])
         time_elapsed = run.get("time_elapsed", [])
+        primal = run.get("primal_residual", [])
 
         seed_val = run.get("seed", None)
 
@@ -30,6 +31,7 @@ def summarize_runs(results, source_name):
             len(mse_test),
             len(mse_coll_test),
             len(time_elapsed),
+            len(primal),
         )
 
         for i in range(max_len):
@@ -39,7 +41,7 @@ def summarize_runs(results, source_name):
                     "run": idx,
                     "iter": iters[i] if i < len(iters) else None,
                     "seed": seed_val,
-                    "primal_residual": run.get("primal_residual", [None]*max_len)[i] if i < len(run.get("primal_residual", [])) else None,
+                    "primal_residual": primal[i] if i < len(primal) else None,
                     "mse_train": mse_train[i] if i < len(mse_train) else None,
                     "mse_coll_train": mse_coll_train[i] if i < len(mse_coll_train) else None,
                     "mse_test": mse_test[i] if i < len(mse_test) else None,
@@ -50,7 +52,7 @@ def summarize_runs(results, source_name):
     return rows
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(description="Analyze ADMM result pickles.")
     parser.add_argument(
         "--dir",
@@ -67,7 +69,7 @@ def main():
         action="store_true",
         help="If set, also dump raw results after the summary dataframe.",
     )
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     rows_all = []
     raw_all = []
@@ -93,6 +95,7 @@ def main():
             raw_all.append({"file": pkl.name, "results": results})
 
     df = pd.DataFrame(rows_all)
+    pd.set_option("display.max_columns", None)
     print(df)
 
     if args.raw:
@@ -100,6 +103,8 @@ def main():
         for entry in raw_all:
             print(f"\nFILE: {entry['file']}")
             print(entry["results"])
+
+    return df
 
 
 if __name__ == "__main__":

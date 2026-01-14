@@ -42,7 +42,7 @@ def _build_parser():
     p.add_argument("--max_wall_time", type=float, default=None, help="Optional wall-time limit (seconds) for Pyomo solve.")
     # training_convergence_wall_time specific arguments:
     p.add_argument("--t_range", type=json.loads, default=None)
-    p.add_argument("--n_steps", type=int, default=1)
+    p.add_argument("--n_steps", type=int, default=None)
     p.add_argument("--meta", action="store_true", default=True, help="Write run_meta.json with args/params.")
     return p
 

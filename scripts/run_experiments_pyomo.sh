@@ -21,4 +21,4 @@ micromamba run -n "$ENV" pip install pympler
 micromamba run -n "$ENV" python -m src.synthetic_data.training_conv_pyomo \
   --layer_width "[2,32,2]" --penalty_lambda_reg 0.001 --tol 1e-8 --time_invariant True \
   --no_print "False" --n_seeds 1 --outdir "$OUTDIR" --data_type "$DATA_TYPE" \
-  --exp "default"
+  --exp "training_convergence_wall_time"

@@ -17,7 +17,7 @@ from models.nn_pyomo_admm import NeuralODEPyomoADMM
 def generate_admm_data(initial_state, include_test=False):
     base_params = {
         "N": 150,
-        "noise_level": 0.1,
+        "noise_level": 0.2,
         "ode_type": "van_der_pol",
         "data_param": {"mu": 1, "omega": 1},
         "spacing_type": "gauss_radau",

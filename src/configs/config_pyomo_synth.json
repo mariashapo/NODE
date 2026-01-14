@@ -41,7 +41,7 @@
       },
       "training_convergence_wall_time": {
         "pre_initialize": true,
-        "t_range": [0.01, 6],
+        "t_range": [0.01, 10],
         "n_steps": 50
       },
       "network_size_grid_search": {
