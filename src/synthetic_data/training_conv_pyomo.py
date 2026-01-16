@@ -137,17 +137,17 @@ def main(argv=None):
         print(f"All results saved to {filename}")
 
 if __name__ == "__main__":
-    action = "prod"
+    action = "dev"
     if action == "dev":
         main([
-            "--data_type", "do",
-            "--layer_width", "[3,8,2]",
+            "--data_type", "vdp",
+            "--layer_width", "[2,32,2]",
             "--penalty_lambda_reg", "0.1",
-            "--tol", "1e-3",
-            "--n_seeds", "1",
+            "--n_seeds", "5",
             "--exp", "default",
-            "--time_invariant", "False",
-            "--outdir", "results/study_do",
+            "--time_invariant", "True",
+            "--n_seeds", "10",
+            "--outdir", "results/pyomo_dev"
         ])
     else:
         main()

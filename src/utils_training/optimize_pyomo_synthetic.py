@@ -47,12 +47,12 @@ class ExperimentRunner:
         """
         # default data parameters
         data_params_ho = {
-            'N': 200,
+            'N': 300,
             'noise_level': self.data_params['noise_level'],
             'ode_type': "harmonic_oscillator",
             'data_param': {"omega_squared": 2},
             'start_time': 0,
-            'end_time': 10,
+            'end_time': 20,
             'spacing_type': spacing_type,
             'initial_state': np.array([0.0, 1.0]),
             'detailed': detailed

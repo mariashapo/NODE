@@ -5,7 +5,7 @@
       "penalty_lambda_reg": 0.001,
       "time_invariant": true,
       "w_init_method": "xavier",
-      "reg_norm": false,
+      "reg_norm": true,
       "skip_collocation": "inf",
       "redirect_logs": true,
       "params": {
@@ -41,7 +41,7 @@
       },
       "training_convergence_wall_time": {
         "pre_initialize": true,
-        "t_range": [0.01, 10],
+        "t_range": [0.01, 20],
         "n_steps": 50
       },
       "network_size_grid_search": {

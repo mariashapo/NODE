@@ -6,7 +6,7 @@ set -euo pipefail
 
 ENV="node25"
 OUTDIR="results/study_vdp"
-DATA_TYPE="vdp"
+DATA_TYPE="ho"
 
 # Ensure required dirs exist (safe even if you redirect logs outside)
 mkdir -p "$OUTDIR" logs
@@ -16,9 +16,20 @@ micromamba run -n "$ENV" python -V
 micromamba run -n "$ENV" pip install pympler
 
 # --------------------------
-# Pyomo experiments
-# --------------------------
+# Single Pyomo experiments
 micromamba run -n "$ENV" python -m src.synthetic_data.training_conv_pyomo \
   --layer_width "[2,32,2]" --penalty_lambda_reg 0.001 --tol 1e-8 --time_invariant True \
-  --no_print "False" --n_seeds 1 --outdir "$OUTDIR" --data_type "$DATA_TYPE" \
+  --no_print "False" --n_seeds 15 --outdir "$OUTDIR" --data_type "$DATA_TYPE" \
   --exp "training_convergence_wall_time"
+
+
+# --------------------------
+# ADMM experiments
+SCRIPT_DIR="$(cd -- "$(dirname "$0")" >/dev/null 2>&1 && pwd)"
+REPO_ROOT="${SCRIPT_DIR}/.."
+
+cd "$REPO_ROOT"
+
+micromamba run -n "$ENV" python -V
+
+micromamba run -n "$ENV" python -m src.synthetic_data.admm

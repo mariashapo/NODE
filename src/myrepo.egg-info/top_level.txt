@@ -1,5 +1,5 @@
 analysis
 models
-training_convergence
+synthetic_data
 utils
 utils_training

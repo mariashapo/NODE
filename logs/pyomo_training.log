@@ -1695,3 +1695,27 @@ ValueError: shapes (8,3) and (2,) not aligned: 3 (dim 1) != 2 (dim 0)
 2026-01-14 16:51:00,077 [WARNING] Setting Var 'y[147,1]' to a numeric value `-12.71882538766929` outside the bounds (-10.0, 10.0).
 2026-01-14 16:51:00,077 [WARNING] Setting Var 'y[148,1]' to a numeric value `-12.728355805328164` outside the bounds (-10.0, 10.0).
 2026-01-14 16:51:00,077 [WARNING] Setting Var 'y[149,1]' to a numeric value `-12.734422243895498` outside the bounds (-10.0, 10.0).
+2026-01-15 15:53:44,168 [ERROR] Failed to complete training: Cannot load a SolverResults object with bad status: error
+2026-01-15 15:53:54,482 [ERROR] Failed to complete training: Cannot load a SolverResults object with bad status: error
+2026-01-15 15:54:04,502 [ERROR] Solver (ipopt) returned non-zero return code (-11)
+2026-01-15 15:54:04,503 [ERROR] Solver log:
+Ipopt 3.14.16: tol=1e-08
+print_level=3
+max_iter=6000
+
+2026-01-15 15:54:04,503 [ERROR] Failed to complete training: Solver (ipopt) did not exit normally
+2026-01-15 15:54:14,573 [ERROR] Solver (ipopt) returned non-zero return code (-11)
+2026-01-15 15:54:14,573 [ERROR] Solver log:
+Ipopt 3.14.16: tol=1e-08
+print_level=3
+max_iter=6000
+
+2026-01-15 15:54:14,574 [ERROR] Failed to complete training: Solver (ipopt) did not exit normally
+2026-01-15 15:54:24,547 [ERROR] Failed to complete training: Cannot load a SolverResults object with bad status: error
+2026-01-15 15:54:34,577 [ERROR] Solver (ipopt) returned non-zero return code (-11)
+2026-01-15 15:54:34,578 [ERROR] Solver log:
+Ipopt 3.14.16: tol=1e-08
+print_level=3
+max_iter=6000
+
+2026-01-15 15:54:34,578 [ERROR] Failed to complete training: Solver (ipopt) did not exit normally
