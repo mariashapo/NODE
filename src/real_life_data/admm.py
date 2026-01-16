@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+from pathlib import Path
 
 from utils_training.optimize_pyomo_rl import ExperimentRunner
 from datetime import datetime, timedelta
@@ -23,7 +24,10 @@ def generate_dates(start_date, sequence_len = 5, frequency = 2):
 tol = 1e-6
 start_date = '2015-01-15'
 extra_input = {}
-extra_input['params_data'] = {'file_path': '../00_data/df_train.csv', 'start_date': start_date, 
+REPO_ROOT = Path(__file__).resolve().parents[2]
+DATA_PATH = REPO_ROOT / "data" / "df_train.csv"
+
+extra_input['params_data'] = {'file_path': str(DATA_PATH), 'start_date': start_date, 
                 'n_points': 600, 'split': 360, 'n_days': 1, 'm': 1, 
                 'prev_hour': False, 'prev_week': True, 'prev_year': True,
                 'spacing': 'gauss_radau',
@@ -65,7 +69,7 @@ params = {
     "print_level": 5,
     "max_iter": 500
 }
-file_path = '../00_data/df_train.csv'
+file_path = '../data/df_train.csv'
 encoding = {'settlement_date': 't', 'temperature': 'var1', 'hour': 'var2', 'nd': 'y'}
 
 date_sequences_str = generate_dates(start_date, sequence_len = 15, frequency = 5)

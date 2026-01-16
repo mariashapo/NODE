@@ -12,5 +12,5 @@ cd "$REPO_ROOT"
 
 micromamba run -n "$ENV" python -V
 
-micromamba run -n "$ENV" python -m src.synthetic_data.admm
+micromamba run -n "$ENV" python -m src.real_life_datas.admm
 
