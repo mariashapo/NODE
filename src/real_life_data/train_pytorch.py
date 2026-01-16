@@ -107,7 +107,7 @@ def main():
     
     parser.add_argument(
         "--sequence_len",
-        default=2,
+        default=15,
     )
     args = parser.parse_args()
 

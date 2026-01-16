@@ -36,7 +36,7 @@ extra_input['params_data'] = {'file_path': str(DATA_PATH), 'start_date': start_d
                 'spacing': 'gauss_radau',
                 'encoding': {'settlement_date': 't', 'temperature': 'var1', 'hour': 'var2', 'nd': 'y'},}
 
-extra_input['params_sequence'] = {'sequence_len': 2, 'frequency': 3}
+extra_input['params_sequence'] = {'sequence_len': 15, 'frequency': 3}
 extra_input['params_model'] = {'layer_sizes': [7, 32, 1], 'penalty': 1e-5, 'w_init_method': 'xavier'}
 extra_input['params_solver'] = { 
                         "tol":tol, 
