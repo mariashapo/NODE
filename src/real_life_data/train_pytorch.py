@@ -3,6 +3,7 @@ import pickle
 import time
 from datetime import datetime
 from pathlib import Path
+from typing import Optional, Tuple
 
 import numpy as np
 import torch
@@ -10,6 +11,7 @@ import torch
 from models.nn_pytorch import NeuralODE
 from utils.preprocess import DataPreprocessor
 from utils_training.optimize_diffrax_rl import ExperimentRunner
+from utils_training.utils_pytorch import prepare_custom_weights
 
 
 def parse_list(value, cast):
@@ -33,6 +35,16 @@ def to_torch_1d(x) -> torch.Tensor:
 
 def to_torch_col(x) -> torch.Tensor:
     return torch.tensor(np.atleast_2d(x).T, dtype=torch.float32)
+
+
+def load_weights_for_date(weights_dir: Path, date_str: str) -> Tuple[Optional[list], Optional[list]]:
+    """Return (layer_sizes, weights) if a weights file for the date exists; otherwise (None, None)."""
+    candidates = sorted(weights_dir.glob(f"*{date_str}*.pkl"))
+    if not candidates:
+        return None, None
+    with candidates[-1].open("rb") as f:
+        payload = pickle.load(f)
+    return payload.get("layer_sizes"), payload.get("weights")
 
 
 def run_staged_training(
@@ -72,18 +84,19 @@ def run_staged_training(
 
 def main():
     repo_root = Path(__file__).resolve().parents[2]
-    outdir = repo_root / "results" / "pytorch_rl_runs"
+    outdir = repo_root / "results" / "pytorch_rl_pyomo_weights"
     outdir.mkdir(parents=True, exist_ok=True)
+    weights_dir = repo_root / "results" / "trained_wb"
 
     parser = argparse.ArgumentParser(description="Train PyTorch Neural ODE on real-life data.")
     parser.add_argument(
         "--pretrain",
-        default="0.2,1",
+        default="1",
         help="Comma-separated fractions of the data to use per training stage (e.g. 0.2,1).",
     )
     parser.add_argument(
         "--num-epochs",
-        default="400,1000",
+        default="1000",
         help="Comma-separated epochs per stage (e.g. 400,1000).",
     )
     parser.add_argument(
@@ -94,7 +107,7 @@ def main():
     
     parser.add_argument(
         "--sequence_len",
-        default=15,
+        default=2,
     )
     args = parser.parse_args()
 
@@ -165,18 +178,29 @@ def main():
         ys_test = to_torch_col(ys_test_np)
         ts_test = to_torch_1d(ts_test_np)
 
+        # Load Pyomo-trained weights for this date if available
+        lw_loaded, weights_loaded = load_weights_for_date(weights_dir, date)
+        layer_widths_use = lw_loaded if lw_loaded else layer_widths
+        prepared_weights = prepare_custom_weights(weights_loaded) if weights_loaded else None
+
         if not args.skip_logging_run:
             # -------------------------
             # RUN 1: WITH LOGGING
             # -------------------------
-            ode_model = NeuralODE(layer_widths, learning_rate, weight_decay=weight_decay, time_invariant=True)
+            ode_model = NeuralODE(
+                layer_widths_use,
+                learning_rate,
+                weight_decay=weight_decay,
+                time_invariant=True,
+                custom_weights=prepared_weights,
+            )
 
             log = {
                 "t": ts,
                 "y": ys,
                 "y_init": y0,
                 "extra_args": None,  # extra inputs are initialized in the training
-                "epoch_recording_step": 25,
+                "epoch_recording_step": 100,
                 "t_test": ts_test,
                 "y_test": ys_test,
                 "y_init_test": y0_test,
@@ -209,7 +233,13 @@ def main():
         # -------------------------
         # RUN 2: NO LOGGING
         # -------------------------
-        ode_model = NeuralODE(layer_widths, learning_rate, weight_decay=weight_decay, time_invariant=True)
+        ode_model = NeuralODE(
+            layer_widths_use,
+            learning_rate,
+            weight_decay=weight_decay,
+            time_invariant=True,
+            custom_weights=prepared_weights,
+        )
 
         times_elapsed = run_staged_training(
             ode_model=ode_model,

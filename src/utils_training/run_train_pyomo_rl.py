@@ -7,6 +7,7 @@ import os
 import shutil
 import time
 import pickle
+from pathlib import Path
 
 from utils.preprocess import DataPreprocessor
 
@@ -58,13 +59,24 @@ class Trainer:
             except Exception as e:
                 print('Failed to delete %s. Reason: %s' % (file_path, e))
     
-    def save_trained_weights(self, description):
+    def save_trained_weights(self, description, weights_dir=None):
+        """Persist trained weights along with basic metadata."""
         weights = self.ode_model.extract_weights()
         formatted_time = time.strftime('%Y-%m-%d_%H-%M-%S')
-        path = f'../00_trained_wb/{description}_{formatted_time}.pkl'
-        with open(path, 'wb') as file:
-            pickle.dump(weights, file)
-        print(f"Results saved to {path}")
+        repo_root = Path(__file__).resolve().parents[2]
+        dest_dir = Path(weights_dir) if weights_dir is not None else (repo_root / "results" / "trained_wb")
+        dest_dir.mkdir(parents=True, exist_ok=True)
+        filename = f"{description}_start-{self.start_date}_{formatted_time}.pkl"
+        path = dest_dir / filename
+        payload = {
+            "start_date": self.start_date,
+            "layer_sizes": self.layer_sizes,
+            "w_init_method": self.w_init_method,
+            "weights": weights,
+        }
+        with path.open('wb') as file:
+            pickle.dump(payload, file, protocol=pickle.HIGHEST_PROTOCOL)
+        print(f"Trained weights saved to {path}")
     
     def train(self):
         print(f'Spacing type: {self.spacing}')

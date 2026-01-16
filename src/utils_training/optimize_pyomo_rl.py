@@ -12,6 +12,7 @@ import os
 import importlib
 import pickle
 import itertools
+from pathlib import Path
 
 
 from utils_training.run_train_pyomo_rl import Trainer
@@ -32,6 +33,11 @@ class ExperimentRunner:
         self.start_date = start_date
         self.opt_aim = optimization_aim
         self.extra_inputs = extra_inputs
+        self.repo_root = Path(__file__).resolve().parents[2]
+        default_weights_dir = self.repo_root / "results" / "trained_wb"
+        user_weights_dir = self.extra_inputs.get("weights_dir")
+        self.weights_dir = Path(user_weights_dir) if user_weights_dir else default_weights_dir
+        self.weights_dir.mkdir(parents=True, exist_ok=True)
         
         # generate default parameters for data, solver and ode
         # if not provided by the user
@@ -266,7 +272,25 @@ class ExperimentRunner:
         
         return tuple(str(item) if isinstance(item, list) else item for item in param_tuple)
     
-    def run(self):
+    @staticmethod
+    def _sanitize_for_path(text):
+        """Simple, file-name-safe tag."""
+        safe = str(text)
+        for ch in [" ", "[", "]", "(", ")", ",", "'"]:
+            safe = safe.replace(ch, "_")
+        while "__" in safe:
+            safe = safe.replace("__", "_")
+        return safe.strip("_")
+    
+    def _build_weight_description(self, date, param_comb):
+        """Create a readable prefix for saved weight files."""
+        if isinstance(param_comb, tuple):
+            param_tag = self._sanitize_for_path(param_comb)
+        else:
+            param_tag = self._sanitize_for_path(param_comb)
+        return f"pyomo_rl_{date}_{param_tag}"
+    
+    def run(self, save_weights = False):
         with open('results.txt', 'w'):
             pass
         file = open('results.txt', 'a')
@@ -294,6 +318,10 @@ class ExperimentRunner:
                     if iter == 1:
                         self.trainer.clear_directory()
                     experiment_results = self.trainer.train()
+                    if save_weights:
+                        desc = self._build_weight_description(date, param_comb)
+                        weights_path = self.trainer.save_trained_weights(desc, self.weights_dir)
+                        experiment_results['weights_path'] = str(weights_path)
                     print(f"message: {self.trainer.termination}")
                     if self.opt_aim == 'convergence' and 'optimal' in self.trainer.termination:
                         print(f"Optimal solution for {date} found in iteration {param_comb}")
@@ -334,8 +362,8 @@ class ExperimentRunner:
     def run_on_prediction(self):
         pass
     
-    def save_trained_weights(self, description):
-        self.trainer.save_trained_weights(description)
+    def save_trained_weights(self, description, weights_dir=None):
+        self.trainer.save_trained_weights(description, weights_dir if weights_dir is not None else self.weights_dir)
            
     def save_results(self, description):
         formatted_time = time.strftime('%Y-%m-%d_%H-%M-%S')
