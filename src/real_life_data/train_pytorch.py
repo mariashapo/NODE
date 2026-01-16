@@ -200,7 +200,7 @@ def main():
                 "y": ys,
                 "y_init": y0,
                 "extra_args": None,  # extra inputs are initialized in the training
-                "epoch_recording_step": 100,
+                "epoch_recording_step": 25,
                 "t_test": ts_test,
                 "y_test": ys_test,
                 "y_init_test": y0_test,
