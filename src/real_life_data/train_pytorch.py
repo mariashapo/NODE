@@ -96,7 +96,7 @@ def main():
     )
     parser.add_argument(
         "--num-epochs",
-        default="1000",
+        default="500",
         help="Comma-separated epochs per stage (e.g. 400,1000).",
     )
     parser.add_argument(
@@ -107,7 +107,7 @@ def main():
     
     parser.add_argument(
         "--sequence_len",
-        default=15,
+        default=30,
     )
     args = parser.parse_args()
 
@@ -200,7 +200,7 @@ def main():
                 "y": ys,
                 "y_init": y0,
                 "extra_args": None,  # extra inputs are initialized in the training
-                "epoch_recording_step": 25,
+                "epoch_recording_step": 15,
                 "t_test": ts_test,
                 "y_test": ys_test,
                 "y_init_test": y0_test,

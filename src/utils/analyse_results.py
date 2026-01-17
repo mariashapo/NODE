@@ -977,6 +977,148 @@ def plot_time_bands(
     return ax
 
 
+def plot_time_bands_median(
+    df_map, *,
+    y_col='mse_train',
+    grid_points=200,
+    tmax_quantile=0.9,
+    align_grid=True,
+    line_width=2.0,
+    band_alpha=0.25,
+    logy=True,
+    grid=True,
+    title=None,
+    extrapolate=True,  # backward-only semantics (matches time_ci)
+    cutoff_missing_frac = 0.5,
+    figsize=(12, 7),
+    xlim=None,
+    ylim=None,
+    min_support_abs=3,
+    label_fontsize=None,
+    tick_fontsize=None,
+    legend_fontsize=None,
+    title_fontsize=None,
+    lo_pct=25,
+    hi_pct=75,
+):
+    """Median/IQR variant of plot_time_bands.
+
+    Uses per-grid medians with percentile bands (defaults to 25/75 for IQR).
+    """
+    def _has_pretraining(df):
+        for col in ("pretrain", "pretraining", "pyomo_pretraining"):
+            if col in df.columns and df[col].astype(bool).any():
+                return True
+        return False
+
+    pretraining_present = any(_has_pretraining(df) for df in df_map.values())
+    curves = {}
+    eps = 1e-12 if logy else 0.0
+
+    # --- compute curves ---
+    for label, df in df_map.items():
+        tmax_q = tmax_quantile[label] if isinstance(tmax_quantile, dict) else tmax_quantile
+        x, _mean, _lo, _hi, Y, pre_mask, meta = ConvergenceCI.time_ci(
+            df,
+            grid_points=grid_points,
+            tmax_quantile=tmax_q,
+            y_col=y_col,
+            extrapolate=extrapolate,
+            logspace=logy,
+            cutoff_missing_frac = cutoff_missing_frac,
+            min_support_abs=min_support_abs,
+        )
+
+        if logy:
+            Yp = np.where(Y > eps, Y, np.nan)
+            L = np.log(Yp)
+            median = np.exp(np.nanmedian(L, axis=0))
+            lo = np.exp(np.nanpercentile(L, lo_pct, axis=0))
+            hi = np.exp(np.nanpercentile(L, hi_pct, axis=0))
+        else:
+            median = np.nanmedian(Y, axis=0)
+            lo = np.nanpercentile(Y, lo_pct, axis=0)
+            hi = np.nanpercentile(Y, hi_pct, axis=0)
+
+        curves[label] = dict(
+            x=x, median=median, lo=lo, hi=hi,
+            pre_mask=pre_mask,
+            t_pre_end=meta['tmin_global']
+        )
+
+    # --- optionally align x-grids across labels ---
+    if align_grid:
+        all_x = np.concatenate([c["x"] for c in curves.values()])
+        x_common = np.linspace(np.nanmin(all_x), np.nanmax(all_x), grid_points)
+
+        for d in curves.values():
+            d["median"] = np.interp(x_common, d["x"], d["median"],
+                                    left=d["median"][0], right=np.nan)
+            d["lo"] = np.interp(x_common, d["x"], d["lo"],
+                                left=d["lo"][0], right=np.nan)
+            d["hi"] = np.interp(x_common, d["x"], d["hi"],
+                                left=d["hi"][0], right=np.nan)
+            d["x"] = x_common
+            d["pre_mask"] = x_common < d["t_pre_end"]
+
+    # --- plot ---
+    fig, ax = plt.subplots(figsize=figsize)
+    any_pre = False
+
+    for label, d in curves.items():
+        x = d["x"]
+        median = np.clip(d["median"], eps, None)
+        lo = np.clip(d["lo"], eps, None)
+        hi = np.clip(d["hi"], eps, None)
+        pre = d["pre_mask"]
+        post = ~pre
+
+        [main_line] = ax.plot(x[post], median[post], label=label, linewidth=line_width)
+        color = main_line.get_color()
+        ax.fill_between(x, lo, hi, alpha=band_alpha, facecolor=color, edgecolor='none')
+
+        if np.any(pre):
+            any_pre = True
+            ax.plot(x[pre], median[pre], linewidth=line_width, linestyle='--', color=color)
+
+    if logy:
+        ax.set_yscale("log")
+
+    ax.set_xlabel("Training Time (s)")
+    ylabel = y_col.replace("_", " ").title()
+    ax.set_ylabel(ylabel + (" (log scale)" if logy else ""))
+
+    if label_fontsize is not None:
+        ax.xaxis.label.set_size(label_fontsize)
+        ax.yaxis.label.set_size(label_fontsize)
+    if tick_fontsize is not None:
+        ax.tick_params(labelsize=tick_fontsize)
+
+    if grid:
+        ax.grid(True, which="both", linestyle="--", linewidth=0.5, alpha=0.4)
+
+    if title:
+        ax.set_title(title, fontsize=title_fontsize)
+
+    if xlim is not None:
+        ax.set_xlim(xlim)
+    if ylim is not None:
+        ax.set_ylim(ylim)
+
+    if any_pre and pretraining_present:
+        pre_proxy = Line2D([0], [0], linestyle='--', color='black', label='pre-training')
+        handles, labels = ax.get_legend_handles_labels()
+        handles.append(pre_proxy)
+        labels.append('pre-training')
+        ax.legend(handles, labels, frameon=False, fontsize=legend_fontsize)
+    else:
+        ax.legend(frameon=False, fontsize=legend_fontsize)
+
+    plt.tight_layout()
+    plt.show()
+    return ax
+
+
 def load_all_pickles(folder, recursive=True):
     """Load all .pkl files from a folder into a list."""
     all_results = []

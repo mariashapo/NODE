@@ -1,4 +1,0 @@
-Running iteration 1 with parameters: 1
-param_comb: 1, date: 2015-01-15, results: {'result': {'solver_time': 10.458470106124878, 'termination_condition': <TerminationCondition.optimal: 'optimal'>, 'message': 'Ipopt 3.14.16\\x3a Optimal Solution Found'}, 'times_elapsed': 10.458470106124878, 'mse_odeint': 0.008492861742993279, 'mse_coll_ode': 0.009048825787987255, 'mse_odeint_test': 0.15129431465648754, 'mse_coll_ode_test': 0.15347257208614792, 'weights_path': 'None'}
-Running iteration 2 with parameters: 1
-param_comb: 1, date: 2015-01-18, results: {'result': {'solver_time': 13.707265853881836, 'termination_condition': <TerminationCondition.optimal: 'optimal'>, 'message': 'Ipopt 3.14.16\\x3a Optimal Solution Found'}, 'times_elapsed': 13.707265853881836, 'mse_odeint': 0.005111223325188756, 'mse_coll_ode': 0.004852808716746816, 'mse_odeint_test': 0.3235312366585606, 'mse_coll_ode_test': 0.25320570349147653, 'weights_path': 'None'}
