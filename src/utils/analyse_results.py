@@ -817,6 +817,14 @@ def plot_ci_fn(x, mean, lo, hi, label=None, logy=True, color=None, alpha_fill=0.
 def plot_time_bands(
     df_map, *,
     y_col='mse_train',
+    y_label=None,
+    points_df=None,
+    points_x_col='time_elapsed',
+    points_y_col=None,
+    points_label=None,
+    points_color='orange',
+    points_marker='x',
+    points_size=60,
     grid_points=200,
     tmax_quantile=0.9,
     align_grid=True,
@@ -941,8 +949,8 @@ def plot_time_bands(
         ax.set_yscale("log")
 
     ax.set_xlabel("Training Time (s)")
-    ylabel = "Training MSE" if y_col is None else y_col.replace("_", " ").title()
-    ax.set_ylabel(ylabel + (" (log scale)" if logy else ""))
+    ylabel = y_label if y_label is not None else ("Training MSE" if y_col is None else y_col.replace("_", " ").title())
+    ax.set_ylabel(ylabel)
 
     if label_fontsize is not None:
         ax.xaxis.label.set_size(label_fontsize)
@@ -963,14 +971,22 @@ def plot_time_bands(
         ax.set_ylim(ylim)
 
     # Build legend with an extra entry for the dashed meaning.
+    # Overlay optional single-point observations (e.g., reference runs)
+    if points_df is not None and len(points_df) > 0:
+        px = np.asarray(points_df[points_x_col], dtype=float)
+        y_key = points_y_col if points_y_col is not None else y_col
+        py = np.asarray(points_df[y_key], dtype=float)
+        ax.scatter(px, py, marker=points_marker, color=points_color, s=points_size,
+                   label=points_label, zorder=5, linewidths=1.2)
+
+    # Build legend after all artists are on the axes
+    handles, labels = ax.get_legend_handles_labels()
     if any_pre and pretraining_present:
         pre_proxy = Line2D([0], [0], linestyle='--', color='black', label='pre-training')
-        handles, labels = ax.get_legend_handles_labels()
         handles.append(pre_proxy)
         labels.append('pre-training')
+    if handles:
         ax.legend(handles, labels, frameon=False, fontsize=legend_fontsize)
-    else:
-        ax.legend(frameon=False, fontsize=legend_fontsize)
 
     plt.tight_layout()
     plt.show()

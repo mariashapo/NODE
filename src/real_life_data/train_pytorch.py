@@ -104,6 +104,22 @@ def main():
         action="store_true",
         help="Skip the first run with logging enabled (default: run both logged and no-log passes).",
     )
+    parser.add_argument(
+        "--use-pyomo-weights",
+        action="store_true",
+        default=False,
+        help="If set, try to load Pyomo-trained weights matching each date. Default: disabled.",
+    )
+    parser.add_argument(
+        "--weights",
+        default=None,
+        help="Comma-separated list of weight files to load (one per date, overrides --use-pyomo-weights for those dates).",
+    )
+    parser.add_argument(
+        "--dates",
+        default=None,
+        help="Comma-separated list of dates (YYYY-MM-DD). If provided, overrides automatic date generation.",
+    )
     
     parser.add_argument(
         "--sequence_len",
@@ -131,14 +147,23 @@ def main():
     experiment_results_with_logs: dict = {}
     experiment_results_no_logs: dict = {}
 
-    date_sequences = ExperimentRunner.generate_dates(start_date_str, sequence_len, freq)
+    if args.dates:
+        date_sequences = parse_list(args.dates, str)
+    else:
+        date_sequences = ExperimentRunner.generate_dates(start_date_str, sequence_len, freq)
+
+    weights_paths = None
+    if args.weights:
+        weights_paths = [Path(p).expanduser() for p in parse_list(args.weights, str)]
+        if len(weights_paths) != len(date_sequences):
+            raise ValueError("Number of weight files must match number of dates.")
 
     # Create one output folder for the whole run (instead of one per date)
     run_stamp = time.strftime("%Y-%m-%d_%H-%M-%S")
     subdir = outdir / f"pytorch_rl_{run_stamp}"
     subdir.mkdir(parents=True, exist_ok=True)
 
-    for date in date_sequences:
+    for i, date in enumerate(date_sequences):
         data_loader = DataPreprocessor(
             str(file_path),
             start_date=date,
@@ -179,7 +204,15 @@ def main():
         ts_test = to_torch_1d(ts_test_np)
 
         # Load Pyomo-trained weights for this date if available
-        lw_loaded, weights_loaded = load_weights_for_date(weights_dir, date)
+        lw_loaded, weights_loaded = (None, None)
+        # Priority: explicit weight files > auto-discovery
+        if weights_paths is not None:
+            with weights_paths[i].open("rb") as f:
+                payload = pickle.load(f)
+            lw_loaded = payload.get("layer_sizes")
+            weights_loaded = payload.get("weights")
+        elif args.use_pyomo_weights:
+            lw_loaded, weights_loaded = load_weights_for_date(weights_dir, date)
         layer_widths_use = lw_loaded if lw_loaded else layer_widths
         prepared_weights = prepare_custom_weights(weights_loaded) if weights_loaded else None
 
