@@ -5,6 +5,7 @@ import jax.numpy as jnp
 from scipy.interpolate import CubicSpline
 from sklearn.preprocessing import StandardScaler
 from scipy.ndimage import gaussian_filter1d
+from pathlib import Path
 
 import sys
 import os
@@ -20,7 +21,7 @@ class DataPreprocessor:
                  sigma = 1, split = 300, num_nodes_mult = 1, 
                  spacing = None, smooth = True):
         
-        self.file_path = file_path
+        self.file_path = Path(file_path)
         self.start_date = pd.to_datetime(start_date)
         self.number_of_points = number_of_points
         self.sigma = sigma
@@ -52,7 +53,8 @@ class DataPreprocessor:
 
     def load_data(self):
         """Load data with an offset to accommodate time lags."""
-        
+        if not self.file_path.exists():
+            raise FileNotFoundError(f"Data file not found: {self.file_path}")
         data = pd.read_csv(self.file_path)
         
         data['settlement_date'] = pd.to_datetime(data['settlement_date'])

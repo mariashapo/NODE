@@ -263,6 +263,7 @@ class NeuralODEPyomoADMM:
         if solution.shape != observed.shape:
             raise ValueError("Solution and observed data do not have the same shape.")
         mse_collocation = np.mean((solution - observed)**2)
+        self.admm_info['mse_collocation'].append(mse_collocation)
         
         # collocation-based predictions TEST
         if self.test_data is not None:
@@ -279,6 +280,8 @@ class NeuralODEPyomoADMM:
                 raise ValueError(f"Test pred shape {test_pred.shape} != obs shape {test_obs.shape}")
             mse_collocation_test = np.mean((test_pred - test_obs)**2)
             self.admm_info['mse_collocation_test'].append(mse_collocation_test)
+        else:
+            self.admm_info['mse_collocation_test'].append(np.nan)
         
         # diffax predictions
         y_solution_1 = self.node_diffrax_pred(
@@ -296,7 +299,6 @@ class NeuralODEPyomoADMM:
         solution = np.squeeze(np.concatenate([y_solution_1, y_solution_2]))
         mse_diffrax = np.mean((solution - observed)**2)
 
-        self.admm_info['mse_collocation'].append(mse_collocation)
         self.admm_info['mse_diffrax'].append(mse_diffrax)
         self.admm_info['iter'].append(self.iter)
         self.admm_info['time_elapsed'].append(time_elapsed)

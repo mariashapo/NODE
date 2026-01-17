@@ -36,7 +36,7 @@ extra_input['params_data'] = {'file_path': str(DATA_PATH), 'start_date': start_d
 extra_input['params_sequence'] = {'sequence_len': 15, 'frequency': 5}
 extra_input['params_model'] = {'layer_sizes': [7, 32, 1], 'penalty': 1e-7}
 extra_input['params_solver'] = { "tol" : tol, 
-                         "halt_on_ampl_error" : 'yes', "print_level": 1, "max_iter": 500, 'warm_start_init_point': 'yes'}
+                         "halt_on_ampl_error" : 'yes', "print_level": 5, "max_iter": 500, 'warm_start_init_point': 'yes', "max_wall_time": 80}
 
 extra_input['plot_odeint'] = True
 
@@ -47,7 +47,7 @@ single_model_results = runner.results_full
 df_single = pd.DataFrame(single_model_results).T
 df_single.reset_index(inplace=True)
 df_single.rename(columns={'level_0': 'regularization'}, inplace=True)
-df_single.drop(columns=['level_1', 'result', 'mse_odeint', 'mse_odeint_test'], inplace=True)
+df_single.drop(columns=['level_1', 'result'], inplace=True)
 df_single
 
 repo_root = Path(__file__).resolve().parents[2]
@@ -69,7 +69,7 @@ params = {
     "print_level": 5,
     "max_iter": 500
 }
-file_path = '../data/df_train.csv'
+file_path = REPO_ROOT / 'data' / 'df_train.csv'
 encoding = {'settlement_date': 't', 'temperature': 'var1', 'hour': 'var2', 'nd': 'y'}
 
 date_sequences_str = generate_dates(start_date, sequence_len = 15, frequency = 5)
