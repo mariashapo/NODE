@@ -20,7 +20,7 @@ extra_input['params_data'] = {'file_path': str(DATA_PATH), 'start_date': start_d
                 'spacing': 'gauss_radau',
                 'encoding': {'settlement_date': 't', 'temperature': 'var1', 'hour': 'var2', 'nd': 'y'},}
 
-extra_input['params_sequence'] = {'sequence_len': 10, 'frequency': 3}
+extra_input['params_sequence'] = {'sequence_len': 1, 'frequency': 3}
 extra_input['params_model'] = {'layer_sizes': [7, 32, 1], 'penalty': 1e-5, 'w_init_method': 'xavier'}
 extra_input['params_solver'] = { 
                         "tol":tol, 
@@ -33,10 +33,10 @@ extra_input['params_solver'] = {
                         "bound_relax_factor": 1e-8
                         }
 
-extra_input['plot_collocation'] = False
+extra_input['plot_collocation'] = True
 extra_input['plot_odeint'] = False
 
-runner = ExperimentRunner(start_date, 'converge_wall_time', extra_input)
+runner = ExperimentRunner(start_date, 'default', extra_input)
 runner.run()
 
 # Persist results similarly to training_convergence style

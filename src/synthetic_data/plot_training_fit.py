@@ -35,8 +35,11 @@ def _plot_combined(
     t_test,
     y_test,
     y_pred_test,
-    title,
     outpath: Path,
+    figsize=(10, 6),
+    label_fontsize=16,
+    tick_fontsize=13,
+    legend_fontsize=13,
 ):
     """Plot all states with train+test on a single axes (common styling)."""
     t_train = _to_np(t_train)
@@ -49,15 +52,12 @@ def _plot_combined(
     y_pred_test = _to_np(y_pred_test)
 
     n_states = y_train.shape[1] if y_train.ndim > 1 else 1
-    fig, ax = plt.subplots(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=figsize)
 
-    # Shared styling per trace type to keep legend compact
     colors = {
-        "train_clean": "C0",
-        "train_noisy": "C1",
-        "train_pred": "C3",
-        "test_clean": "C0",
-        "test_pred": "C3",
+        "true": "C0",
+        "noisy": "C1",
+        "pred": "C3",
     }
 
     for i in range(n_states):
@@ -67,29 +67,36 @@ def _plot_combined(
         ys = y_test[:, i] if n_states > 1 else y_test
         yp_te = y_pred_test[:, i] if n_states > 1 else y_pred_test
 
-        lbl_train_clean = "train clean" if i == 0 else None
-        lbl_train_noisy = "train noisy" if i == 0 else None
-        lbl_train_pred = "train pred" if i == 0 else None
-        lbl_test_clean = "test clean" if i == 0 else None
-        lbl_test_pred = "test pred" if i == 0 else None
+        lbl_true = "True Data" if i == 0 else None
+        lbl_noisy = "Noisy Data" if i == 0 else None
+        lbl_pred = "Predicted Trajectory" if i == 0 else None
 
-        ax.plot(t_train, yt, color=colors["train_clean"], linewidth=2.0, label=lbl_train_clean)
-        ax.scatter(t_train, yn, color=colors["train_noisy"], s=10, alpha=0.45, label=lbl_train_noisy)
-        ax.plot(t_train, yp_tr, color=colors["train_pred"], linewidth=2.0, linestyle="--", label=lbl_train_pred)
+        ax.plot(t_train, yt, color=colors["true"], linewidth=2.0, linestyle=":", label=lbl_true)
+        ax.scatter(t_train, yn, color=colors["noisy"], s=40, alpha=0.6, label=lbl_noisy)
+        ax.plot(t_train, yp_tr, color=colors["pred"], linewidth=2.0, linestyle="-", label=lbl_pred)
 
-        ax.plot(t_test, ys, color=colors["test_clean"], linewidth=2.0, linestyle="-.", label=lbl_test_clean)
-        ax.plot(t_test, yp_te, color=colors["test_pred"], linewidth=2.0, linestyle=":", label=lbl_test_pred)
+        ax.plot(t_test, ys, color=colors["true"], linewidth=2.0, linestyle=":", label=None)
+        ax.plot(t_test, yp_te, color=colors["pred"], linewidth=2.0, linestyle="-", label=None)
 
-    ax.set_title(title, fontsize=TITLE_FONTSIZE)
-    ax.set_xlabel("time", fontsize=LABEL_FONTSIZE)
-    ax.set_ylabel("value", fontsize=LABEL_FONTSIZE)
+    ax.set_xlabel("Time (t)", fontsize=label_fontsize)
+    ax.set_ylabel("State Values - u(t), v(t)", fontsize=label_fontsize)
     ax.grid(True, linestyle="--", alpha=0.4)
+    ax.tick_params(axis="both", labelsize=tick_fontsize)
 
     handles, labels = ax.get_legend_handles_labels()
     # drop None labels
     handles_labels = [(h, l) for h, l in zip(handles, labels) if l]
     uniq = dict(zip([l for _, l in handles_labels], [h for h, _ in handles_labels]))
-    ax.legend(uniq.values(), uniq.keys(), frameon=False, ncol=3)
+    # Place legend below the plot area
+    ax.legend(
+        uniq.values(),
+        uniq.keys(),
+        loc="lower center",
+        ncol=3,
+        frameon=False,
+        fontsize=legend_fontsize,
+        bbox_to_anchor=(0.5, -0.18),
+    )
 
     fig.tight_layout()
     outpath.parent.mkdir(parents=True, exist_ok=True)
@@ -195,7 +202,7 @@ def _plot_split_compare(
         loc="lower center",
         ncol=5,
         frameon=False,
-        bbox_to_anchor=(0.5, 0.02),
+        bbox_to_anchor=(0.5, -0.03),
     )
     fig.tight_layout(rect=[0, 0.05, 1, 0.92])
     outpath.parent.mkdir(parents=True, exist_ok=True)
@@ -234,7 +241,7 @@ def make_pyomo_params(args) -> Dict[str, Any]:
         "layer_widths": args.layer_width if args.layer_width is not None else [2, 32, 2],
         "act_func": "tanh",
         "penalty_lambda_reg": args.penalty_lambda_reg,
-        "time_invariant": True,
+        "time_invariant": False,
         "w_init_method": "xavier",
         "reg_norm": args.reg_norm,
         "skip_collocation": np.inf,
@@ -339,7 +346,9 @@ def main():
             split_states=(args.plot_mode == "split_compare"),
         )
     else:
-        y_pred_train, y_pred_test = preds[model_list[0]]
+        first = preds[model_list[0]]
+        y_pred_train = first["y_pred_train"]
+        y_pred_test = first["y_pred_test"]
         _plot_combined(
             base_trainer.t,
             base_trainer.y,
@@ -348,7 +357,6 @@ def main():
             base_trainer.t_test,
             base_trainer.y_test,
             y_pred_test,
-            title,
             outfile,
         )
 

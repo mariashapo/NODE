@@ -47,7 +47,7 @@ class ExperimentRunner:
         """
         # default data parameters
         data_params_ho = {
-            'N': 300,
+            'N': 200,
             'noise_level': self.data_params['noise_level'],
             'ode_type': "harmonic_oscillator",
             'data_param': {"omega_squared": 2},
@@ -59,7 +59,7 @@ class ExperimentRunner:
         }
 
         data_params_vdp = {
-            'N': 300,
+            'N': 200,
             'noise_level': self.data_params['noise_level'],
             'ode_type': "van_der_pol",
             'data_param': {"mu": 1, "omega": 1},

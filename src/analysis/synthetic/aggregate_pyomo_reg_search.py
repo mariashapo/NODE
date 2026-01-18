@@ -342,7 +342,7 @@ def main(argv=None):
                 g[hi_col],
                 title=f"{metric_pretty} vs Width ({title_suffix}; arch=[2,w,2])" if not args.no_title else None,
                 xlabel="Width (architecture [2,w,2])",
-                ylabel=f"{metric_pretty} (Mean ± 95% CI)",
+                ylabel=f"{metric_pretty}",
                 xscale=xscale,
                 yscale=yscale,
                 add_errorbars=False,
@@ -375,7 +375,7 @@ def main(argv=None):
                 g[hi_col],
                 title=f"{metric_pretty} vs {xlabel} ({title_suffix}, lw={lw})" if not args.no_title else None,
                 xlabel=xlabel,
-                ylabel=f"{metric_pretty} (Mean ± 95% CI)",
+                ylabel=f"{metric_pretty}",
                 xscale=xscale,
                 yscale=yscale,
                 add_errorbars=False,
@@ -392,7 +392,7 @@ def main(argv=None):
 
 
 if __name__ == "__main__":
-    action = "prod"
+    action = "dev"
     if action == "dev":
         main([
             "--dir", "results/study_ho_reg/pyomo_ho_241225",
