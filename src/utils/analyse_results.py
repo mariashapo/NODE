@@ -825,6 +825,7 @@ def plot_time_bands(
     points_color='orange',
     points_marker='x',
     points_size=60,
+    points_linewidth=1.8,
     grid_points=200,
     tmax_quantile=0.9,
     align_grid=True,
@@ -977,7 +978,7 @@ def plot_time_bands(
         y_key = points_y_col if points_y_col is not None else y_col
         py = np.asarray(points_df[y_key], dtype=float)
         ax.scatter(px, py, marker=points_marker, color=points_color, s=points_size,
-                   label=points_label, zorder=5, linewidths=1.2)
+                   label=points_label, zorder=5, linewidths=points_linewidth)
 
     # Build legend after all artists are on the axes
     handles, labels = ax.get_legend_handles_labels()
