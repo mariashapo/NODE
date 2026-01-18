@@ -137,7 +137,7 @@ def main(argv=None):
         print(f"All results saved to {filename}")
 
 if __name__ == "__main__":
-    action = "dev"
+    action = "prod"
     if action == "dev":
         main([
             "--data_type", "vdp",
