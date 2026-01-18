@@ -5,7 +5,7 @@
       "penalty_lambda_reg": 0.001,
       "time_invariant": true,
       "w_init_method": "xavier",
-      "reg_norm": true,
+      "reg_norm": false,
       "skip_collocation": "inf",
       "redirect_logs": true,
       "params": {

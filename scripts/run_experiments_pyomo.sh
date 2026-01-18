@@ -18,7 +18,7 @@ micromamba run -n "$ENV" pip install pympler
 # --------------------------
 # Single Pyomo experiments
 micromamba run -n "$ENV" python -m src.synthetic_data.training_conv_pyomo \
-  --layer_width "[2,32,2]" --penalty_lambda_reg 0.1 --tol 1e-8 --time_invariant True \
+  --layer_width "[2,32,2]" --penalty_lambda_reg 0.001 --tol 1e-8 --time_invariant True \
   --no_print "False" --n_seeds 15 --outdir "$OUTDIR" --data_type "$DATA_TYPE" \
   --exp "network_size_grid_search"
 
