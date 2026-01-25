@@ -64,7 +64,7 @@ class ExperimentRunner:
             'ode_type': "van_der_pol",
             'data_param': {"mu": 1, "omega": 1},
             'start_time': 0,
-            'end_time': 30,
+            'end_time': 15,
             'spacing_type': spacing_type,
             'initial_state': np.array([0.0, 1.0]),
             'detailed' : detailed

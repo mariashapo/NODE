@@ -1719,3 +1719,6 @@ print_level=3
 max_iter=6000
 
 2026-01-15 15:54:34,578 [ERROR] Failed to complete training: Solver (ipopt) did not exit normally
+2026-01-25 13:37:20,676 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.19\x3a Maximum Wallclock Time Exceeded.

@@ -2,10 +2,10 @@
     "model_params": {
       "layer_widths": [2, 32, 2],
       "act_func": "tanh",
-      "penalty_lambda_reg": 0.001,
+      "penalty_lambda_reg": 0.1,
       "time_invariant": true,
       "w_init_method": "xavier",
-      "reg_norm": false,
+      "reg_norm": true,
       "skip_collocation": "inf",
       "redirect_logs": true,
       "params": {
