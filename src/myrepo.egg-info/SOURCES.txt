@@ -4,7 +4,7 @@ src/analysis/synthetic/aggregate_pyomo_reg_search.py
 src/analysis/synthetic/analyze_admm_results.py
 src/models/nn_jax_diffrax.py
 src/models/nn_pyomo_admm.py
-src/models/nn_pyomo_admm_2.py
+src/models/nn_pyomo_admm_1.py
 src/models/nn_pyomo_base.py
 src/models/nn_pyomo_dae.py
 src/models/nn_pytorch.py

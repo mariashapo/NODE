@@ -5,7 +5,7 @@
 set -euo pipefail
 
 ENV="node25"
-OUTDIR="results/study_vdp_network_size"
+OUTDIR="results/study_vdp_network_size_no_reg_norm"
 DATA_TYPE="vdp"
 
 # Ensure required dirs exist (safe even if you redirect logs outside)

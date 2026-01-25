@@ -1,9 +1,9 @@
-Solver command line: ['/opt/homebrew/bin/ipopt', '/var/folders/2v/gfm3z1tn5fj8zss_r9hrgnv80000gn/T/tmp74xtelyi.pyomo.nl', '-AMPL', 'tol=1e-08', 'print_level=3', 'max_iter=6000', 'max_wall_time=0.01']
+Solver command line: ['/opt/homebrew/bin/ipopt', '/var/folders/2v/gfm3z1tn5fj8zss_r9hrgnv80000gn/T/tmpgxk5sv_m.pyomo.nl', '-AMPL', 'tol=1e-08', 'print_level=3', 'max_iter=6000', 'max_wall_time=0.0433']
 
 Ipopt 3.14.19: tol=1e-08
 print_level=3
 max_iter=6000
-max_wall_time=0.01
+max_wall_time=0.0433
 
 
 ******************************************************************************
@@ -26,12 +26,12 @@ Total number of inequality constraints...............:        0
 Number of Iterations....: 0
 
                                    (scaled)                 (unscaled)
-Objective...............:   7.0850038931459261e-02    7.0850038931459261e-02
-Dual infeasibility......:   4.6374071910735282e-03    4.6374071910735282e-03
-Constraint violation....:   5.1111324561879350e+00    3.4516548986382702e+02
+Objective...............:   6.2420621576061312e-02    6.2420621576061312e-02
+Dual infeasibility......:   3.4543382041352100e-03    3.4543382041352100e-03
+Constraint violation....:   5.9481945973180599e+00    1.3136767111384196e+02
 Variable bound violation:   0.0000000000000000e+00    0.0000000000000000e+00
-Complementarity.........:   1.0065807453364837e+02    1.0065807453364837e+02
-Overall NLP error.......:   1.0065807453364837e+02    3.4516548986382702e+02
+Complementarity.........:   1.0059810493327771e+02    1.0059810493327771e+02
+Overall NLP error.......:   1.0059810493327771e+02    1.3136767111384196e+02
 
 
 Number of objective function evaluations             = 1
@@ -41,7 +41,7 @@ Number of inequality constraint evaluations          = 0
 Number of equality constraint Jacobian evaluations   = 1
 Number of inequality constraint Jacobian evaluations = 0
 Number of Lagrangian Hessian evaluations             = 0
-Total seconds in IPOPT                               = 0.070
+Total seconds in IPOPT                               = 0.066
 
 EXIT: Maximum wallclock time exceeded.
 

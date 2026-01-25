@@ -2,10 +2,10 @@
     "model_params": {
       "layer_widths": [2, 32, 2],
       "act_func": "tanh",
-      "penalty_lambda_reg": 0.1,
+      "penalty_lambda_reg": 0.001,
       "time_invariant": true,
       "w_init_method": "xavier",
-      "reg_norm": true,
+      "reg_norm": false,
       "skip_collocation": "inf",
       "redirect_logs": true,
       "params": {
@@ -53,7 +53,7 @@
           [2, 64, 2],
           [2, 96, 2]
         ],
-        "reg_list": [0.1],
+        "reg_list": [0.001],
         "tol_list": [1e-8]
       },
       "activation_function": {

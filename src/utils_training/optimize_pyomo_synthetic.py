@@ -146,7 +146,6 @@ class ExperimentRunner:
                     self.tested_params.append((param_comb[0], param_comb[1]))
                     i_since_convergence = 1
 
-                # extract -> try to keep only small scalars in results
                 try:
                     r = trainer.extract_results_pyomo(detailed = True)
                 except Exception as e:
@@ -162,7 +161,6 @@ class ExperimentRunner:
 
 
             print_memory("Finished training: ")
-            # aggressive cleanup
             self._cleanup_trainer(trainer)
             del trainer
             import gc

@@ -1722,3 +1722,16 @@ max_iter=6000
 2026-01-25 13:37:20,676 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
   - termination condition: maxIterations
   - message from solver: Ipopt 3.14.19\x3a Maximum Wallclock Time Exceeded.
+2026-01-25 15:02:36,962 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.19\x3a Maximum Wallclock Time Exceeded.
+2026-01-25 15:02:41,801 [ERROR] Failed to extract results: Cannot load a SolverResults object with bad status: error
+2026-01-25 15:02:49,407 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.19\x3a Maximum Wallclock Time Exceeded.
+2026-01-25 15:02:54,240 [ERROR] Failed to extract results: Cannot load a SolverResults object with bad status: error
+2026-01-25 15:03:01,883 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.19\x3a Maximum Wallclock Time Exceeded.
+2026-01-25 15:03:04,065 [ERROR] Constructing component 'obj' from data=None failed:
+    KeyboardInterrupt: 
