@@ -23,6 +23,24 @@ def _is_pyomo_pretrain(pretrain: Any) -> bool:
     return isinstance(pretrain, str) and pretrain.startswith("pyomo")
 
 
+def _normalize_pretrain(pretrain: Any) -> Any:
+    """Treat single full-length schedules as no-pretrain."""
+    if _is_pyomo_pretrain(pretrain):
+        return pretrain
+    if pretrain in (None, False):
+        return False
+    # Collapse scalar >=1 or single-element list/tuple >=1 to False
+    try:
+        if isinstance(pretrain, (int, float)):
+            return False if float(pretrain) >= 1 else [pretrain]
+        if isinstance(pretrain, (list, tuple)) and len(pretrain) == 1:
+            val = float(pretrain[0])
+            return False if val >= 1 else pretrain
+    except Exception:
+        pass
+    return pretrain
+
+
 def _format_width_tag(layer_widths) -> str:
     return "-".join(str(w) for w in layer_widths)
 
@@ -83,7 +101,7 @@ def parse_args(argv=None):
 
 def main(argv=None):
     args = parse_args(argv)
-    pretrain_value = _parse_pretrain_arg(args.pretrain)
+    pretrain_value = _normalize_pretrain(_parse_pretrain_arg(args.pretrain))
     
     params_model = {
         'layer_widths': args.layer_width if args.layer_width is not None else [2, 32, 2],
