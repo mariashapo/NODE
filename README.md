@@ -27,7 +27,7 @@ python -m src.synthetic_data.training_conv_pyomo --layer_width '[2,32,2]' --exp 
 ```
 
 4. **Running real-life data experiments:**
-Download the data from [link](https://drive.google.com/drive/folders/1ehxKYdF-eWPjYj5T6zqrfIXIJNknMZSb?usp=sharing) and save it as `data/df_train.csv'.
+> Download the data from [link](https://drive.google.com/drive/folders/1ehxKYdF-eWPjYj5T6zqrfIXIJNknMZSb?usp=sharing) and save it as `data/'.
 
 
 Default Pyomo run for real-life data experiments. All parameters can be adjusted in the 'src.real_life_data.train_pyomo.py' file itself. 
