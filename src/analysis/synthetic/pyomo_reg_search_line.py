@@ -1,7 +1,8 @@
 """Aggregate results from Pyomo regularization/width/tolerance sweeps.
 
-Loads pickle files from results/study_vdp_reg/pyomo_vdp and produces a
-DataFrame that can be explored or saved to CSV.
+Loads pickle files from the synthetic analysis results folder
+(`src/analysis/synthetic/results/study_vdp_reg/pyomo_vdp` by default) and
+produces a DataFrame that can be explored or saved to CSV.
 """
 
 from pathlib import Path
@@ -12,8 +13,29 @@ from utils.analyse_results import Graphs
 from math import sqrt
 import numpy as np
 import json
+from typing import Union
 
-def load_reg_search(dir_path: str = "results/study_vdp_reg/pyomo_vdp") -> pd.DataFrame:
+RESULTS_ROOT = Path(__file__).resolve().parent / "results"
+# "study_vdp_reg/pyomo_vdp"
+DEFAULT_CLI_DIR = RESULTS_ROOT / "study_ho_reg/pyomo_ho_241225"
+
+
+def _resolve_results_dir(dir_path: Union[str, Path]) -> Path:
+    """Resolve a user-supplied results directory, preferring synthetic/results."""
+    path = Path(dir_path)
+    if path.is_absolute():
+        return path
+
+    # If the caller passed "results/..." drop the prefix so we don't duplicate it
+    relative = Path(*path.parts[1:]) if path.parts and path.parts[0] == "results" else path
+    candidate = RESULTS_ROOT / relative
+    if candidate.exists():
+        return candidate
+    # Fall back to the user-provided relative path if it exists; otherwise stick with the synthetic path
+    return path if path.exists() else candidate
+
+
+def load_reg_search(dir_path: Union[str, Path]) -> pd.DataFrame:
     """Load all .pkl result files into a flat DataFrame (one row per run).
 
     Handles both (layer_widths, reg, tol) keys and wall-time sweeps that use
@@ -21,9 +43,10 @@ def load_reg_search(dir_path: str = "results/study_vdp_reg/pyomo_vdp") -> pd.Dat
     pull defaults like layer_width/penalty_lambda_reg/tol from run_meta.json
     if present in the folder so downstream plotting still has sensible columns.
     """
+    dir_path = _resolve_results_dir(dir_path)
     # Optional defaults from a companion run_meta.json
     meta_defaults = {}
-    meta_path = Path(dir_path) / "run_meta.json"
+    meta_path = dir_path / "run_meta.json"
     if meta_path.exists():
         try:
             with open(meta_path, "r") as f:
@@ -37,7 +60,7 @@ def load_reg_search(dir_path: str = "results/study_vdp_reg/pyomo_vdp") -> pd.Dat
             meta_defaults = {}
 
     records = []
-    for fp in sorted(Path(dir_path).glob("*.pkl")):
+    for fp in sorted(dir_path.glob("*.pkl")):
         try:
             run = pickle.load(open(fp, "rb"))
         except Exception as exc:  # pragma: no cover
@@ -183,7 +206,11 @@ def main(argv=None):
     import ast
 
     ap = argparse.ArgumentParser(description="Aggregate Pyomo reg/width/tol sweeps with CIs.")
-    ap.add_argument("--dir", default="results/study_ho_reg/pyomo_ho_241225", help="Folder with .pkl results")
+    ap.add_argument(
+        "--dir",
+        default=str(DEFAULT_CLI_DIR),
+        help="Folder with .pkl results (relative paths are resolved under src/analysis/synthetic/results).",
+    )
     ap.add_argument("--plot", action="store_true", help="Plot a reg curve with CIs (pick metric/tol/layer_width).")
     ap.add_argument(
         "--metric",
@@ -395,11 +422,10 @@ if __name__ == "__main__":
     action = "dev"
     if action == "dev":
         main([
-            "--dir", "results/study_ho_reg/pyomo_ho_241225",
+            "--dir", str(DEFAULT_CLI_DIR),
             "--plot",
             "--metric", "mse_test_coll",
-            "--tol", "1e-6",
-            "--layer_width", "[2,32,2]",
+            "--boxplot"
         ])
     else:    
         main()

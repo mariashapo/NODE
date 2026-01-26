@@ -1,6 +1,6 @@
 README.md
 pyproject.toml
-src/analysis/synthetic/aggregate_pyomo_reg_search.py
+src/analysis/synthetic/pyomo_reg_search_line.py
 src/analysis/synthetic/analyze_admm_results.py
 src/models/nn_jax_diffrax.py
 src/models/nn_pyomo_admm.py

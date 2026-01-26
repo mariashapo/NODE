@@ -16,7 +16,7 @@ import pickle
 from pathlib import Path
 import numpy as np
 
-from analysis.synthetic.aggregate_pyomo_reg_search import load_reg_search
+from analysis.synthetic.pyomo_reg_search_line import load_reg_search
 
 
 def load_jax_folder(folder: Path, recursive: bool = False):

@@ -20,20 +20,14 @@ Initialise packages
 pip install -e .
 ```
 
-3. **Run the Experiments**
+3. **Running the synthetic experiments:**
+Default Pyomo run, further parameters can be added as needed. Some other parameters are in the config file in `src/config_pyomo_synth.json`. 
 ```bash
-python -m src.synthetic_data.training_conv_pyomo
-python -m src.synthetic_data.training_conv_pyomo --layer_width '[2,32,2]' --t_range '[0.01,7]' --n_steps 5 --no_print True
+python -m src.synthetic_data.training_conv_pyomo --layer_width '[2,32,2]' --exp 'default'
 ```
 
-## Cross-model Boxplots (Pyomo vs JAX)
-- Compare metrics across layer widths:
-  ```
-  python scripts/compare_boxplots_pyomo_jax.py \
-    --pyomo_dir results/study_vdp/pyomo_vdp_32_301225 \
-    --jax_dir results/jax_pretrain_pyomo_vdp_w2-64-2/jax_vdp_5000_311225 \
-    --metric mse_test \
-    --min_runs 3 \
-    --out results/plots/pyomo_vs_jax_width.png
-  ```
-  Uses log-y for MSE; switch to `--metric time_elapsed` for wall-time (linear y).
+4. **Running real-life data experiments:**
+Default Pyomo run for real-life data experiments. All parameters can be adjusted in the 'src.real_life_data.train_pyomo.py' file itself. 
+```bash
+python -m src.real_life_data.train_pyomo
+```

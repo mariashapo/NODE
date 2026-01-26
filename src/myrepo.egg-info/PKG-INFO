@@ -161,13 +161,13 @@ python -m src.synthetic_data.training_conv_pyomo --layer_width '[2,32,2]' --t_ra
 - Regularization/width/tol grid (Pyomo VDP): `bash run_exp_pyomo_reg_width_tol.sh`
 - PyTorch batches (VDP): `bash run_experiments_pytorch.sh`
 - JAX/Diffrax batches (HO/VDP): `bash run_experiments_jax.sh`
-- Inspect results: notebooks under `src/analysis/synthetic/` (e.g., `00_training_convergence.ipynb`); aggregate Pyomo reg search via `python src/analysis/synthetic/aggregate_pyomo_reg_search.py`
+- Inspect results: notebooks under `src/analysis/synthetic/` (e.g., `00_training_convergence.ipynb`); aggregate Pyomo reg search via `python src/analysis/synthetic/pyomo_reg_search_line.py`
 
 ## Regularization Study (Pyomo, VDP)
 - Launch sweep (reg/width/tol grid): `bash run_exp_pyomo_reg_width_tol.sh`
 - Aggregate/plot (reg on x-axis by default):
   ```
-  python -m src.analysis.synthetic.aggregate_pyomo_reg_search \
+  python -m src.analysis.synthetic.pyomo_reg_search_line \
     --dir results/study_vdp_reg/pyomo_vdp \
     --metric mse_test \
     --plot \
@@ -180,7 +180,7 @@ python -m src.synthetic_data.training_conv_pyomo --layer_width '[2,32,2]' --t_ra
 - Launch sweep (width/reg/tol grid): `bash run_exp_pyomo_reg_width_tol.sh` (uses config lists for widths/regs/tols).
 - Aggregate/plot width on x-axis (works for `results/study_vdp/pyomo_vdp_*`):
   ```
-  python -m src.analysis.synthetic.aggregate_pyomo_reg_search \
+  python -m src.analysis.synthetic.pyomo_reg_search_line \
     --dir results/study_vdp/pyomo_vdp_32_301225 \
     --metric mse_test \
     --plot \

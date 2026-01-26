@@ -58,10 +58,12 @@ Examples:
 Outputs: PNG under `results/plots/` with train (clean/noisy/pred) and test (clean/pred) for each state.
 
 ## Aggregate Pyomo regularization sweeps
+Paths are now resolved under `src/analysis/synthetic/results` (absolute paths still work, and old `results/...` prefixes are redirected there).
+
 Example to aggregate and plot a reg curve with CIs (filters tol/layer width and drops combos with <3 runs):
 ```bash
-python -m src.analysis.synthetic.aggregate_pyomo_reg_search \
-  --dir results/study_ho_reg/pyomo_ho_241225 \
+python -m src.analysis.synthetic.pyomo_reg_search_line \
+  --dir src/analysis/synthetic/results/study_ho_reg/pyomo_ho_241225 \
   --plot \
   --metric mse_test_coll \
   --tol 1e-6 \
@@ -69,8 +71,8 @@ python -m src.analysis.synthetic.aggregate_pyomo_reg_search \
 ```
 Same, but hide the title:
 ```bash
-python -m src.analysis.synthetic.aggregate_pyomo_reg_search \
-  --dir results/study_ho_reg/pyomo_ho_241225 \
+python -m src.analysis.synthetic.pyomo_reg_search_line \
+  --dir src/analysis/synthetic/results/study_ho_reg/pyomo_ho_241225 \
   --plot \
   --metric mse_test_coll \
   --tol 1e-6 \
@@ -80,15 +82,15 @@ python -m src.analysis.synthetic.aggregate_pyomo_reg_search \
 
 ### Quick VDP reg plot (collocation metric, auto tol/width detection)
 ```bash
-python -m src.analysis.synthetic.aggregate_pyomo_reg_search \
-  --dir results/study_vdp_reg/pyomo_vdp_251225 \
+python -m src.analysis.synthetic.pyomo_reg_search_line \
+  --dir src/analysis/synthetic/results/study_vdp_reg/pyomo_vdp_251225 \
   --plot \
   --metric mse_test_coll
 ```
 Boxplot variant (per-reg distributions):
 ```bash
-python -m src.analysis.synthetic.aggregate_pyomo_reg_search \
-  --dir results/study_vdp_reg/pyomo_vdp_251225 \
+python -m src.analysis.synthetic.pyomo_reg_search_line \
+  --dir src/analysis/synthetic/results/study_vdp_reg/pyomo_vdp_251225 \
   --boxplot \
   --metric mse_test_coll
 ```
@@ -96,8 +98,8 @@ python -m src.analysis.synthetic.aggregate_pyomo_reg_search \
 
 ### Hidden layer widths
 ```bash
-python -m src.analysis.synthetic.aggregate_pyomo_reg_search \
-  --dir results/study_vdp/pyomo_layer_width \
+python -m src.analysis.synthetic.pyomo_reg_search_line \
+  --dir src/analysis/synthetic/results/study_vdp/pyomo_layer_width \
   --metric mse_train_coll \
   --plot \
   --x_axis width \
@@ -109,8 +111,8 @@ python -m src.analysis.synthetic.aggregate_pyomo_reg_search \
 ### To plot Boxplots comparing Pyomo and JAX models
 ```bash
 python scripts/compare_boxplots_pyomo_jax.py \
-  --pyomo_dir results/study_vdp/pyomo_layer_width \
-  --jax_dir results/study_vdp/jax_layer_width \
+  --pyomo_dir src/analysis/synthetic/results/study_vdp/pyomo_layer_width \
+  --jax_dir src/analysis/synthetic/results/study_vdp/jax_layer_width \
   --metric mse_test \
   --min_runs 3 \
   --recursive \
@@ -120,8 +122,8 @@ python scripts/compare_boxplots_pyomo_jax.py \
 ### To plot pareto frontier plots 
 ```bash
 python scripts/pareto_pyomo_jax.py \
-  --pyomo_dir results/study_vdp/pyomo_layer_width \
-  --jax_dir results/study_vdp/jax_layer_width \
+  --pyomo_dir src/analysis/synthetic/results/study_vdp/pyomo_layer_width \
+  --jax_dir src/analysis/synthetic/results/study_vdp/jax_layer_width \
   --metric mse_test \
   --min_runs 1 \
   --only_single_hidden \
@@ -132,8 +134,8 @@ python scripts/pareto_pyomo_jax.py \
 ### Pareto with only specified width printed
 ```bash
 python scripts/pareto_pyomo_jax.py \
-  --pyomo_dir results/study_vdp/pyomo_layer_width \
-  --jax_dir results/study_vdp/jax_layer_width \
+  --pyomo_dir src/analysis/synthetic/results/study_vdp/pyomo_layer_width \
+  --jax_dir src/analysis/synthetic/results/study_vdp/jax_layer_width \
   --metric mse_test \
   --min_runs 1 \
   --only_single_hidden \

@@ -15,7 +15,7 @@ import pickle
 from pathlib import Path
 import numpy as np
 
-from analysis.synthetic.aggregate_pyomo_reg_search import load_reg_search, aggregate_by_hparams, _format_layer_width
+from analysis.synthetic.pyomo_reg_search_line import load_reg_search, aggregate_by_hparams, _format_layer_width
 from utils.analyse_results import Graphs
 
 
