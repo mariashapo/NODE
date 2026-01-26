@@ -168,7 +168,7 @@ class ExperimentRunner:
             param_combinations = [1]
             
         elif self.opt_aim == 'network_size':
-            sizes = [[7, 8, 1], [7, 16, 1], [7, 32, 1], [7, 64, 1], [7, 128, 1]]
+            sizes = [[7, 4, 1], [7, 8, 1], [7, 16, 1], [7, 32, 1], [7, 64, 1], [7, 128, 1]]
             reg = [1e-5]
             tol = [1e-6]
             param_combinations = list(itertools.product(sizes, reg, tol))
@@ -235,7 +235,7 @@ class ExperimentRunner:
     @staticmethod
     def default_data_params(start_date):
         print("Generating default parameters for data")
-        params_data = {'file_path': '../00_data/df_train.csv', 'start_date': start_date, 
+        params_data = {'file_path': '../data/df_train.csv', 'start_date': start_date, 
                 'n_points': 400, 'split': 200, 'n_days': 1, 'm': 0, 
                 'prev_hour': True, 'prev_week': True, 'prev_year': False,
                 'spacing': 'gauss_radau',

@@ -12,6 +12,10 @@ micromamba run -n "$ENV" pip install pympler
 # --------------------------
 # experiments
 # --------------------------
+# pyomo
+micromamba run -n "$ENV" python -m src.real_life_data.train_pyomo --sequence_len 1 --n_seeds 15
+micromamba run -n "$ENV" python -m src.real_life_data.train_pyomo --sequence_len 15 --n_seeds 1
+
 # quick tests
 # micromamba run -n "$ENV" python -m src.real_life_data.train_jax --num-epochs 100,10 --pretrain 0.2,1
 # micromamba run -n "$ENV" python -m src.real_life_data.train_jax --num-epochs 10 --pretrain 1

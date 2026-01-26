@@ -37,7 +37,7 @@ python -m src.synthetic_data.training_conv_pyomo --layer_width "[2, 32, 2]" --ex
 
 Experiment presets via `--exp`:
 
-- `default`: default experiment (no pre-training).
+- `default`: default experiment (single run).
 - `training_convergence_wall_time`: sweeps wall-time limits defined in the config (e.g. `t_range`, `n_steps`) and re-runs multiple Pyomo models to measure convergence vs. wall-clock time (used for convergence visualizations). Optional overrides: `--t_range "[0.01, 10]"` and `--n_steps 30`.
 - `network_size_grid_search`: grid over widths / regularization strengths / solver tolerances defined in the config. **Note:** since this script sweeps over parameters, widths/regs/tols in the config override options passed via CLI.
 
@@ -59,5 +59,9 @@ and save it as `data/df_train.csv`.
 Default Pyomo run for real-life data experiments. All parameters can be adjusted within `src/real_life_data/train_pyomo.py`; there is no separate config file for this set of experiments.
 
 ```bash
-python -m src.real_life_data.train_pyomo
+python -m src.real_life_data.train_pyomo --n_steps 1 --sequence_len 1
 ```
+
+Experiment presets can be accssed ExperimentRunner initialization argument 'optimization_aim', which behaves similarly to `--exp` in synthetic experiments. Optimization presents can be modified in the define_param_combinations() method of the ExperimentRunner class. Sample preset:
+- `default`: default experiment (single run for each date and seed).
+- `network size`: grid over widths / regularization strengths / solver tolerances defined in the config.
