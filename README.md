@@ -36,9 +36,7 @@ Use `--exp` to select a predefined experiment setup.
 
 - `--exp training_convergence_wall_time`  
   Sweep wall-time limits defined in the config (e.g., `t_range`, `n_steps`) and re-run multiple Pyomo trainings to measure convergence vs. wall-clock time (used for convergence plots).  
-  Optional overrides:
-  - `--t_range "[0.01, 10]"`
-  - `--n_steps 30`
+  Optional overrides: `--t_range "[0.01, 10]"` and `--n_steps 30`
 
 - `--exp network_size_grid_search`  
   Grid search over network widths / regularization strengths / solver tolerances defined in the config.  
