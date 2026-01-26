@@ -13,7 +13,7 @@ import importlib
 import pickle
 import itertools
 from pathlib import Path
-
+from utils.general import generate_seeds
 
 from utils_training.run_train_pyomo_rl import Trainer
 
@@ -168,9 +168,9 @@ class ExperimentRunner:
             param_combinations = [1]
             
         elif self.opt_aim == 'network_size':
-            sizes = [[6, 16, 1], [6, 32, 1], [6, 64, 1], [6, 128, 1]]
-            reg = [1e-7, 1e-6, 1e-5]
-            tol = [1e-8, 1e-6, 1e-4]
+            sizes = [[7, 8, 1], [7, 16, 1], [7, 32, 1], [7, 64, 1], [7, 128, 1]]
+            reg = [1e-5]
+            tol = [1e-6]
             param_combinations = list(itertools.product(sizes, reg, tol))
         else:
             raise ValueError("optimization_aim not recognized")
@@ -290,11 +290,13 @@ class ExperimentRunner:
             param_tag = self._sanitize_for_path(param_comb)
         return f"pyomo_rl_{date}_{param_tag}"
     
-    def run(self, save_weights = False):
+    def run(self, save_weights = False, n_seeds = 1):
         with open('results.txt', 'w'):
             pass
         file = open('results.txt', 'a')
         
+        # generate seeds once
+        seeds = generate_seeds(n_seeds)
         iter = 1
         for param_comb in self.param_combinations:
             
@@ -304,47 +306,50 @@ class ExperimentRunner:
             for date in self.date_sequences:
                 self.update_date(date, param_comb, file, iter)
                 
-                if self.opt_aim == 'convergence' and self.optimal[date]:
-                    break
+                for seed in seeds:
+                    if self.opt_aim == 'convergence' and seed in self.optimal[date]:
+                        break
                 
-                try:
-                    if iter != 1:
-                        # caching previous computed derivate matrix
-                        Ds_train = self.trainer.Ds_train
-                        Ds_test = self.trainer.Ds_test
-                    else:
-                        Ds_train, Ds_test = None, None    
-                    self.trainer = self.Trainer(self.params_results, self.params_data, self.params_model, self.params_solver, self.params_ode, Ds_train = Ds_train, Ds_test = Ds_test)
-                    if iter == 1:
-                        self.trainer.clear_directory()
-                    experiment_results = self.trainer.train()
-                    if save_weights:
-                        desc = self._build_weight_description(date, param_comb)
-                        weights_path = self.trainer.save_trained_weights(desc, self.weights_dir)
-                        experiment_results['weights_path'] = str(weights_path)
-                    print(f"message: {self.trainer.termination}")
-                    if self.opt_aim == 'convergence' and 'optimal' in self.trainer.termination:
-                        print(f"Optimal solution for {date} found in iteration {param_comb}")
-                        self.optimal[date] = True
-                except Exception as e:
-                    print(f"Failed to complete training: {e}")
-                    continue
+                    try:
+                        if iter != 1:
+                            # caching previous computed derivate matrix
+                            Ds_train = self.trainer.Ds_train
+                            Ds_test = self.trainer.Ds_test
+                        else:
+                            Ds_train, Ds_test = None, None    
+                        
+                        # reinitialize trainer for each date and parameter combination
+                        self.trainer = self.Trainer(self.params_results, self.params_data, self.params_model, self.params_solver, self.params_ode, Ds_train = Ds_train, Ds_test = Ds_test, seed = seed)
+                        if iter == 1:
+                            self.trainer.clear_directory()
+                        experiment_results = self.trainer.train()
+                        if save_weights:
+                            desc = self._build_weight_description(date, param_comb)
+                            weights_path = self.trainer.save_trained_weights(desc, self.weights_dir)
+                            experiment_results['weights_path'] = str(weights_path)
+                        print(f"message: {self.trainer.termination}")
+                        if self.opt_aim == 'convergence' and 'optimal' in self.trainer.termination:
+                            print(f"Optimal solution for {date} found in iteration {param_comb}")
+                            self.optimal[date].add(seed)
+                    except Exception as e:
+                        print(f"Failed to complete training: {e}")
+                        continue
+                    
+                    try:
+                        if isinstance(param_comb, tuple):
+                            param_comb = ExperimentRunner.convert_lists_in_tuple(param_comb)
+                        self.results_full[(param_comb, date, seed)] = experiment_results
+                    except Exception as e:
+                        print(f"Failed to extract results: {e}")
+                        continue                
+                    
+                    self.collect_metrics(experiment_results)
+                    file.write(f"param_comb: {param_comb}, date: {date}, results: {experiment_results}\n")
+                    file.flush() 
+                    
+                    print (f"Iteration i: {iter}/{len(self.param_combinations)*len(self.date_sequences)*n_seeds} completed")
+                    iter += 1
                 
-                try:
-                    if isinstance(param_comb, tuple):
-                        param_comb = ExperimentRunner.convert_lists_in_tuple(param_comb)
-                    self.results_full[(param_comb, date)] = experiment_results
-                except Exception as e:
-                    print(f"Failed to extract results: {e}")
-                    continue                
-                
-                self.collect_metrics(experiment_results)
-                file.write(f"param_comb: {param_comb}, date: {date}, results: {experiment_results}\n")
-                file.flush() 
-                
-                print (f"Iteration i: {iter}/{len(self.param_combinations)*len(self.date_sequences)} completed")
-                iter += 1
-            
             if self.opt_aim != 'convergence':    
                 # no need to compute averages when recording training losses
                 try:

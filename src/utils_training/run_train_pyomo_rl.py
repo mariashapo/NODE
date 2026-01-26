@@ -16,7 +16,7 @@ from models.ode_solver_pyomo_opt import DirectODESolver
 from models.nn_pyomo_base import NeuralODEPyomo
 
 class Trainer:
-    def __init__(self, params_results, params_data, params_model, params_solver, params_ode = None, Ds_train = None, Ds_test = None):
+    def __init__(self, params_results, params_data, params_model, params_solver, params_ode = None, Ds_train = None, Ds_test = None, seed = None):
         self.file_path = params_data['file_path']
         self.start_date = params_data['start_date']
         self.n_points, self.split = params_data['n_points'], params_data['split']
@@ -35,6 +35,7 @@ class Trainer:
                 
         self.params_solver = params_solver
         self.params_ode = params_ode
+        self.seed = seed
         
         # Save plots under repo-root/results/plots/pyomo (resolve relative to repo root)
         repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir))
@@ -106,7 +107,8 @@ class Trainer:
                         penalty_lambda_reg = self.penalty, 
                         time_invariant = True,
                         w_init_method = self.w_init_method, 
-                        params = self.params_solver
+                        params = self.params_solver,
+                        seed = self.seed
                         )
         
         self.ode_model.build_model()

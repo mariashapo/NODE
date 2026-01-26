@@ -102,7 +102,7 @@ def parse_args(argv=None):
 def main(argv=None):
     args = parse_args(argv)
     pretrain_value = _normalize_pretrain(_parse_pretrain_arg(args.pretrain))
-    
+    print(f"Using pretrain setting: {pretrain_value}")
     params_model = {
         'layer_widths': args.layer_width if args.layer_width is not None else [2, 32, 2],
         'penalty_lambda_reg': args.penalty_lambda_reg,

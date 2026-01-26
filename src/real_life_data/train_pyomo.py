@@ -36,8 +36,8 @@ extra_input['params_solver'] = {
 extra_input['plot_collocation'] = True
 extra_input['plot_odeint'] = False
 
-runner = ExperimentRunner(start_date, 'default', extra_input)
-runner.run()
+runner = ExperimentRunner(start_date, 'network_size', extra_input)
+runner.run(n_seeds=2)
 
 # Persist results similarly to training_convergence style
 ts = time.strftime('%Y-%m-%d_%H-%M-%S')
