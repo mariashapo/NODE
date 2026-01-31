@@ -22,6 +22,11 @@ def _build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="Train Pyomo on real-life data.")
     p.add_argument("--sequence_len", type=int, default=1, help="Length of date sequence window.")
     p.add_argument("--n_seeds", type=int, default=1, help="Number of random seeds to run.")
+    p.add_argument(
+        "--exp",
+        default="default",
+        help="Experiment/optimization type to run.",
+    )
     return p
 
 
@@ -64,7 +69,7 @@ def main(argv=None):
     extra_input['plot_collocation'] = True
     extra_input['plot_odeint'] = False
 
-    runner = ExperimentRunner(start_date, 'network_size', extra_input)
+    runner = ExperimentRunner(start_date, args.exp, extra_input)
     runner.run(n_seeds=args.n_seeds)
 
     # Persist results similarly to training_convergence style

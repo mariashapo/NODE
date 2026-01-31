@@ -12,7 +12,7 @@ from models.nn_jax_diffrax import NeuralODE as NeuralODE_JAX
 
 
 class Trainer:
-    def __init__(self, params_results, params_data, params_model, trained_wb = None):
+    def __init__(self, params_results, params_data, params_model, trained_wb = None, seed = 42):
         # data loading parameters
         self.file_path = params_data['file_path']
         self.start_date = params_data['start_date']
@@ -41,7 +41,7 @@ class Trainer:
         
         self.trained_wb = trained_wb
         
-        self.rng = random.PRNGKey(42)
+        self.rng = random.PRNGKey(seed)
         self.experiment_results = {}
 
         
@@ -106,10 +106,16 @@ class Trainer:
         total_start = time.time()
         self.losses = [] 
         self.time_elapsed_parts = []
-        
+
+        # Normalize schedules so indexing works even if single ints were passed
         if not self.pretrain:
             self.pretrain = [1]
+        if not isinstance(self.num_epochs, (list, tuple)):
             self.num_epochs = [self.num_epochs]
+        if len(self.num_epochs) < len(self.pretrain):
+            # Repeat last epoch count to match pretrain stages
+            last = self.num_epochs[-1]
+            self.num_epochs = list(self.num_epochs) + [last] * (len(self.pretrain) - len(self.num_epochs))
           
         for i, pretrain in enumerate(self.pretrain):
             stage_start = time.time()

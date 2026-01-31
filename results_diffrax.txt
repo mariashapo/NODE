@@ -1,1 +1,4 @@
-Running iteration 1 with parameters: 1
+Running iteration 1 with parameters: ([7, 4, 1], 1e-05, 500)
+param_comb: ('[7, 4, 1]', 1e-05, 500), date: 2015-01-15, results: {'times_elapsed_split': [2.382429838180542, 2.3940889835357666], 'times_elapsed': 4.776518821716309, 'mse_diffrax': 0.5874218034177614, 'mse_diffrax_test': 1.7330182450251772}
+Running iteration 2 with parameters: ([7, 8, 1], 1e-05, 500)
+param_comb: ('[7, 8, 1]', 1e-05, 500), date: 2015-01-15, results: {'times_elapsed_split': [2.3015291690826416, 2.5530800819396973], 'times_elapsed': 4.854609251022339, 'mse_diffrax': 0.47578746958824836, 'mse_diffrax_test': 1.6884566771444887}

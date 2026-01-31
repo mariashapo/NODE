@@ -23,6 +23,7 @@ from pathlib import Path
 from utils_training.run_train_diffrax_rl import Trainer
 import jax, gc
 
+
 class ExperimentRunner:
     def __init__(self, start_date, optimization_aim, extra_inputs = {}):
         self.start_date = start_date
@@ -93,12 +94,11 @@ class ExperimentRunner:
         elif self.opt_aim == 'default':
             param_combinations = [1]
         elif self.opt_aim == 'network_size':
-            in_layer = 6
-            layer_sizes = [[in_layer, 16, 1], [in_layer, 32, 1], [in_layer, 64, 1], [in_layer, 128, 1],
-                           [in_layer, 16, 16, 1], [in_layer, 32, 32, 1]]
-            regularization = [0, 1e-7, 1e-5]
-            num_epochs = [5000, 7500, 10000]
+            layer_sizes = [7, 4, 1], [7, 8, 1], [7, 16, 1], [7, 32, 1], [7, 64, 1], [7, 128, 1]
+            regularization = [1e-5] # 0, 1e-7, 
+            num_epochs = [10000] # 5000, 7500, 10000
             param_combinations = list(itertools.product(layer_sizes, regularization, num_epochs))
+            self.params_model['num_epochs'] = num_epochs[0]  # set default num_epochs to the first value
         elif self.opt_aim == 'convergence':
             param_combinations = [1]
         elif self.opt_aim == 'learning_rate':
@@ -124,10 +124,10 @@ class ExperimentRunner:
             self.params_model['layer_sizes'] = param_comb[0]
             self.params_model['penalty'] = param_comb[1]
             
-            if len(self.params_model['num_epochs']) > 1:
-                self.params_model['num_epochs'][-1] = param_comb[2]
-            else:
+            if isinstance(self.params_model['num_epochs'], int) or len(self.params_model['num_epochs']) == 1:
                 self.params_model['num_epochs'] = param_comb[2]
+            else:
+                self.params_model['num_epochs'][-1] = param_comb[2]
                 
         elif self.opt_aim == 'default':
             pass
@@ -184,7 +184,7 @@ class ExperimentRunner:
         print(f"Running iteration {iter} with parameters: {param_comb}")
         file.write(f"Running iteration {iter} with parameters: {param_comb}\n")
 
-    def run(self):
+    def run(self, seeds = [42]):
         with open('results_diffrax.txt', 'w'):
             pass
         file = open('results_diffrax.txt', 'a')
@@ -200,40 +200,43 @@ class ExperimentRunner:
             for date in self.date_sequences:
                 self.update_date(date, param_comb, file, iter)
                 
-                try:
-                    trainer = Trainer(self.params_results, self.params_data, self.params_model, self.trained_wb)
-                    if iter == 1:
-                        trainer.clear_directory()
-                    experiment_results = trainer.train()
-                except Exception as e:
-                    print(f"Failed to complete training: {e}")
-                    file.write(f"Error in iteration {iter}: {e}\n")
-                    continue
-                
-                if isinstance(param_comb, tuple):
-                    param_comb = ExperimentRunner.convert_lists_in_tuple(param_comb)
-                
-                try:
-                    self.results_full[(param_comb, date)] = experiment_results
-                except Exception as e:
-                    print(f"Failed to save results: {e}")
-                    file.write(f"Error in iteration {iter}: {e}\n")
-                    continue
-                
-                if self.params_results['log'] > 0:
-                    self.losses.append(trainer.losses)
+                for seed in seeds:
+                    try:
+                        trainer = Trainer(self.params_results, self.params_data, self.params_model, self.trained_wb, seed = seed)
+                        if iter == 1:
+                            trainer.clear_directory()
+                        experiment_results = trainer.train()
+                    except Exception as e:
+                        print(f"Failed to complete training: {e}")
+                        file.write(f"Error in iteration {iter}: {e}\n")
+                        continue
+                    
+                    if isinstance(param_comb, tuple):
+                        param_comb = ExperimentRunner.convert_lists_in_tuple(param_comb)
+                    
+                    try:
+                        key = (param_comb, date, seed)
+                        self.results_full[key] = experiment_results
+                    except Exception as e:
+                        print(f"Failed to save results: {e}")
+                        file.write(f"Error in iteration {iter}: {e}\n")
+                        continue
+                    
+                    if self.params_results['log'] > 0:
+                        self.losses.append(trainer.losses)
+                        self.results_full[key] = trainer.losses
 
-                self.collect_metrics(trainer.experiment_results)
-                file.write(f"param_comb: {param_comb}, date: {date}, results: {experiment_results}\n")
-                file.flush() 
-                print (f"Iteration i: {iter}/{len(self.param_combinations)*len(self.date_sequences)} completed")
-                iter += 1
+                    self.collect_metrics(trainer.experiment_results)
+                    file.write(f"param_comb: {param_comb}, date: {date}, results: {experiment_results}\n")
+                    file.flush() 
+                    print (f"Iteration i: {iter}/{len(self.param_combinations)*len(self.date_sequences)} completed")
+                    iter += 1
 
-                # after you're done saving what you need
-                del trainer
-                del experiment_results
-                jax.clear_caches()
-                gc.collect()
+                    # after you're done saving what you need
+                    del trainer
+                    del experiment_results
+                    jax.clear_caches()
+                    gc.collect()
 
         
             try:

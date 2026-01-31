@@ -58,10 +58,22 @@ and save it as `data/df_train.csv`.
 
 Default Pyomo run for real-life data experiments. All parameters can be adjusted within `src/real_life_data/train_pyomo.py`; there is no separate config file for this set of experiments.
 
+Basic parameters can be passed via CLI:
 ```bash
-python -m src.real_life_data.train_pyomo --n_steps 1 --sequence_len 1
+python -m src.real_life_data.train_pyomo --n_seeds 1 --sequence_len 1 
 ```
+- `n_seeds`: number of random seeds to run and `sequence_len`: length of the date sequences to run.
 
-Experiment presets can be accssed ExperimentRunner initialization argument 'optimization_aim', which behaves similarly to `--exp` in synthetic experiments. Optimization presents can be modified in the define_param_combinations() method of the ExperimentRunner class. Sample preset:
+Experiment presets can be accssed ExperimentRunner using the `--exp` argument, similarly to the in synthetic experiments. Optimization presets (corresponding to `--exp`) can be modified in the define_param_combinations() method of the ExperimentRunner class. Sample preset:
 - `default`: default experiment (single run for each date and seed).
 - `network size`: grid over widths / regularization strengths / solver tolerances defined in the config.
+
+Sample JAX run for real-life data experiments:
+```bash
+python -m src.real_life_data.train_jax --n_seeds 1 --sequence_len 1 --exp 'default'
+```
+
+Example of an experiment with multiple seeds and sequence lengths:
+```bash
+python -m src.real_life_data.train_jax --n_seeds 1 --sequence_len 1 --exp 'network_size'
+```
