@@ -62,7 +62,7 @@ Paths are now resolved under `src/analysis/synthetic/results` (absolute paths st
 
 Example to aggregate and plot a reg curve with CIs (filters tol/layer width and drops combos with <3 runs):
 ```bash
-python -m src.analysis.synthetic.pyomo_reg_search_line \
+python -m src.analysis.synthetic.pyomo_reg_search_plot \
   --dir src/analysis/synthetic/results/study_ho_reg/pyomo_ho_241225 \
   --plot \
   --metric mse_test_coll \
@@ -71,7 +71,7 @@ python -m src.analysis.synthetic.pyomo_reg_search_line \
 ```
 Same, but hide the title:
 ```bash
-python -m src.analysis.synthetic.pyomo_reg_search_line \
+python -m src.analysis.synthetic.pyomo_reg_search_plot \
   --dir src/analysis/synthetic/results/study_ho_reg/pyomo_ho_241225 \
   --plot \
   --metric mse_test_coll \
@@ -82,14 +82,14 @@ python -m src.analysis.synthetic.pyomo_reg_search_line \
 
 ### Quick VDP reg plot (collocation metric, auto tol/width detection)
 ```bash
-python -m src.analysis.synthetic.pyomo_reg_search_line \
+python -m src.analysis.synthetic.pyomo_reg_search_plot \
   --dir src/analysis/synthetic/results/study_vdp_reg/pyomo_vdp_251225 \
   --plot \
   --metric mse_test_coll
 ```
 Boxplot variant (per-reg distributions):
 ```bash
-python -m src.analysis.synthetic.pyomo_reg_search_line \
+python -m src.analysis.synthetic.pyomo_reg_search_plot \
   --dir src/analysis/synthetic/results/study_vdp_reg/pyomo_vdp_251225 \
   --boxplot \
   --metric mse_test_coll
@@ -98,7 +98,7 @@ python -m src.analysis.synthetic.pyomo_reg_search_line \
 
 ### Hidden layer widths
 ```bash
-python -m src.analysis.synthetic.pyomo_reg_search_line \
+python -m src.analysis.synthetic.pyomo_reg_search_plot \
   --dir src/analysis/synthetic/results/study_vdp/pyomo_layer_width \
   --metric mse_train_coll \
   --plot \
@@ -141,4 +141,5 @@ python scripts/pareto_pyomo_jax.py \
   --only_single_hidden \
   --recursive \
   --label_widths '4,16,64,128'
+  --out results/plots/pareto_pyomo_jax.png
 ```

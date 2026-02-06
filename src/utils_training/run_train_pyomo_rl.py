@@ -146,6 +146,7 @@ class Trainer:
         
         experiment_results['mse_odeint_test'] = np.mean(np.square(np.squeeze(y_pred_test) - np.squeeze(ys_test)))
         if self.plot_odeint:
+            sequential_plot_path = f'{self.plot_directory}/odeint_solver_test_{self.start_date}.png'
             plt.figure(figsize=(10, 6))
             plt.plot(ts, ys, label='True Data', alpha = 1, color = 'green', ls = '--')
             plt.plot(ts_test, ys_test, alpha = 1, color = 'green', ls = '--')
@@ -154,8 +155,10 @@ class Trainer:
             plt.title(f"Collocation-based training & sequential predictions: True Data vs Model Prediction (Test)")
             plt.legend(loc ="lower right")
             plt.grid(True)
-            plt.savefig(f'{self.plot_directory}/ode_solver_test_{self.start_date}.png', format='png')  
+            plt.savefig(sequential_plot_path)  
             plt.close() 
+            
+            print(f'ODEINT sequential plot saved to {sequential_plot_path}')
         
         y0_test = ys_test[0][0]
         direct_solver = DirectODESolver(ts_test, self.layer_sizes, trained_weights_biases, y0_test, 
@@ -169,6 +172,7 @@ class Trainer:
         experiment_results['mse_coll_ode_test'] = np.mean(np.square(np.squeeze(y_solution_test) - np.squeeze(ys_test)))
         
         if self.plot_collocation:
+            collocation_plot_path = f'{self.plot_directory}/collocation_solver_train_{self.start_date}.png'
             plt.figure(figsize=(10, 6))
             # True data: dashed blue
             plt.plot(ts, ys, label='True Data', ls='--', linewidth=2.0, color='C0')
@@ -176,15 +180,24 @@ class Trainer:
             # Predicted trajectories: solid red (train) and solid green (test)
             plt.plot(ts, y_solution, color='red', linewidth=2.0, label='Predicted Trajectory (Train)')
             plt.plot(ts_test, y_solution_test, color='green', linewidth=2.0, label='Predicted Trajectory (Test)')
-            plt.xlabel("Time (t)", fontsize=16)
-            plt.ylabel("National Demand", fontsize=16)
-            plt.xticks(fontsize=13)
-            plt.yticks(fontsize=13)
-            plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2, frameon=False, fontsize=13)
+            plt.xlabel("Time (t)", fontsize=20)
+            plt.ylabel("National Demand", fontsize=20)
+            plt.xticks([0.0, 1.0], fontsize=18)
+            plt.yticks([-1.5, 0.0, 1.5], fontsize=18)
+            plt.legend(
+                loc='lower center',
+                bbox_to_anchor=(0.5, -0.05),
+                ncol=2,
+                frameon=False,
+                fontsize=18,
+                bbox_transform=plt.gcf().transFigure,
+            )
             plt.grid(True, linestyle='--', alpha=0.4)
-            plt.tight_layout(rect=[0, 0.05, 1, 1])
-            plt.savefig(f'{self.plot_directory}/collocation_solver_train_{self.start_date}.png', format='png')
+            plt.tight_layout(rect=[0, 0.08, 1, 1], pad=0.2)
+            plt.savefig(collocation_plot_path, format='png', bbox_inches='tight', pad_inches=0.06)
             plt.close() 
+            
+            print(f'Collocation plot saved to {collocation_plot_path}')
                 
         return experiment_results
     

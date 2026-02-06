@@ -843,7 +843,9 @@ def plot_time_bands(
     label_fontsize=None,
     tick_fontsize=None,
     legend_fontsize=None,
-    title_fontsize=None
+    title_fontsize=None,
+    legend_bbox_y=None,
+    legend_ncol=2,
 ):
     """Plot mean/CI bands of convergence curves over training time.
 
@@ -960,7 +962,7 @@ def plot_time_bands(
         ax.tick_params(labelsize=tick_fontsize)
 
     if grid:
-        ax.grid(True, which="both", linestyle="--", linewidth=0.5, alpha=0.4)
+        ax.grid(True, which="major", linestyle="--", linewidth=0.6, alpha=0.5)
 
     if title:
         ax.set_title(title, fontsize=title_fontsize)
@@ -987,9 +989,19 @@ def plot_time_bands(
         handles.append(pre_proxy)
         labels.append('pre-training')
     if handles:
-        ax.legend(handles, labels, frameon=False, fontsize=legend_fontsize)
+        bbox_y = legend_bbox_y if legend_bbox_y is not None else -0.10
+        ax.legend(
+            handles,
+            labels,
+            frameon=False,
+            fontsize=legend_fontsize,
+            loc="lower center",
+            ncol=legend_ncol,
+            bbox_to_anchor=(0.5, bbox_y),
+            bbox_transform=fig.transFigure,
+        )
 
-    plt.tight_layout()
+    plt.tight_layout(rect=[0, 0.08, 1, 1])
     plt.show()
     return ax
 

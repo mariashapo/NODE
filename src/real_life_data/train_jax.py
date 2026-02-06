@@ -118,7 +118,8 @@ if __name__ == "__main__":
             "--n_seeds", "1",
             "--sequence_len", "1",
             "--pretrain", "1",
-            "--num-epochs", "1000",
+            "--num-epochs", "100",
             "--exp", "network_size",
+            "--skip-logging-run",
         ]
         main(dev_args)

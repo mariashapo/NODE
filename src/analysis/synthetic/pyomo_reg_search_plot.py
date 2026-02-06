@@ -14,11 +14,14 @@ from math import sqrt
 import numpy as np
 import json
 from typing import Union
+import sys
 
 RESULTS_ROOT = Path(__file__).resolve().parent / "results"
 # "study_vdp_reg/pyomo_vdp"
 DEFAULT_CLI_DIR = RESULTS_ROOT / "study_ho_reg/pyomo_ho_241225"
 
+DEFAULT_LEBEL_FONT_SIZE = 20
+DEFAULT_TICK_FONT_SIZE = 16
 
 def _resolve_results_dir(dir_path: Union[str, Path]) -> Path:
     """Resolve a user-supplied results directory, preferring synthetic/results."""
@@ -232,6 +235,8 @@ def main(argv=None):
     ap.add_argument("--label_fontsize", type=int, default=None, help="Axis label font size override.")
     ap.add_argument("--tick_fontsize", type=int, default=None, help="Tick label font size override.")
     ap.add_argument("--title_fontsize", type=int, default=None, help="Title font size override.")
+    ap.add_argument("--save", action="store_true", help="Save plot to results/plots/regularization_study instead of showing.")
+    ap.add_argument("--outdir", type=Path, default=Path("results/plots/regularization_study"), help="Directory to save plots when --save is used.")
     args = ap.parse_args(argv)
 
     df = load_reg_search(args.dir)
@@ -250,6 +255,17 @@ def main(argv=None):
 
     # Shared plotting parameters (used by plot/boxplot)
     if (args.plot or args.boxplot) and not agg.empty:
+        outpath = None
+        if args.save:
+            outdir = args.outdir
+            outdir.mkdir(parents=True, exist_ok=True)
+            dir_label = Path(args.dir).name
+            lw_str = str(args.layer_width).replace(" ", "") if args.layer_width else "ALL"
+            reg_str = f"reg{args.reg}" if args.reg is not None else "regALL"
+            tol_str = f"tol{args.tol}" if args.tol is not None else "tolALL"
+            kind = "boxplot" if args.boxplot else "line"
+            outname = f"{dir_label}_{kind}_{args.metric}_{args.x_axis}_{reg_str}_{tol_str}_{lw_str}.png"
+            outpath = outdir / outname
         target_tol = args.tol if args.tol is not None else (agg["tol"].iloc[0] if "tol" in agg.columns else None)
         target_reg = args.reg if args.reg is not None else (agg["penalty_lambda_reg"].iloc[0] if "penalty_lambda_reg" in agg.columns else None)
         lw_filter = None
@@ -307,10 +323,13 @@ def main(argv=None):
                 y_log=True,
                 color="C0",
                 label="",
-                label_fontsize=args.label_fontsize or 14,
-                tick_fontsize=args.tick_fontsize or 12,
-                title_fontsize=args.title_fontsize or 16,
+                label_fontsize=args.label_fontsize or DEFAULT_LEBEL_FONT_SIZE,
+                tick_fontsize=args.tick_fontsize or DEFAULT_TICK_FONT_SIZE,
+                title_fontsize=args.title_fontsize or DEFAULT_LEBEL_FONT_SIZE,
             )
+            if outpath:
+                plt.savefig(outpath, dpi=200, bbox_inches="tight")
+                print(f"Saved plot to {outpath}")
             return
 
         # curve plot path
@@ -361,7 +380,7 @@ def main(argv=None):
                 return
             labels = [_format_layer_width(lw) for lw in g["layer_widths"]]
             x_vals = np.arange(len(g))
-            fig, ax = plt.subplots(figsize=(8, 5))
+            fig, ax = plt.subplots(figsize=(10, 6))
             Graphs.plot_reg_curve_ci(
                 x_vals,
                 g[y_col],
@@ -378,14 +397,18 @@ def main(argv=None):
                 preserve_label_case=True,
                 inset=False,
                 ax=ax,
-                label_fontsize=args.label_fontsize or 14,
-                title_fontsize=args.title_fontsize or 16,
-                tick_fontsize=args.tick_fontsize,
+                label_fontsize=args.label_fontsize or DEFAULT_LEBEL_FONT_SIZE,
+                title_fontsize=args.title_fontsize or DEFAULT_LEBEL_FONT_SIZE,
+                tick_fontsize=args.tick_fontsize or DEFAULT_TICK_FONT_SIZE,
             )
             ax.set_xticks(x_vals)
             ax.set_xticklabels(labels, rotation=20, ha="right")
             fig.tight_layout()
-            plt.show()
+            if outpath:
+                plt.savefig(outpath, dpi=200, bbox_inches="tight")
+                print(f"Saved plot to {outpath}")
+            else:
+                plt.show()
             return
 
         # If multiple layer widths remain, plot each separately for reg/tol curves
@@ -395,6 +418,7 @@ def main(argv=None):
             if g.empty:
                 print(f"No valid rows to plot for lw={lw} (metric={metric}, x={x_axis}) after filtering n_runs>={args.min_runs}/NA.")
                 continue
+            fig, ax = plt.subplots(figsize=(10, 6))
             Graphs.plot_reg_curve_ci(
                 g[x_col],
                 g[y_col],
@@ -412,20 +436,29 @@ def main(argv=None):
                 inset=args.inset if x_axis == "reg" else False,
                 inset_min_x=args.inset_min_x,
                 inset_max_x=args.inset_max_x,
-                label_fontsize=args.label_fontsize or 14,
-                title_fontsize=args.title_fontsize or 16,
-                tick_fontsize=args.tick_fontsize,
+                label_fontsize=args.label_fontsize or DEFAULT_LEBEL_FONT_SIZE,
+                title_fontsize=args.title_fontsize or DEFAULT_LEBEL_FONT_SIZE,
+                tick_fontsize=args.tick_fontsize or DEFAULT_TICK_FONT_SIZE,
+                ax=ax,
             )
+            fig.tight_layout()
+            if outpath:
+                lw_tag = _format_layer_width(lw).replace(",", "x").replace(" ", "")
+                target_path = outpath.with_name(f"{outpath.stem}_lw{lw_tag}{outpath.suffix}")
+                plt.savefig(target_path, dpi=200, bbox_inches="tight")
+                print(f"Saved plot to {target_path}")
+                plt.close(fig)
+            else:
+                plt.show()
 
 
 if __name__ == "__main__":
-    action = "dev"
-    if action == "dev":
+    if len(sys.argv) > 1:            # invoked with CLI args
+        main() 
+    else:
         main([
             "--dir", str(DEFAULT_CLI_DIR),
             "--plot",
             "--metric", "mse_test_coll",
             "--boxplot"
         ])
-    else:    
-        main()

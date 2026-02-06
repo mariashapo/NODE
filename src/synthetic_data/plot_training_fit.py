@@ -18,8 +18,10 @@ import numpy as np  # noqa: E402
 
 from utils_training.run_train_toy import TrainerToy  # noqa: E402
 
-LABEL_FONTSIZE = 14
+LABEL_FONTSIZE = 20
 TITLE_FONTSIZE = 16
+TICK_FONTSIZE = 18
+LEGEND_FONTSIZE = 20
 
 
 def _to_np(x: Any) -> np.ndarray:
@@ -37,9 +39,11 @@ def _plot_combined(
     y_pred_test,
     outpath: Path,
     figsize=(10, 6),
-    label_fontsize=16,
-    tick_fontsize=13,
-    legend_fontsize=13,
+    label_fontsize=LABEL_FONTSIZE,
+    tick_fontsize=TICK_FONTSIZE,
+    legend_fontsize=LEGEND_FONTSIZE,
+    x_ticks_endpoints: bool = False,
+    y_ticks_endpoints: bool = False,
 ):
     """Plot all states with train+test on a single axes (common styling)."""
     t_train = _to_np(t_train)
@@ -79,7 +83,13 @@ def _plot_combined(
         ax.plot(t_test, yp_te, color=colors["pred"], linewidth=2.0, linestyle="-", label=None)
 
     ax.set_xlabel("Time (t)", fontsize=label_fontsize)
-    ax.set_ylabel("State Values - u(t), v(t)", fontsize=label_fontsize)
+    ax.set_ylabel("State Values: u(t), v(t)", fontsize=label_fontsize)
+    if x_ticks_endpoints and t_train.size > 0:
+        ax.set_xticks([t_train[0], t_train[-1], t_test[-1]])
+    if y_ticks_endpoints:
+        ymin, ymax = ax.get_ylim()
+        ymid = (ymin + ymax) / 2.0
+        ax.set_yticks([ymin, ymid, ymax])
     ax.grid(True, linestyle="--", alpha=0.4)
     ax.tick_params(axis="both", labelsize=tick_fontsize)
 
@@ -95,12 +105,14 @@ def _plot_combined(
         ncol=3,
         frameon=False,
         fontsize=legend_fontsize,
-        bbox_to_anchor=(0.5, -0.18),
+        bbox_to_anchor=(0.5, 0.02),          # figure coords
+        bbox_transform=fig.transFigure,
     )
 
-    fig.tight_layout()
+    fig.subplots_adjust(bottom=0.22)
+    # fig.tight_layout(rect=[0, 0.07, 1, 1], pad=0.2, h_pad=0.2, w_pad=0.2)
     outpath.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(outpath, dpi=200)
+    fig.savefig(outpath, dpi=200, bbox_inches="tight", pad_inches=0.02)
     plt.close(fig)
     print(f"Saved plot to {outpath}")
 
@@ -206,7 +218,7 @@ def _plot_split_compare(
     )
     fig.tight_layout(rect=[0, 0.05, 1, 0.92])
     outpath.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(outpath, dpi=200)
+    fig.savefig(outpath, dpi=200, bbox_inches="tight", pad_inches=0.02)
     plt.close(fig)
     print(f"Saved plot to {outpath}")
 
@@ -224,8 +236,8 @@ def build_parser():
     p.add_argument("--model_types", nargs="+", choices=["pyomo", "jax_diffrax", "pytorch"], help="Optional list of models to compare/overlay.")
     p.add_argument("--data_type", choices=["ho", "vdp", "do"], default="ho")
     p.add_argument("--layer_width", type=parse_json, default=None, help="JSON list, e.g. '[2,32,2]'")
-    p.add_argument("--max_iter", type=parse_json, default=None, help="Optional JSON list; per-model defaults are used when omitted")
-    p.add_argument("--pretrain", type=parse_json, default="[0.2,1]", help="JSON list of fractions or []/false for none")
+    p.add_argument("--max_iter", type=parse_json, default=None, help="JAX/PT only: optional JSON list; per-model defaults are used when omitted")
+    p.add_argument("--pretrain", type=parse_json, default=None, help="JAX/PT only: JSON list of fractions or []/false for none")
     p.add_argument("--penalty_lambda_reg", type=float, default=0.01, help="Regularization for Pyomo/JAX/PT")
     p.add_argument("--reg_norm", action=argparse.BooleanOptionalAction, default=True, help="Normalize L2 regularization by parameter count (default True to match Pyomo).")
     p.add_argument("--tol", type=float, default=1e-12, help="IPOPT tol (Pyomo only)")
@@ -233,6 +245,8 @@ def build_parser():
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--outdir", type=Path, default=Path("results/plots"))
     p.add_argument("--plot_mode", choices=["combined", "split_compare"], default="combined", help="combined: single model with train+test on one axes; split_compare: train/test split with multiple models overlaid.")
+    p.add_argument("--x_ticks_endpoints", action=argparse.BooleanOptionalAction, default=False, help="If set, only show first/last x tick in combined mode.")
+    p.add_argument("--y_ticks_endpoints", action=argparse.BooleanOptionalAction, default=False, help="If set, show only min/mid/max y ticks in combined mode.")
     return p
 
 
@@ -241,7 +255,7 @@ def make_pyomo_params(args) -> Dict[str, Any]:
         "layer_widths": args.layer_width if args.layer_width is not None else [2, 32, 2],
         "act_func": "tanh",
         "penalty_lambda_reg": args.penalty_lambda_reg,
-        "time_invariant": False,
+        "time_invariant": True if args.data_type != "do" else False,
         "w_init_method": "xavier",
         "reg_norm": args.reg_norm,
         "skip_collocation": np.inf,
@@ -302,6 +316,8 @@ def main():
             base_trainer = trainer  # capture data/ts from the first model
 
         if m == "pyomo":
+            if args.pretrain not in (False, None, []) or args.max_iter is not None:
+                print("Ignoring --pretrain/--max_iter for pyomo; they are JAX/PT-only.")
             params_model = make_pyomo_params(args)
             trainer.train_pyomo(params_model, seed=args.seed)
             results = trainer.extract_results_pyomo(detailed=True)
@@ -358,6 +374,8 @@ def main():
             base_trainer.y_test,
             y_pred_test,
             outfile,
+            x_ticks_endpoints=args.x_ticks_endpoints,
+            y_ticks_endpoints=args.y_ticks_endpoints,
         )
 
 

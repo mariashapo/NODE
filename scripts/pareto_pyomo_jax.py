@@ -16,7 +16,7 @@ import pickle
 from pathlib import Path
 import numpy as np
 
-from analysis.synthetic.pyomo_reg_search_line import load_reg_search
+from analysis.synthetic.pyomo_reg_search_plot import load_reg_search
 
 
 def load_jax_folder(folder: Path, recursive: bool = False):
@@ -135,6 +135,7 @@ def main(argv=None):
     import pandas as pd
 
     df = pd.DataFrame(pyomo_rows + jax_rows)
+    print(df)
     # ensure numeric
     df["time_elapsed"] = pd.to_numeric(df["time_elapsed"], errors="coerce")
     df[args.metric] = pd.to_numeric(df[args.metric], errors="coerce")
@@ -226,12 +227,12 @@ def main(argv=None):
             plt.annotate(
                 _width_label(r["layer_widths"]),
                 (r["time_elapsed"], r[args.metric]),
-                fontsize=12,
+                fontsize=20,
                 alpha=0.8,
                 bbox=dict(facecolor="white", edgecolor="none", alpha=0.7, pad=0.5),
             )
 
-    plt.xlabel("Training Time (s)", fontsize=14)
+    plt.xlabel("Training Time (s)", fontsize=20)
     ylabel = args.metric.replace("_", " ").title()
     if "mse" in args.metric.lower():
         parts = []
@@ -241,14 +242,22 @@ def main(argv=None):
             else:
                 parts.append(p.title())
         ylabel = " ".join(parts)
-    plt.ylabel(ylabel, fontsize=14)
+    plt.ylabel(ylabel, fontsize=20)
     if args.x_log:
         plt.xscale("log")
     if args.y_log:
         plt.yscale("log")
     plt.grid(True, which="major", linestyle="--", alpha=0.25)
-    plt.legend(frameon=False, fontsize=12)
-    plt.tight_layout()
+    plt.tick_params(labelsize=18)
+    plt.legend(
+        frameon=False,
+        fontsize=20,
+        loc="lower center",
+        ncol=2,
+        bbox_to_anchor=(0.5, -0.05),  # figure coords
+        bbox_transform=plt.gcf().transFigure,
+    )
+    plt.tight_layout(rect=[0, 0.08, 1, 1])
 
     if args.out:
         plt.savefig(args.out, dpi=200, bbox_inches="tight")

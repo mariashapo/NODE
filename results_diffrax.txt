@@ -1,4 +1,12 @@
-Running iteration 1 with parameters: ([7, 4, 1], 1e-05, 500)
-param_comb: ('[7, 4, 1]', 1e-05, 500), date: 2015-01-15, results: {'times_elapsed_split': [2.382429838180542, 2.3940889835357666], 'times_elapsed': 4.776518821716309, 'mse_diffrax': 0.5874218034177614, 'mse_diffrax_test': 1.7330182450251772}
-Running iteration 2 with parameters: ([7, 8, 1], 1e-05, 500)
-param_comb: ('[7, 8, 1]', 1e-05, 500), date: 2015-01-15, results: {'times_elapsed_split': [2.3015291690826416, 2.5530800819396973], 'times_elapsed': 4.854609251022339, 'mse_diffrax': 0.47578746958824836, 'mse_diffrax_test': 1.6884566771444887}
+Running iteration 1 with parameters: ([7, 4, 1], 1e-05, 10000)
+param_comb: ('[7, 4, 1]', 1e-05, 10000), date: 2015-01-15, results: {'times_elapsed_split': [29.659900188446045], 'times_elapsed': 29.659900188446045, 'mse_diffrax': 0.12732519784179674, 'mse_diffrax_test': 1.525331534093362}
+Running iteration 2 with parameters: ([7, 8, 1], 1e-05, 10000)
+param_comb: ('[7, 8, 1]', 1e-05, 10000), date: 2015-01-15, results: {'times_elapsed_split': [32.31217885017395], 'times_elapsed': 32.31217885017395, 'mse_diffrax': 0.0359862125613056, 'mse_diffrax_test': 0.4960875619984443}
+Running iteration 3 with parameters: ([7, 16, 1], 1e-05, 10000)
+param_comb: ('[7, 16, 1]', 1e-05, 10000), date: 2015-01-15, results: {'times_elapsed_split': [36.0502610206604], 'times_elapsed': 36.0502610206604, 'mse_diffrax': 0.01178914689640336, 'mse_diffrax_test': 0.16307013969736592}
+Running iteration 4 with parameters: ([7, 32, 1], 1e-05, 10000)
+param_comb: ('[7, 32, 1]', 1e-05, 10000), date: 2015-01-15, results: {'times_elapsed_split': [41.022741079330444], 'times_elapsed': 41.022741079330444, 'mse_diffrax': 0.011134939400754227, 'mse_diffrax_test': 0.15391185655359335}
+Running iteration 5 with parameters: ([7, 64, 1], 1e-05, 10000)
+param_comb: ('[7, 64, 1]', 1e-05, 10000), date: 2015-01-15, results: {'times_elapsed_split': [55.51702380180359], 'times_elapsed': 55.51702380180359, 'mse_diffrax': 0.010038948458670644, 'mse_diffrax_test': 0.14384939894029197}
+Running iteration 6 with parameters: ([7, 128, 1], 1e-05, 10000)
+param_comb: ('[7, 128, 1]', 1e-05, 10000), date: 2015-01-15, results: {'times_elapsed_split': [77.05534219741821], 'times_elapsed': 77.05534219741821, 'mse_diffrax': 0.013717435034008733, 'mse_diffrax_test': 0.16429635167154466}

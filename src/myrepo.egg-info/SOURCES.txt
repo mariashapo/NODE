@@ -1,7 +1,7 @@
 README.md
 pyproject.toml
 src/analysis/synthetic/analyze_admm_results.py
-src/analysis/synthetic/pyomo_reg_search_line.py
+src/analysis/synthetic/pyomo_reg_search_plot.py
 src/models/nn_jax_diffrax.py
 src/models/nn_pyomo_admm.py
 src/models/nn_pyomo_admm_1.py
