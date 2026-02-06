@@ -99,6 +99,7 @@ class ExperimentRunner:
             num_epochs = [10000] # 5000, 7500, 10000
             param_combinations = list(itertools.product(layer_sizes, regularization, num_epochs))
             self.params_model['num_epochs'] = num_epochs[0]  # set default num_epochs to the first value
+            self.params_model['pretrain'] = [1]  # single-stage training for network_size sweeps
         elif self.opt_aim == 'convergence':
             param_combinations = [1]
         elif self.opt_aim == 'learning_rate':
