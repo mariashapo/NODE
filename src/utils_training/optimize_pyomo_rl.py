@@ -168,8 +168,8 @@ class ExperimentRunner:
             param_combinations = [1]
             
         elif self.opt_aim == 'network_size':
-            sizes = [[7, 4, 1], [7, 8, 1], [7, 16, 1], [7, 32, 1], [7, 64, 1], [7, 128, 1]]
-            reg = [1e-5]
+            sizes = [[7, 64, 1]]
+            reg = [10, 1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 0]
             tol = [1e-6]
             param_combinations = list(itertools.product(sizes, reg, tol))
         else:

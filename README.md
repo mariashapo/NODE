@@ -131,7 +131,7 @@ python -m src.real_life_data.train_pyomo --sequence_len 1 --n_seeds 1
 
 #### Network size analysis:
 
-Sample commands to loop through different network sizes:
+Sample commands to loop through different network sizes (modify the `elif self.opt_aim == 'network_size':` branch in `src/utils_training/optimize_pyomo_rl.py` as necessary):
 ```bash
 micromamba run -n "$ENV" python -m src.real_life_data.train_jax --n_seeds 1 --sequence_len 15 --exp 'network_size' # option with 15 different dates
 micromamba run -n "$ENV" python -m src.real_life_data.train_jax --n_seeds 15 --sequence_len 1 --exp 'network_size' # option with 15 different seeds for the same date
