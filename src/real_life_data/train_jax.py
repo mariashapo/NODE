@@ -120,6 +120,6 @@ if __name__ == "__main__":
             "--pretrain", "1",
             "--num-epochs", "100",
             "--exp", "network_size",
-            "--skip-logging-run",
+            # "--skip-logging-run",
         ]
         main(dev_args)

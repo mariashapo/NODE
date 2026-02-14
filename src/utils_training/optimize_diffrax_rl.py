@@ -94,7 +94,7 @@ class ExperimentRunner:
         elif self.opt_aim == 'default':
             param_combinations = [1]
         elif self.opt_aim == 'network_size':
-            layer_sizes = [7, 64, 1]
+            layer_sizes = [[7, 64, 1]]
             regularization = [10, 1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 0] # 0, 1e-7, 
             num_epochs = [10000] # 5000, 7500, 10000
             param_combinations = list(itertools.product(layer_sizes, regularization, num_epochs))

@@ -38,6 +38,81 @@ class Graphs:
         plt.legend(handles=[patch1, patch2], loc='upper left')
         plt.grid(True)
         plt.show()
+    
+    @staticmethod
+    def plot_boxplots_custom(
+        data1,
+        data2,
+        labels,
+        title=None,
+        ylabel=None,
+        colors=('blue', 'green'),
+        color_labels=('Pyomo', 'Diffrax'),
+        x_label='Model Size Configuration',
+        y_log=True,
+        figsize=(10, 6),
+        widths=0.5,
+        label_fontsize=None,
+        tick_fontsize=None,
+        legend_fontsize=None,
+        title_fontsize=None,
+        legend_bbox_y=-0.02,
+        legend_ncol=2,
+        grid=True,
+    ):
+        """Side-by-side boxplots with customizable sizing and legend placement."""
+        n_groups = len(data1)
+        positions_1 = [2 * i + 1.2 for i in range(n_groups)]
+        positions_2 = [2 * i + 1.8 for i in range(n_groups)]
+
+        fig, ax = plt.subplots(figsize=figsize)
+        box1 = ax.boxplot(
+            data1,
+            positions=positions_1,
+            widths=widths,
+            patch_artist=True,
+            boxprops=dict(facecolor=colors[0]),
+        )
+        box2 = ax.boxplot(
+            data2,
+            positions=positions_2,
+            widths=widths,
+            patch_artist=True,
+            boxprops=dict(facecolor=colors[1]),
+        )
+
+        if title:
+            ax.set_title(title, fontsize=title_fontsize)
+        ax.set_xlabel(x_label, fontsize=label_fontsize)
+        if ylabel:
+            ax.set_ylabel(ylabel, fontsize=label_fontsize)
+        if y_log:
+            ax.set_yscale('log')
+
+        xticks = [2 * i + 1.5 for i in range(n_groups)]
+        ax.set_xticks(xticks)
+        ax.set_xticklabels(labels, fontsize=tick_fontsize)
+        ax.tick_params(axis='y', labelsize=tick_fontsize)
+
+        patch1 = mpatches.Patch(color=colors[0], label=color_labels[0])
+        patch2 = mpatches.Patch(color=colors[1], label=color_labels[1])
+        bbox_y = legend_bbox_y if legend_bbox_y is not None else -0.10
+        ax.legend(
+            handles=[patch1, patch2],
+            frameon=False,
+            fontsize=legend_fontsize,
+            loc="lower center",
+            ncol=legend_ncol,
+            bbox_to_anchor=(0.5, bbox_y),
+            bbox_transform=fig.transFigure,
+        )
+
+        if grid:
+            ax.grid(True, which="major", linestyle="--", linewidth=0.6, alpha=0.5)
+
+        plt.tight_layout(rect=[0, 0.08, 1, 1])
+        plt.show()
+        return ax
         
     @staticmethod
     def plot_single_boxplot(

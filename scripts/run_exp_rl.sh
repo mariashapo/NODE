@@ -13,7 +13,7 @@ micromamba run -n "$ENV" pip install pympler
 # experiments
 # --------------------------
 # pyomo
-micromamba run -n "$ENV" python -m src.real_life_data.train_pyomo --sequence_len 1 --n_seeds 15 --exp 'network_size'
+# micromamba run -n "$ENV" python -m src.real_life_data.train_pyomo --sequence_len 1 --n_seeds 15 --exp 'network_size'
 
 # jax
 micromamba run -n "$ENV" python -m src.real_life_data.train_jax --n_seeds 15 --sequence_len 1 --exp 'network_size'
