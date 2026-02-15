@@ -51,10 +51,11 @@
           [2, 16, 2],
           [2, 32, 2],
           [2, 64, 2],
-          [2, 96, 2]
+          [2, 96, 2],
+          [2, 128, 2]
         ],
-        "reg_list": [0.001],
-        "tol_list": [1e-8]
+        "reg_list": [0.1, 0.01, 0.001],
+        "tol_list": [1e-6]
       },
       "activation_function": {
         "act_func_list": ["tanh", "softplus", "sigmoid"],

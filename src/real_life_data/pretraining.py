@@ -17,16 +17,6 @@ DATA_PATH = REPO_ROOT / "data" / "df_train.csv"
 OUTDIR = REPO_ROOT / "results" / "pyomo_rl_weights_pretraining"
 OUTDIR.mkdir(parents=True, exist_ok=True)
 
-start_date = '2015-01-15'
-def generate_dates(start_date, sequence_len = 10, frequency = 3):
-    start_date = datetime.strptime(start_date, '%Y-%m-%d')
-    date_sequences = [start_date + timedelta(days=i*frequency) for i in range(sequence_len)]
-    date_sequences_str = [date.strftime('%Y-%m-%d') for date in date_sequences]
-    return date_sequences_str
-
-
-dates = generate_dates(start_date, sequence_len = 10, frequency = 3)
-
 tol = 1e-6
 start_date = '2015-01-15'
 extra_input = {}
@@ -36,8 +26,8 @@ extra_input['params_data'] = {'file_path': str(DATA_PATH), 'start_date': start_d
                 'spacing': 'gauss_radau',
                 'encoding': {'settlement_date': 't', 'temperature': 'var1', 'hour': 'var2', 'nd': 'y'},}
 
-extra_input['params_sequence'] = {'sequence_len': 30, 'frequency': 3}
-extra_input['params_model'] = {'layer_sizes': [7, 32, 1], 'penalty': 1e-5, 'w_init_method': 'xavier'}
+extra_input['params_sequence'] = {'sequence_len': 1, 'frequency': 1}
+extra_input['params_model'] = {'layer_sizes': [7, 64, 1], 'penalty': 1e-5, 'w_init_method': 'xavier'}
 extra_input['params_solver'] = { 
                         "tol":tol, 
                         "dual_inf_tol": 0.1, 
@@ -53,7 +43,7 @@ extra_input['plot_collocation'] = False
 extra_input['plot_odeint'] = False
 
 runner = ExperimentRunner(start_date, 'default', extra_input)
-runner.run(save_weights=True)
+runner.run(n_seeds = 1, save_weights=True)
 
 # Persist results similarly to training_convergence style
 ts = time.strftime('%Y-%m-%d_%H-%M-%S')

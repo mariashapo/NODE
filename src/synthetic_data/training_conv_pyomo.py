@@ -31,7 +31,7 @@ def _build_parser():
     p = argparse.ArgumentParser()
     p.add_argument("--no_print", type=str2bool, default=False)
     p.add_argument("--config", default="src/configs/config_pyomo_synth.json")
-    p.add_argument("--exp", default="training_convergence_wall_time") # "default" / "network_size_grid_search" / "training_convergence_wall_time"
+    p.add_argument("--exp", default="network_size_grid_search") # "default" / "network_size_grid_search" / "training_convergence_wall_time"
     p.add_argument("--n_seeds", type=int, default=1)
     p.add_argument("--outdir", default=None)
     p.add_argument("--data_type", default = "vdp")
@@ -137,17 +137,13 @@ def main(argv=None):
         print(f"All results saved to {filename}")
 
 if __name__ == "__main__":
-    action = "prod"
-    if action == "dev":
+    if len(sys.argv) > 1:            # invoked with CLI args
+        main()  
+    else:
         main([
             "--data_type", "vdp",
-            "--layer_width", "[2,32,2]",
-            "--penalty_lambda_reg", "0.1",
-            "--n_seeds", "5",
-            "--exp", "default",
+            "--exp", "network_size_grid_search",
             "--time_invariant", "True",
             "--n_seeds", "10",
             "--outdir", "results/pyomo_dev"
         ])
-    else:
-        main()

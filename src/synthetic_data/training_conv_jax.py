@@ -118,7 +118,7 @@ def main(argv=None):
         'act_func': 'tanh',
     }
     
-    run_date = time.strftime('%d%m%y')
+    run_time = time.strftime("%d%m%y_%H%M")
     layer_widths = args.layer_width if args.layer_width is not None else params_model["layer_widths"]
     width_tag = _format_width_tag(layer_widths) if layer_widths is not None else "unknown"
     # all_results = []
@@ -214,7 +214,7 @@ def main(argv=None):
 
         max_iter = str(args.max_iter).strip('[]').replace(',','_').replace(' ','')
         # Create a dated subfolder for this run
-        subdir = os.path.join(args.outdir, f"jax_{args.data_type}_w{width_tag}_{max_iter}_{run_date}")
+        subdir = os.path.join(args.outdir, f"jax_{args.data_type}_w{width_tag}_{max_iter}_{run_time}")
         os.makedirs(subdir, exist_ok=True)
 
         # Persist run metadata once per subdir for traceability
