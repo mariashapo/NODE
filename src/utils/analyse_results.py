@@ -10,6 +10,7 @@ import os
 import pickle
 from matplotlib.lines import Line2D
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes, mark_inset
+from matplotlib.ticker import LogLocator, LogFormatterMathtext
 
 class Graphs:
     @staticmethod
@@ -99,6 +100,102 @@ class Graphs:
         bbox_y = legend_bbox_y if legend_bbox_y is not None else -0.10
         ax.legend(
             handles=[patch1, patch2],
+            frameon=False,
+            fontsize=legend_fontsize,
+            loc="lower center",
+            ncol=legend_ncol,
+            bbox_to_anchor=(0.5, bbox_y),
+            bbox_transform=fig.transFigure,
+        )
+
+        if grid:
+            ax.grid(True, which="major", linestyle="--", linewidth=0.6, alpha=0.5)
+
+        plt.tight_layout(rect=[0, 0.08, 1, 1])
+        plt.show()
+        return ax
+
+    @staticmethod
+    def plot_lines_ci_from_lists(
+        data1,
+        data2,
+        labels,
+        title=None,
+        ylabel=None,
+        colors=("blue", "green"),
+        color_labels=("Pyomo", "Diffrax"),
+        x_label="Model Size Configuration",
+        y_log=True,
+        figsize=(10, 6),
+        label_fontsize=None,
+        tick_fontsize=None,
+        legend_fontsize=None,
+        title_fontsize=None,
+        legend_bbox_y=-0.02,
+        legend_ncol=2,
+        grid=True,
+        ci=(25, 75),
+        center="median",  # "median" or "mean"
+        alpha_band=0.25,
+        line_width=2.0,
+        x_ticklabels=None,
+        y_log_locator_base=10,
+        y_log_mathtext=True,
+    ):
+        """Plot two lines with CI bands computed from per-label samples.
+
+        data1/data2: list-like where each element is a sequence of samples for that label.
+        ci: percentiles for the band (default IQR).
+        center: use 'median' or 'mean' for the central line.
+        x_ticklabels: optional override for x tick labels (e.g., mathtext 10^k + "No reg").
+        y_log_locator_base: if provided and y_log=True, use LogLocator with this base.
+        y_log_mathtext: if True and y_log=True, format ticks as 10^k via LogFormatterMathtext.
+        """
+
+        def _summaries(data):
+            center_vals, lo_vals, hi_vals = [], [], []
+            for samples in data:
+                arr = np.asarray(samples, dtype=float)
+                if center == "mean":
+                    center_vals.append(np.nanmean(arr))
+                else:
+                    center_vals.append(np.nanmedian(arr))
+                lo_vals.append(np.nanpercentile(arr, ci[0]))
+                hi_vals.append(np.nanpercentile(arr, ci[1]))
+            return np.asarray(center_vals), np.asarray(lo_vals), np.asarray(hi_vals)
+
+        data1_c, data1_lo, data1_hi = _summaries(data1)
+        data2_c, data2_lo, data2_hi = _summaries(data2)
+
+        x = np.arange(len(labels))
+        fig, ax = plt.subplots(figsize=figsize)
+
+        for c, lo, hi, color, lbl in [
+            (data1_c, data1_lo, data1_hi, colors[0], color_labels[0]),
+            (data2_c, data2_lo, data2_hi, colors[1], color_labels[1]),
+        ]:
+            ax.plot(x, c, color=color, linewidth=line_width, label=lbl)
+            ax.fill_between(x, lo, hi, color=color, alpha=alpha_band)
+
+        if title:
+            ax.set_title(title, fontsize=title_fontsize)
+        ax.set_xlabel(x_label, fontsize=label_fontsize)
+        if ylabel:
+            ax.set_ylabel(ylabel, fontsize=label_fontsize)
+        if y_log:
+            ax.set_yscale("log")
+            if y_log_locator_base is not None:
+                ax.yaxis.set_major_locator(LogLocator(base=y_log_locator_base))
+            if y_log_mathtext:
+                ax.yaxis.set_major_formatter(LogFormatterMathtext(base=y_log_locator_base or 10))
+
+        ax.set_xticks(x)
+        tick_labels = x_ticklabels if x_ticklabels is not None else labels
+        ax.set_xticklabels(tick_labels, fontsize=tick_fontsize)
+        ax.tick_params(axis="y", labelsize=tick_fontsize)
+
+        bbox_y = legend_bbox_y if legend_bbox_y is not None else -0.10
+        ax.legend(
             frameon=False,
             fontsize=legend_fontsize,
             loc="lower center",
