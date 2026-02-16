@@ -698,6 +698,7 @@ class Results:
         df["system"] = one_seed_result.get("data_type")
         df["pretrain"] = bool(t_before > 0)
         df["max_iter"] = str(one_seed_result.get("max_iter"))
+        df["layer_width"] = one_seed_result.get("layer_widths")[1] if one_seed_result.get("layer_widths")[1] else None
         
         return df
         
