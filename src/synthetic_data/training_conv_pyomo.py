@@ -141,9 +141,9 @@ if __name__ == "__main__":
         main()  
     else:
         main([
-            "--data_type", "vdp",
-            "--exp", "network_size_grid_search",
+            "--data_type", "ho",
+            "--exp", "regularization",
             "--time_invariant", "True",
-            "--n_seeds", "10",
+            "--n_seeds", "14",
             "--outdir", "results/pyomo_dev"
         ])

@@ -4659,3 +4659,1048 @@ max_iter=6000
 2026-02-15 12:00:38,032 [WARNING] Setting Var 'y[97,0]' to a numeric value `-11.829951611985269` outside the bounds (-10.0, 10.0).
 2026-02-15 12:00:38,032 [WARNING] Setting Var 'y[98,0]' to a numeric value `-11.895092982528698` outside the bounds (-10.0, 10.0).
 2026-02-15 12:00:38,032 [WARNING] Setting Var 'y[99,0]' to a numeric value `-11.936668542206435` outside the bounds (-10.0, 10.0).
+2026-02-21 16:13:43,535 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Number of Iterations Exceeded.
+2026-02-21 16:13:44,188 [ERROR] jax.pure_callback failed
+Traceback (most recent call last):
+  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/callback.py", line 79, in pure_callback_impl
+    return tree_util.tree_map(np.asarray, callback(*args))
+  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/callback.py", line 64, in __call__
+    return tree_util.tree_leaves(self.callback_func(*args, **kwargs))
+  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/equinox/_errors.py", line 70, in raises
+    raise EqxRuntimeError(msgs[_index.item()])
+equinox._errors.EqxRuntimeError: The maximum number of solver steps was reached. Try increasing `max_steps`.
+2026-02-21 16:13:44,192 [ERROR] Failed to extract results: The maximum number of solver steps was reached. Try increasing `max_steps`.
+-------
+This error occurred during the runtime of your JAX program. Setting the environment
+variable `EQX_ON_ERROR=breakpoint` is usually the most useful way to debug such errors.
+(This can be navigated using most of the usual commands for the Python debugger:
+`u` and `d` to move through stack frames, the name of a variable to print its value,
+etc.) See also `https://docs.kidger.site/equinox/api/errors/#equinox.error_if` for more
+information.
+
+2026-02-21 16:31:09,912 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Number of Iterations Exceeded.
+2026-02-21 16:34:40,163 [WARNING] Setting Var 'y[64,0]' to a numeric value `10.06131996243357` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,163 [WARNING] Setting Var 'y[65,0]' to a numeric value `11.986646923624166` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,163 [WARNING] Setting Var 'y[66,0]' to a numeric value `13.930765650923222` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,163 [WARNING] Setting Var 'y[67,0]' to a numeric value `15.893193204505714` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,163 [WARNING] Setting Var 'y[68,0]' to a numeric value `17.873445093356185` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,163 [WARNING] Setting Var 'y[69,0]' to a numeric value `19.871032857214754` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,163 [WARNING] Setting Var 'y[69,1]' to a numeric value `-10.949017508971583` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,163 [WARNING] Setting Var 'y[70,0]' to a numeric value `21.885463584327493` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,163 [WARNING] Setting Var 'y[70,1]' to a numeric value `-12.221700661843668` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,163 [WARNING] Setting Var 'y[71,0]' to a numeric value `23.916240244039837` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,163 [WARNING] Setting Var 'y[71,1]' to a numeric value `-13.504710897871066` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,163 [WARNING] Setting Var 'y[72,0]' to a numeric value `25.96286177258269` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,163 [WARNING] Setting Var 'y[72,1]' to a numeric value `-14.797731653446261` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[73,0]' to a numeric value `28.02482319670243` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[73,1]' to a numeric value `-16.100443895015438` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[74,0]' to a numeric value `30.101615758255562` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[74,1]' to a numeric value `-17.412526197795415` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[75,0]' to a numeric value `32.192727039737434` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[75,1]' to a numeric value `-18.733654825080688` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[76,0]' to a numeric value `34.29764109071352` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[76,1]' to a numeric value `-20.063503808120647` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[77,0]' to a numeric value `36.415838555122676` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[77,1]' to a numeric value `-21.40174502654783` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[78,0]' to a numeric value `38.546796799420484` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[78,1]' to a numeric value `-22.748048289336744` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[79,0]' to a numeric value `40.68999004153144` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[79,1]' to a numeric value `-24.10208141627383` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[80,0]' to a numeric value `42.844889480577834` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[80,1]' to a numeric value `-25.46351031991811` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[81,0]' to a numeric value `45.01096342735362` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[81,1]' to a numeric value `-26.831999088032447` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[82,0]' to a numeric value `47.18767743551076` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[82,1]' to a numeric value `-28.207210066464956` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[83,0]' to a numeric value `49.37449443342607` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[83,1]' to a numeric value `-29.58880394246041` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[84,0]' to a numeric value `51.570874856715584` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[84,1]' to a numeric value `-30.97643982838061` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[85,0]' to a numeric value `53.77627678136402` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[85,1]' to a numeric value `-32.369775345813494` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[86,0]' to a numeric value `55.990156057436806` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[86,1]' to a numeric value `-33.76846671005013` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[87,0]' to a numeric value `58.21196644334059` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[87,1]' to a numeric value `-35.1721688149084` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[88,0]' to a numeric value `60.44115974060048` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[88,1]' to a numeric value `-36.58053531788304` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[89,0]' to a numeric value `62.67718592911992` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[89,1]' to a numeric value `-37.99321872560055` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[90,0]' to a numeric value `64.9194933028898` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[90,1]' to a numeric value `-39.409870479558116` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[91,0]' to a numeric value `67.16752860611383` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[91,1]' to a numeric value `-40.83014104212524` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[92,0]' to a numeric value `69.42073716971613` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[92,1]' to a numeric value `-42.25367998278702` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[93,0]' to a numeric value `71.67856304819763` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,164 [WARNING] Setting Var 'y[93,1]' to a numeric value `-43.680136064607815` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[94,0]' to a numeric value `73.94044915680716` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[94,1]' to a numeric value `-45.10915733089359` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[95,0]' to a numeric value `76.20583740899416` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[95,1]' to a numeric value `-46.54039119203219` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[96,0]' to a numeric value `78.47416885410763` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[96,1]' to a numeric value `-47.9734845124894` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[97,0]' to a numeric value `80.74488381530956` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[97,1]' to a numeric value `-49.40808369794011` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[98,0]' to a numeric value `83.01742202766623` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[98,1]' to a numeric value `-50.84383478251222` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[99,0]' to a numeric value `85.29122277638557` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[99,1]' to a numeric value `-52.28038351612258` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[100,0]' to a numeric value `87.5657250351647` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[100,1]' to a numeric value `-53.71737545188268` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[101,0]' to a numeric value `89.8403676046155` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[101,1]' to a numeric value `-55.154456033553494` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[102,0]' to a numeric value `92.11458925073143` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[102,1]' to a numeric value `-56.59127068302646` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[103,0]' to a numeric value `94.38782884336369` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[103,1]' to a numeric value `-58.027464887809806` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[104,0]' to a numeric value `96.65952549464181` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[104,1]' to a numeric value `-59.462684288443576` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[105,0]' to a numeric value `98.92911869739436` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[105,1]' to a numeric value `-60.89657476598785` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[106,0]' to a numeric value `101.19604846345912` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[106,1]' to a numeric value `-62.328782529423066` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[107,0]' to a numeric value `103.45975546183702` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[107,1]' to a numeric value `-63.75895420291408` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[108,0]' to a numeric value `105.71968115669875` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[108,1]' to a numeric value `-65.18673691300057` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[109,0]' to a numeric value `107.97526794519506` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[109,1]' to a numeric value `-66.61177837566315` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[110,0]' to a numeric value `110.22595929503674` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[110,1]' to a numeric value `-68.03372698324416` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[111,0]' to a numeric value `112.47119988181097` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[111,1]' to a numeric value `-69.45223189120169` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[112,0]' to a numeric value `114.71043572599913` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[112,1]' to a numeric value `-70.86694310467519` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[113,0]' to a numeric value `116.94311432966298` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[113,1]' to a numeric value `-72.27751156484146` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[114,0]' to a numeric value `119.16868481276514` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[114,1]' to a numeric value `-73.68358923503958` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[115,0]' to a numeric value `121.38659804909071` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[115,1]' to a numeric value `-75.084829186644` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[116,0]' to a numeric value `123.59630680173586` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,165 [WARNING] Setting Var 'y[116,1]' to a numeric value `-76.48088568466376` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[117,0]' to a numeric value `125.7972658581302` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[117,1]' to a numeric value `-77.87141427304745` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[118,0]' to a numeric value `127.98893216456005` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[118,1]' to a numeric value `-79.25607185967273` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[119,0]' to a numeric value `130.17076496015875` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[119,1]' to a numeric value `-80.63451680099901` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[120,0]' to a numeric value `132.34222591033114` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[120,1]' to a numeric value `-82.00640898636301` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[121,0]' to a numeric value `134.50277923957987` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[121,1]' to a numeric value `-83.37140992189596` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[122,0]' to a numeric value `136.65189186369975` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[122,1]' to a numeric value `-84.72918281404169` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[123,0]' to a numeric value `138.78903352130828` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[123,1]' to a numeric value `-86.07939265265578` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[124,0]' to a numeric value `140.91367690468002` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[124,1]' to a numeric value `-87.42170629366397` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[125,0]' to a numeric value `143.02529778985144` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[125,1]' to a numeric value `-88.75579254126059` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[126,0]' to a numeric value `145.12337516596563` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[126,1]' to a numeric value `-90.0813222296262` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[127,0]' to a numeric value `147.20739136382383` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[127,1]' to a numeric value `-91.39796830414421` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[128,0]' to a numeric value `149.2768321836127` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[128,1]' to a numeric value `-92.70540590209697` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[129,0]' to a numeric value `151.3311870217753` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[129,1]' to a numeric value `-94.00331243282058` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[130,0]' to a numeric value `153.3699489969948` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[130,1]' to a numeric value `-95.2913676572992` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[131,0]' to a numeric value `155.39261507525987` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[131,1]' to a numeric value `-96.5692537671795` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[132,0]' to a numeric value `157.39868619398104` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[132,1]' to a numeric value `-97.8366554631849` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[133,0]' to a numeric value `159.3876673851267` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[133,1]' to a numeric value `-99.09326003291113` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[134,0]' to a numeric value `161.35906789734906` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[134,1]' to a numeric value `-100.33875742798321` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[135,0]' to a numeric value `163.3124013170698` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[135,1]' to a numeric value `-101.57284034055525` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[136,0]' to a numeric value `165.2471856884952` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[136,1]' to a numeric value `-102.79520427913413` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[137,0]' to a numeric value `167.1629436325317` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[137,1]' to a numeric value `-104.00554764370808` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[138,0]' to a numeric value `169.05920246457177` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[138,1]' to a numeric value `-105.20357180016215` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,166 [WARNING] Setting Var 'y[139,0]' to a numeric value `170.9354943111222` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[139,1]' to a numeric value `-106.38898115396167` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[140,0]' to a numeric value `172.7913562252443` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[140,1]' to a numeric value `-107.56148322308553` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[141,0]' to a numeric value `174.62633030077956` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[141,1]' to a numeric value `-108.72078871019205` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[142,0]' to a numeric value `176.43996378533114` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[142,1]' to a numeric value `-109.86661157399868` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[143,0]' to a numeric value `178.23180919197333` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[143,1]' to a numeric value `-110.99866909985823` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[144,0]' to a numeric value `180.00142440966266` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[144,1]' to a numeric value `-112.1166819695147` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[145,0]' to a numeric value `181.748372812322` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[145,1]' to a numeric value `-113.22037433002073` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[146,0]' to a numeric value `183.4722233665716` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[146,1]' to a numeric value `-114.30947386180034` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[147,0]' to a numeric value `185.17255073807985` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[147,1]' to a numeric value `-115.38371184583937` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[148,0]' to a numeric value `186.84893539650852` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[148,1]' to a numeric value `-116.44282322998828` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[149,0]' to a numeric value `188.50096371902524` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[149,1]' to a numeric value `-117.48654669435949` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[150,0]' to a numeric value `190.128228092359` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[150,1]' to a numeric value `-118.51462471580426` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[151,0]' to a numeric value `191.73032701337235` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[151,1]' to a numeric value `-119.52680363145264` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[152,0]' to a numeric value `193.30686518812632` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[152,1]' to a numeric value `-120.52283370130091` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[153,0]' to a numeric value `194.8574536294136` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[153,1]' to a numeric value `-121.5024691698314` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[154,0]' to a numeric value `196.3817097527346` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[154,1]' to a numeric value `-122.46546832664852` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[155,0]' to a numeric value `197.87925747069505` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[155,1]' to a numeric value `-123.41159356611759` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[156,0]' to a numeric value `199.34972728579956` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[156,1]' to a numeric value `-124.34061144599029` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[157,0]' to a numeric value `200.79275638161943` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[157,1]' to a numeric value `-125.25229274500285` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[158,0]' to a numeric value `202.20798871231264` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[158,1]' to a numeric value `-126.1464125194332` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[159,0]' to a numeric value `203.59507509047208` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[159,1]' to a numeric value `-127.0227501586022` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[160,0]' to a numeric value `204.9536732732826` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[160,1]' to a numeric value `-127.8810894393061` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[161,0]' to a numeric value `206.28344804696414` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,167 [WARNING] Setting Var 'y[161,1]' to a numeric value `-128.7212185791661` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[162,0]' to a numeric value `207.58407130948046` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[162,1]' to a numeric value `-129.54293028888262` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[163,0]' to a numeric value `208.8552221514937` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[163,1]' to a numeric value `-130.34602182338077` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[164,0]' to a numeric value `210.09658693554272` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[164,1]' to a numeric value `-131.13029503183418` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[165,0]' to a numeric value `211.30785937342992` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[165,1]' to a numeric value `-131.8955564065562` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[166,0]' to a numeric value `212.4887406017907` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[166,1]' to a numeric value `-132.64161713074407` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[167,0]' to a numeric value `213.63893925583565` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[167,1]' to a numeric value `-133.36829312506725` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[168,0]' to a numeric value `214.758171541238` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[168,1]' to a numeric value `-134.0754050930852` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[169,0]' to a numeric value `215.8461613041567` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[169,1]' to a numeric value `-134.76277856548668` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[170,0]' to a numeric value `216.90264009937135` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[170,1]' to a numeric value `-135.43024394313608` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[171,0]' to a numeric value `217.92734725651698` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[171,1]' to a numeric value `-136.0776365389196` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[172,0]' to a numeric value `218.9200299443993` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[172,1]' to a numeric value `-136.70479661837842` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[173,0]' to a numeric value `219.8804432333762` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[173,1]' to a numeric value `-137.3115694391204` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[174,0]' to a numeric value `220.8083501557885` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[174,1]' to a numeric value `-137.89780528899908` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[175,0]' to a numeric value `221.7035217644263` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[175,1]' to a numeric value `-138.46335952305168` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[176,0]' to a numeric value `222.56573718901566` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[176,1]' to a numeric value `-139.0080925991867` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[177,0]' to a numeric value `223.39478369071202` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[177,1]' to a numeric value `-139.53187011261156` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[178,0]' to a numeric value `224.19045671458522` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[178,1]' to a numeric value `-140.03456282899222` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[179,0]' to a numeric value `224.95255994008508` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[179,1]' to a numeric value `-140.51604671633586` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[180,0]' to a numeric value `225.68090532947227` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[180,1]' to a numeric value `-140.97620297558927` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[181,0]' to a numeric value `226.37531317420257` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[181,1]' to a numeric value `-141.4149180699433` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[182,0]' to a numeric value `227.03561213925263` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[182,1]' to a numeric value `-141.8320837528372` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[183,0]' to a numeric value `227.66163930537155` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[183,1]' to a numeric value `-142.2275970946525` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[184,0]' to a numeric value `228.2532402092485` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,168 [WARNING] Setting Var 'y[184,1]' to a numeric value `-142.60136050809018` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[185,0]' to a numeric value `228.81026888157783` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[185,1]' to a numeric value `-142.95328177221955` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[186,0]' to a numeric value `229.3325878830052` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[186,1]' to a numeric value `-143.28327405518854` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[187,0]' to a numeric value `229.82006833793142` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[187,1]' to a numeric value `-143.59125593558016` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[188,0]' to a numeric value `230.2725899661412` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[188,1]' to a numeric value `-143.87715142239506` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[189,0]' to a numeric value `230.69004111219832` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[189,1]' to a numeric value `-144.14088997362325` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[190,0]' to a numeric value `231.07231877251704` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[190,1]' to a numeric value `-144.3824065133468` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[191,0]' to a numeric value `231.4193286199179` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[191,1]' to a numeric value `-144.60164144725422` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[192,0]' to a numeric value `231.73098502528032` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[192,1]' to a numeric value `-144.79854067632` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[193,0]' to a numeric value `232.0072110754021` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[193,1]' to a numeric value `-144.97305560808792` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[194,0]' to a numeric value `232.24793858483102` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[194,1]' to a numeric value `-145.12514316414618` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[195,0]' to a numeric value `232.4531080953734` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[195,1]' to a numeric value `-145.25476577981686` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[196,0]' to a numeric value `232.62266884271352` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[196,1]' to a numeric value `-145.36189138306656` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[197,0]' to a numeric value `232.75657860786632` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[197,1]' to a numeric value `-145.4464933006569` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[198,0]' to a numeric value `232.85480300931064` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[198,1]' to a numeric value `-145.50854981092607` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[199,0]' to a numeric value `232.91731021445256` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:40,169 [WARNING] Setting Var 'y[199,1]' to a numeric value `-145.5480408025814` outside the bounds (-10.0, 10.0).
+2026-02-21 16:34:41,069 [ERROR] Solver (ipopt) returned non-zero return code (1)
+2026-02-21 16:34:41,069 [ERROR] Solver log:
+Error evaluating objective function: can't evaluate tanh'(-724.727).
+Ipopt 3.14.16: 
+
+******************************************************************************
+This program contains Ipopt, a library for large-scale nonlinear optimization.
+ Ipopt is released as open source code under the Eclipse Public License (EPL).
+         For more information visit https://github.com/coin-or/Ipopt
+******************************************************************************
+
+This is Ipopt version 3.14.16, running with linear solver MUMPS 5.7.1.
+
+Number of nonzeros in equality constraint Jacobian...:        2
+Number of nonzeros in inequality constraint Jacobian.:        0
+Number of nonzeros in Lagrangian Hessian.............:    80200
+
+
+2026-02-21 16:34:41,069 [ERROR] Failed to extract results: Solver (ipopt) did not exit normally
+2026-02-21 16:41:25,049 [ERROR] jax.pure_callback failed
+Traceback (most recent call last):
+  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/callback.py", line 79, in pure_callback_impl
+    return tree_util.tree_map(np.asarray, callback(*args))
+  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/callback.py", line 64, in __call__
+    return tree_util.tree_leaves(self.callback_func(*args, **kwargs))
+  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/equinox/_errors.py", line 70, in raises
+    raise EqxRuntimeError(msgs[_index.item()])
+equinox._errors.EqxRuntimeError: The maximum number of solver steps was reached. Try increasing `max_steps`.
+2026-02-21 16:41:25,055 [ERROR] Failed to extract results: The maximum number of solver steps was reached. Try increasing `max_steps`.
+-------
+This error occurred during the runtime of your JAX program. Setting the environment
+variable `EQX_ON_ERROR=breakpoint` is usually the most useful way to debug such errors.
+(This can be navigated using most of the usual commands for the Python debugger:
+`u` and `d` to move through stack frames, the name of a variable to print its value,
+etc.) See also `https://docs.kidger.site/equinox/api/errors/#equinox.error_if` for more
+information.
+
+2026-02-21 16:49:26,819 [WARNING] Setting Var 'y[33,1]' to a numeric value `10.326718131639398` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[34,1]' to a numeric value `11.41524538833589` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[35,1]' to a numeric value `12.444947102865777` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[36,1]' to a numeric value `13.462876947392816` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[37,1]' to a numeric value `14.495107424573106` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[38,1]' to a numeric value `15.548899170610337` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[39,1]' to a numeric value `16.62569458328319` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[40,1]' to a numeric value `17.725689718788566` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[41,1]' to a numeric value `18.84863984948069` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[42,1]' to a numeric value `19.99449678906758` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[43,1]' to a numeric value `21.161267017148056` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[44,1]' to a numeric value `22.351803959482424` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[45,1]' to a numeric value `23.56239475748454` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[46,1]' to a numeric value `24.79596577949486` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[47,1]' to a numeric value `26.04855363415174` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[48,1]' to a numeric value `27.324122054294456` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[49,1]' to a numeric value `28.61683426419705` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[50,1]' to a numeric value `29.93135025285897` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[51,1]' to a numeric value `31.266133362517763` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[52,1]' to a numeric value `32.618868771867476` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[53,1]' to a numeric value `33.99056845763184` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[54,1]' to a numeric value `35.38213073062487` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[55,1]' to a numeric value `36.788734217454284` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[56,1]' to a numeric value `38.21642965256717` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[57,1]' to a numeric value `39.660773980684205` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[58,1]' to a numeric value `41.12008923904926` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[59,1]' to a numeric value `42.59719894731985` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[60,1]' to a numeric value `44.09327784946096` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[61,1]' to a numeric value `45.6035381013385` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,820 [WARNING] Setting Var 'y[62,1]' to a numeric value `47.12400104666366` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[63,1]' to a numeric value `48.66675843999662` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[64,1]' to a numeric value `50.223440808751135` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[65,1]' to a numeric value `51.794654628497106` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[66,1]' to a numeric value `53.376838455010194` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[67,1]' to a numeric value `54.97242789218672` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[68,1]' to a numeric value `56.58574320440118` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[69,1]' to a numeric value `58.2107917534859` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[70,1]' to a numeric value `59.84713935747133` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[71,1]' to a numeric value `61.4958014825639` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[72,1]' to a numeric value `63.15341083594762` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[73,1]' to a numeric value `64.82296926352471` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[74,1]' to a numeric value `66.50835873747279` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[75,1]' to a numeric value `68.20242051400504` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[76,1]' to a numeric value `69.90748211469531` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[77,1]' to a numeric value `71.62499636771777` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[78,1]' to a numeric value `73.3400158952914` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[79,1]' to a numeric value `75.07152750840942` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[80,1]' to a numeric value `76.81197196204351` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[81,1]' to a numeric value `78.5594909400033` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[82,1]' to a numeric value `80.31510056098516` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[83,1]' to a numeric value `82.08243349857725` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[84,1]' to a numeric value `83.85330785506014` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[85,1]' to a numeric value `85.62962181835186` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[86,1]' to a numeric value `87.41376864483631` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[87,1]' to a numeric value `89.2064265319705` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[88,1]' to a numeric value `90.99699413799686` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[89,1]' to a numeric value `92.79486904356486` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[90,1]' to a numeric value `94.59811268977045` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[91,1]' to a numeric value `96.40462599483982` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[92,1]' to a numeric value `98.2118611526342` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[93,1]' to a numeric value `100.02230552255935` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[94,1]' to a numeric value `101.83948048036362` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[95,1]' to a numeric value `103.66087508586354` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[96,1]' to a numeric value `105.4853079755116` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[97,1]' to a numeric value `107.31067469332247` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[98,1]' to a numeric value `109.13604644817802` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[99,1]' to a numeric value `110.96046954622886` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[100,1]' to a numeric value `112.78344861865585` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[101,1]' to a numeric value `114.60474266164303` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[102,1]' to a numeric value `116.42438542676868` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[103,1]' to a numeric value `118.24274086916333` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[104,1]' to a numeric value `120.06048359362967` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[105,1]' to a numeric value `121.87905323403535` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,821 [WARNING] Setting Var 'y[106,1]' to a numeric value `123.69742944772878` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[107,1]' to a numeric value `125.51376309653756` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[108,1]' to a numeric value `127.32645295276764` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[109,1]' to a numeric value `129.1341882613339` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[110,1]' to a numeric value `130.93597699131305` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[111,1]' to a numeric value `132.73121400827432` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[112,1]' to a numeric value `134.51976855563115` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[113,1]' to a numeric value `136.3021039207067` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[114,1]' to a numeric value `138.07944476387465` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[115,1]' to a numeric value `139.85431094853647` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[116,1]' to a numeric value `141.62543257543442` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[117,1]' to a numeric value `143.3899125602992` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[118,1]' to a numeric value `145.14538157271497` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[119,1]' to a numeric value `146.89007796869515` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[120,1]' to a numeric value `148.62300434214384` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[121,1]' to a numeric value `150.34482874812147` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[122,1]' to a numeric value `152.05897167324676` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[123,1]' to a numeric value `153.77065114121112` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[124,1]' to a numeric value `155.4749454202717` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[125,1]' to a numeric value `157.16574046982666` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[126,1]' to a numeric value `158.8395772168034` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[127,1]' to a numeric value `160.49763649890187` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[128,1]' to a numeric value `162.1487490794115` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[129,1]' to a numeric value `163.79749010613634` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[130,1]' to a numeric value `165.4313888094763` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[131,1]' to a numeric value `167.04327633546148` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[132,1]' to a numeric value `168.6370240513467` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[133,1]' to a numeric value `170.23010982970789` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[134,1]' to a numeric value `171.81290747467517` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[135,1]' to a numeric value `173.36925180825367` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[136,1]' to a numeric value `174.90620609805634` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[137,1]' to a numeric value `176.4418922736759` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[138,1]' to a numeric value `177.95671732592814` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[139,1]' to a numeric value `179.457411965726` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[140,1]' to a numeric value `180.93326037426777` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[141,1]' to a numeric value `182.40484875887145` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[142,1]' to a numeric value `183.84875664445732` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[143,1]' to a numeric value `185.2794043590762` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[144,1]' to a numeric value `186.6832038178352` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[145,1]' to a numeric value `188.07636759231525` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[146,1]' to a numeric value `189.47955458727674` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[147,1]' to a numeric value `190.7999595933486` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[148,1]' to a numeric value `192.2644158532038` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[149,1]' to a numeric value `193.56222616103116` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,822 [WARNING] Setting Var 'y[150,1]' to a numeric value `194.85846751129637` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[151,1]' to a numeric value `196.14068866849928` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[152,1]' to a numeric value `197.38307218556926` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[153,1]' to a numeric value `198.6017601873831` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[154,1]' to a numeric value `199.79525962739635` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[155,1]' to a numeric value `200.97518239128487` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[156,1]' to a numeric value `202.15048101509984` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[157,1]' to a numeric value `203.3242389789842` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[158,1]' to a numeric value `204.49530496090648` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[159,1]' to a numeric value `205.61180254304472` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[160,1]' to a numeric value `206.6530552394738` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[161,1]' to a numeric value `207.68161577530088` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[162,1]' to a numeric value `208.74112811365453` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[163,1]' to a numeric value `209.81539432291385` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[164,1]' to a numeric value `210.7717714656291` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[165,1]' to a numeric value `211.69095914406378` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[166,1]' to a numeric value `212.67714217291825` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[167,1]' to a numeric value `213.6258134592421` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[168,1]' to a numeric value `214.4479847100462` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[169,1]' to a numeric value `215.3568810451776` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[170,1]' to a numeric value `216.21989839699984` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[171,1]' to a numeric value `216.97402670364292` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[172,1]' to a numeric value `217.85259169967492` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[173,1]' to a numeric value `218.54423347961685` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[174,1]' to a numeric value `219.32755298690827` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[175,1]' to a numeric value `220.01930177870474` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[176,1]' to a numeric value `220.71524600252368` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[177,1]' to a numeric value `221.3730657291242` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[178,1]' to a numeric value `222.01932913398636` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[179,1]' to a numeric value `222.60067808361995` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[180,1]' to a numeric value `223.23953966137825` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[181,1]' to a numeric value `223.7155636778534` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[182,1]' to a numeric value `224.32820797139155` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[183,1]' to a numeric value `224.76630859054114` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[184,1]' to a numeric value `225.23190968070224` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[185,1]' to a numeric value `225.75391808272175` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[186,1]' to a numeric value `226.0983158426302` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[187,1]' to a numeric value `226.4720307033138` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[188,1]' to a numeric value `226.9023186032729` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[189,1]' to a numeric value `227.2347514117371` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[190,1]' to a numeric value `227.4759945392549` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[191,1]' to a numeric value `227.74362918633997` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[192,1]' to a numeric value `228.0328835787834` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[193,1]' to a numeric value `228.29834192570735` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[194,1]' to a numeric value `228.4945600861065` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,823 [WARNING] Setting Var 'y[195,1]' to a numeric value `228.63121084645834` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,824 [WARNING] Setting Var 'y[196,1]' to a numeric value `228.7495561310277` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,824 [WARNING] Setting Var 'y[197,1]' to a numeric value `228.84582918703435` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,824 [WARNING] Setting Var 'y[198,1]' to a numeric value `228.91771710928765` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:26,824 [WARNING] Setting Var 'y[199,1]' to a numeric value `228.96394199790774` outside the bounds (-10.0, 10.0).
+2026-02-21 16:49:27,733 [ERROR] Solver (ipopt) returned non-zero return code (1)
+2026-02-21 16:49:27,733 [ERROR] Solver log:
+Error evaluating objective function: can't evaluate tanh'(-716.037).
+Ipopt 3.14.16: 
+
+******************************************************************************
+This program contains Ipopt, a library for large-scale nonlinear optimization.
+ Ipopt is released as open source code under the Eclipse Public License (EPL).
+         For more information visit https://github.com/coin-or/Ipopt
+******************************************************************************
+
+This is Ipopt version 3.14.16, running with linear solver MUMPS 5.7.1.
+
+Number of nonzeros in equality constraint Jacobian...:        2
+Number of nonzeros in inequality constraint Jacobian.:        0
+Number of nonzeros in Lagrangian Hessian.............:    80200
+
+
+2026-02-21 16:49:27,733 [ERROR] Failed to extract results: Solver (ipopt) did not exit normally
+2026-02-21 17:11:47,187 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Number of Iterations Exceeded.
+2026-02-21 17:21:58,708 [ERROR] Failed to complete training: Cannot load a SolverResults object with bad status: error
+2026-02-21 17:57:15,601 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Number of Iterations Exceeded.
+2026-02-21 17:57:16,351 [ERROR] jax.pure_callback failed
+Traceback (most recent call last):
+  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/callback.py", line 79, in pure_callback_impl
+    return tree_util.tree_map(np.asarray, callback(*args))
+  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/callback.py", line 64, in __call__
+    return tree_util.tree_leaves(self.callback_func(*args, **kwargs))
+  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/equinox/_errors.py", line 70, in raises
+    raise EqxRuntimeError(msgs[_index.item()])
+equinox._errors.EqxRuntimeError: The maximum number of solver steps was reached. Try increasing `max_steps`.
+2026-02-21 17:57:16,357 [ERROR] Failed to extract results: The maximum number of solver steps was reached. Try increasing `max_steps`.
+-------
+This error occurred during the runtime of your JAX program. Setting the environment
+variable `EQX_ON_ERROR=breakpoint` is usually the most useful way to debug such errors.
+(This can be navigated using most of the usual commands for the Python debugger:
+`u` and `d` to move through stack frames, the name of a variable to print its value,
+etc.) See also `https://docs.kidger.site/equinox/api/errors/#equinox.error_if` for more
+information.
+
+2026-02-21 17:59:54,143 [WARNING] Setting Var 'y[11,1]' to a numeric value `-10.349596022527225` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,143 [WARNING] Setting Var 'y[12,1]' to a numeric value `-12.235086234217857` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,143 [WARNING] Setting Var 'y[13,1]' to a numeric value `-14.293434338005547` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,143 [WARNING] Setting Var 'y[14,1]' to a numeric value `-16.53979875075598` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,143 [WARNING] Setting Var 'y[15,1]' to a numeric value `-19.044069099320097` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,143 [WARNING] Setting Var 'y[16,1]' to a numeric value `-22.05913947688454` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,143 [WARNING] Setting Var 'y[17,1]' to a numeric value `-27.294198119382553` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,143 [WARNING] Setting Var 'y[18,1]' to a numeric value `-36.42564820263256` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,143 [WARNING] Setting Var 'y[19,1]' to a numeric value `-46.46746939202868` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,143 [WARNING] Setting Var 'y[20,1]' to a numeric value `-57.00065933877571` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,143 [WARNING] Setting Var 'y[21,1]' to a numeric value `-68.00715132792229` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,143 [WARNING] Setting Var 'y[22,1]' to a numeric value `-79.47666809268839` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,143 [WARNING] Setting Var 'y[23,1]' to a numeric value `-91.39510843003566` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,143 [WARNING] Setting Var 'y[24,1]' to a numeric value `-103.75470965835869` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,143 [WARNING] Setting Var 'y[25,0]' to a numeric value `10.06224127506209` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,143 [WARNING] Setting Var 'y[25,1]' to a numeric value `-116.5452069042814` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,143 [WARNING] Setting Var 'y[26,0]' to a numeric value `11.163451067806268` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,143 [WARNING] Setting Var 'y[26,1]' to a numeric value `-129.74759849258191` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,143 [WARNING] Setting Var 'y[27,0]' to a numeric value `12.326419294871238` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,143 [WARNING] Setting Var 'y[27,1]' to a numeric value `-143.34892106139392` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,143 [WARNING] Setting Var 'y[28,0]' to a numeric value `13.494100012055636` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,143 [WARNING] Setting Var 'y[28,1]' to a numeric value `-157.34126844968233` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[29,0]' to a numeric value `14.696781862862768` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[29,1]' to a numeric value `-171.7077289292064` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[30,0]' to a numeric value `15.895034485031092` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[30,1]' to a numeric value `-186.43789885720736` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[31,0]' to a numeric value `17.171655410200344` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[31,1]' to a numeric value `-201.5089531854773` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[32,0]' to a numeric value `18.48466290296893` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[32,1]' to a numeric value `-216.91003752036195` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[33,0]' to a numeric value `19.812594647484286` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[33,1]' to a numeric value `-232.62794312453883` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[34,0]' to a numeric value `21.153465269706015` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[34,1]' to a numeric value `-248.6472249268998` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[35,0]' to a numeric value `22.507292409239135` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[35,1]' to a numeric value `-264.9519414929987` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[36,0]' to a numeric value `23.54423421986233` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[36,1]' to a numeric value `-281.5584228863049` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[37,0]' to a numeric value `25.091945521349082` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[37,1]' to a numeric value `-298.3684967178534` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[38,0]' to a numeric value `26.64656230243075` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[38,1]' to a numeric value `-315.4151500136266` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[39,0]' to a numeric value `28.161961917754265` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[39,1]' to a numeric value `-332.6859603002096` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[40,0]' to a numeric value `29.001398174432353` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[40,1]' to a numeric value `-350.22657745035195` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[41,0]' to a numeric value `30.793530813960405` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[41,1]' to a numeric value `-367.8588737585303` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[42,0]' to a numeric value `32.53777852747607` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[42,1]' to a numeric value `-385.664022969453` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[43,0]' to a numeric value `34.00361551785077` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[43,1]' to a numeric value `-403.6470346881684` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[44,0]' to a numeric value `35.39121751445668` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[44,1]' to a numeric value `-421.7702633681383` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[45,0]' to a numeric value `37.12083486136406` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[45,1]' to a numeric value `-439.97421313016184` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[46,0]' to a numeric value `38.810653117416514` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[46,1]' to a numeric value `-458.27843239541573` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[47,0]' to a numeric value `40.02837421090975` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[47,1]' to a numeric value `-476.7073568313917` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[48,0]' to a numeric value `40.73577577954738` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[48,1]' to a numeric value `-495.24645294872647` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[49,0]' to a numeric value `42.92507669379374` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[49,1]' to a numeric value `-513.6807401930524` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[50,0]' to a numeric value `44.75405998736909` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[50,1]' to a numeric value `-532.1736247547626` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[51,0]' to a numeric value `46.15891649589393` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[51,1]' to a numeric value `-550.7129756978136` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,144 [WARNING] Setting Var 'y[52,0]' to a numeric value `48.03215697777338` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[52,1]' to a numeric value `-569.1922765364948` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[53,0]' to a numeric value `48.767638221094074` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[53,1]' to a numeric value `-587.7516212612139` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[54,0]' to a numeric value `50.65426554769568` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[54,1]' to a numeric value `-606.1467260590306` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[55,0]' to a numeric value `52.22337663447952` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[55,1]' to a numeric value `-624.5041984617997` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[56,0]' to a numeric value `53.467988651464864` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[56,1]' to a numeric value `-642.8064581824317` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[57,0]' to a numeric value `56.01677757373194` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[57,1]' to a numeric value `-660.8745848009611` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[58,0]' to a numeric value `56.28425997549213` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[58,1]' to a numeric value `-679.0443570779913` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[59,0]' to a numeric value `58.65525139975291` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[59,1]' to a numeric value `-696.8650719438441` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[60,0]' to a numeric value `59.52585089919936` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[60,1]' to a numeric value `-714.6745873012021` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[61,0]' to a numeric value `61.5608486993356` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[61,1]' to a numeric value `-732.1922493838971` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[62,0]' to a numeric value `62.47638653110567` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[62,1]' to a numeric value `-749.6259704152961` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[63,0]' to a numeric value `63.66775078343747` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[63,1]' to a numeric value `-766.8207528237111` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[64,0]' to a numeric value `64.82120638125994` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[64,1]' to a numeric value `-783.7904745006956` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[65,0]' to a numeric value `67.15937998307011` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[65,1]' to a numeric value `-800.3976127250745` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[66,0]' to a numeric value `67.91505547742676` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[66,1]' to a numeric value `-816.8986522582251` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[67,0]' to a numeric value `69.52122778861037` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[67,1]' to a numeric value `-833.0371181464889` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[68,0]' to a numeric value `68.80152758416727` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[68,1]' to a numeric value `-849.1104090654169` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[69,0]' to a numeric value `71.516982615975` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[69,1]' to a numeric value `-864.5341661110452` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[70,0]' to a numeric value `71.13786840048253` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[70,1]' to a numeric value `-879.9373341403973` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[71,0]' to a numeric value `73.24290351742548` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[71,1]' to a numeric value `-894.7541748408526` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[72,0]' to a numeric value `75.80445029084066` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[72,1]' to a numeric value `-909.1699721090115` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[73,0]' to a numeric value `75.64658602773038` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[73,1]' to a numeric value `-923.4836875557178` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[74,0]' to a numeric value `78.05459507827271` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[74,1]' to a numeric value `-937.1595960499683` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,145 [WARNING] Setting Var 'y[75,0]' to a numeric value `78.33775758374385` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[75,1]' to a numeric value `-950.6469025024212` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[76,0]' to a numeric value `80.80202636675226` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[76,1]' to a numeric value `-963.5073064528365` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[77,0]' to a numeric value `80.16756110831497` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[77,1]' to a numeric value `-976.2489535363309` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[78,0]' to a numeric value `82.28621894656726` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[78,1]' to a numeric value `-988.2818003540581` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[79,0]' to a numeric value `82.72718378191317` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[79,1]' to a numeric value `-1000.0310511127918` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[80,0]' to a numeric value `85.14360303506164` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[80,1]' to a numeric value `-1011.1245318182498` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[81,0]' to a numeric value `84.25401094892726` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[81,1]' to a numeric value `-1022.0722969212594` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[82,0]' to a numeric value `86.05876038945256` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[82,1]' to a numeric value `-1032.2714428926083` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[83,0]' to a numeric value `87.96008919069926` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[83,1]' to a numeric value `-1041.9681066296812` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[84,0]' to a numeric value `86.71201787954422` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[84,1]' to a numeric value `-1051.4728852890184` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[85,0]' to a numeric value `88.24722201423144` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[85,1]' to a numeric value `-1060.1910135037358` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[86,0]' to a numeric value `89.33192374429953` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[86,1]' to a numeric value `-1068.4328855788062` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[87,0]' to a numeric value `89.92659721863375` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[87,1]' to a numeric value `-1076.1941629950766` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[88,0]' to a numeric value `91.38461135879375` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[88,1]' to a numeric value `-1083.3335618511856` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[89,0]' to a numeric value `89.77854684029622` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[89,1]' to a numeric value `-1090.2314987327388` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[90,0]' to a numeric value `90.84963853284879` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[90,1]' to a numeric value `-1096.3147093662787` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[91,0]' to a numeric value `92.16475999323316` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[91,1]' to a numeric value `-1101.8172157378124` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[92,0]' to a numeric value `92.19858372531579` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[92,1]' to a numeric value `-1106.883996713058` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[93,0]' to a numeric value `91.31415101996586` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[93,1]' to a numeric value `-1111.474219197992` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[94,0]' to a numeric value `91.6980973547723` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[94,1]' to a numeric value `-1115.3676356859357` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[95,0]' to a numeric value `92.27887254220194` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[95,1]' to a numeric value `-1118.666118715935` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[96,0]' to a numeric value `92.75947326080045` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[96,1]' to a numeric value `-1121.3956659974658` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[97,0]' to a numeric value `93.13942413025947` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,146 [WARNING] Setting Var 'y[97,1]' to a numeric value `-1123.5535776155098` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,147 [WARNING] Setting Var 'y[98,0]' to a numeric value `93.41834637398337` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,147 [WARNING] Setting Var 'y[98,1]' to a numeric value `-1125.137702302578` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,147 [WARNING] Setting Var 'y[99,0]' to a numeric value `93.59594312951741` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,147 [WARNING] Setting Var 'y[99,1]' to a numeric value `-1126.1463540337904` outside the bounds (-10.0, 10.0).
+2026-02-21 17:59:54,583 [ERROR] Solver (ipopt) returned non-zero return code (1)
+2026-02-21 17:59:54,583 [ERROR] Solver log:
+Error evaluating objective function: can't evaluate tanh'(779.568).
+Ipopt 3.14.16: 
+
+******************************************************************************
+This program contains Ipopt, a library for large-scale nonlinear optimization.
+ Ipopt is released as open source code under the Eclipse Public License (EPL).
+         For more information visit https://github.com/coin-or/Ipopt
+******************************************************************************
+
+This is Ipopt version 3.14.16, running with linear solver MUMPS 5.7.1.
+
+Number of nonzeros in equality constraint Jacobian...:        2
+Number of nonzeros in inequality constraint Jacobian.:        0
+Number of nonzeros in Lagrangian Hessian.............:    20100
+
+
+2026-02-21 17:59:54,584 [ERROR] Failed to extract results: Solver (ipopt) did not exit normally
+2026-02-21 18:03:45,872 [WARNING] Setting Var 'y[47,1]' to a numeric value `-10.101150826481836` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,872 [WARNING] Setting Var 'y[48,1]' to a numeric value `-10.737379216239493` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,872 [WARNING] Setting Var 'y[49,0]' to a numeric value `10.600134390644392` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,872 [WARNING] Setting Var 'y[49,1]' to a numeric value `-11.333240822755544` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,872 [WARNING] Setting Var 'y[50,0]' to a numeric value `11.210424969718535` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,872 [WARNING] Setting Var 'y[50,1]' to a numeric value `-11.956018943776547` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[51,0]' to a numeric value `11.80864212907718` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[51,1]' to a numeric value `-12.578663207131978` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[52,0]' to a numeric value `12.412423430240963` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[52,1]' to a numeric value `-13.17911345490919` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[53,0]' to a numeric value `12.997458726827075` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[53,1]' to a numeric value `-13.739975165685387` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[54,0]' to a numeric value `13.51380584365556` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[54,1]' to a numeric value `-14.344987421236949` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[55,0]' to a numeric value `14.00641810007906` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[55,1]' to a numeric value `-14.832629448464347` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[56,0]' to a numeric value `14.532520678877816` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[56,1]' to a numeric value `-15.245364198753402` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[57,0]' to a numeric value `14.902743825939915` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[57,1]' to a numeric value `-15.717153086589361` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[58,0]' to a numeric value `15.416521999118645` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[58,1]' to a numeric value `-16.113027959151726` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[59,0]' to a numeric value `15.790592939471784` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[59,1]' to a numeric value `-16.48435351988439` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[60,0]' to a numeric value `16.34608882170278` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[60,1]' to a numeric value `-16.860866232232812` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[61,0]' to a numeric value `16.848431730683092` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[61,1]' to a numeric value `-17.418666903900817` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[62,0]' to a numeric value `17.227398855802303` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[62,1]' to a numeric value `-18.230914905336984` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[63,0]' to a numeric value `17.816002438008` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[63,1]' to a numeric value `-18.528523142818084` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[64,0]' to a numeric value `18.295779929781293` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[64,1]' to a numeric value `-19.012574031923076` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[65,0]' to a numeric value `18.866427862296757` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[65,1]' to a numeric value `-19.39022072930477` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[66,0]' to a numeric value `19.18075838632181` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[66,1]' to a numeric value `-20.04017883273547` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[67,0]' to a numeric value `19.791255614113005` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[67,1]' to a numeric value `-20.266444288887204` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[68,0]' to a numeric value `20.028478536508437` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[68,1]' to a numeric value `-21.063447483364527` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[69,0]' to a numeric value `20.507606116738646` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[69,1]' to a numeric value `-21.265259224178923` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[70,0]' to a numeric value `20.984914589400745` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[70,1]' to a numeric value `-21.51872807874247` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[71,0]' to a numeric value `21.344278947569354` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[71,1]' to a numeric value `-22.060125581569515` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[72,0]' to a numeric value `21.621097030943318` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[72,1]' to a numeric value `-22.53453340639475` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[73,0]' to a numeric value `22.405801203619284` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,873 [WARNING] Setting Var 'y[73,1]' to a numeric value `-22.881263272737847` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[74,0]' to a numeric value `22.725656046087497` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[74,1]' to a numeric value `-23.359520130425036` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[75,0]' to a numeric value `22.973145747916053` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[75,1]' to a numeric value `-23.838186494255712` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[76,0]' to a numeric value `23.33333486818434` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[76,1]' to a numeric value `-23.79621329805114` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[77,0]' to a numeric value `23.549560296362998` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[77,1]' to a numeric value `-24.43821623766663` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[78,0]' to a numeric value `24.083254808007982` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[78,1]' to a numeric value `-24.648579779388925` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[79,0]' to a numeric value `24.30835545183847` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[79,1]' to a numeric value `-25.18562511696969` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[80,0]' to a numeric value `24.72926576529937` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[80,1]' to a numeric value `-25.270215273931285` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[81,0]' to a numeric value `24.92399119959489` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[81,1]' to a numeric value `-25.932636091705707` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[82,0]' to a numeric value `25.615712223522806` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[82,1]' to a numeric value `-25.919294397843554` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[83,0]' to a numeric value `25.72661440744877` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[83,1]' to a numeric value `-26.627391327718072` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[84,0]' to a numeric value `26.043334256274687` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[84,1]' to a numeric value `-27.0297687157557` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[85,0]' to a numeric value `26.385095041309263` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[85,1]' to a numeric value `-27.185714878805793` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[86,0]' to a numeric value `26.64011983975606` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[86,1]' to a numeric value `-27.710237783761468` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[87,0]' to a numeric value `27.097729134912775` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[87,1]' to a numeric value `-27.717003574537657` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[88,0]' to a numeric value `27.17571950153639` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[88,1]' to a numeric value `-28.503684972502224` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[89,0]' to a numeric value `27.60613199501652` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[89,1]' to a numeric value `-28.488230230352695` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[90,0]' to a numeric value `28.245299164783667` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[90,1]' to a numeric value `-28.573976095067295` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[91,0]' to a numeric value `28.334951735069055` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[91,1]' to a numeric value `-29.286126399279144` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[92,0]' to a numeric value `28.64821486639167` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[92,1]' to a numeric value `-29.59573427976869` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[93,0]' to a numeric value `28.96878988285903` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[93,1]' to a numeric value `-29.695801328474413` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[94,0]' to a numeric value `29.068682275084477` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[94,1]' to a numeric value `-30.429755638061142` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[95,0]' to a numeric value `29.432282868162435` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[95,1]' to a numeric value `-30.642960244386344` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[96,0]' to a numeric value `29.718875650760236` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[96,1]' to a numeric value `-30.66472579676488` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[97,0]' to a numeric value `29.966490879747674` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,874 [WARNING] Setting Var 'y[97,1]' to a numeric value `-31.073731031336884` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[98,0]' to a numeric value `30.385131521896867` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[98,1]' to a numeric value `-30.87939439881235` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[99,0]' to a numeric value `30.529063627561253` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[99,1]' to a numeric value `-31.442442830062387` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[100,0]' to a numeric value `30.786115614777408` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[100,1]' to a numeric value `-31.800479648466137` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[101,0]' to a numeric value `31.093441947108047` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[101,1]' to a numeric value `-31.740868603026108` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[102,0]' to a numeric value `31.23243123125381` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[102,1]' to a numeric value `-32.32843858070294` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[103,0]' to a numeric value `31.513117700073856` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[103,1]' to a numeric value `-32.60063203401412` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[104,0]' to a numeric value `31.878899374212416` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[104,1]' to a numeric value `-32.54740443447526` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[105,0]' to a numeric value `31.9690969421588` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[105,1]' to a numeric value `-33.227373994719656` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[106,0]' to a numeric value `32.35977821817685` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[106,1]' to a numeric value `-33.23211263346911` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[107,0]' to a numeric value `32.6387589937281` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[107,1]' to a numeric value `-33.50534334776821` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[108,0]' to a numeric value `32.90488384573245` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[108,1]' to a numeric value `-33.762314094784486` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[109,0]' to a numeric value `32.97533667992932` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[109,1]' to a numeric value `-34.454030792419246` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[110,0]' to a numeric value `33.40202303861962` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[110,1]' to a numeric value `-34.34680045870704` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[111,0]' to a numeric value `33.693244896595125` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[111,1]' to a numeric value `-34.568249223959135` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[112,0]' to a numeric value `33.884169050233886` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[112,1]' to a numeric value `-34.96960545035236` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[113,0]' to a numeric value `34.29880263521469` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[113,1]' to a numeric value `-35.04504407842239` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[114,0]' to a numeric value `34.24170916713447` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[114,1]' to a numeric value `-35.822154906722126` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[115,0]' to a numeric value `35.13796708646182` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[115,1]' to a numeric value `-35.69502026011113` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[116,0]' to a numeric value `35.179127000768744` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[116,1]' to a numeric value `-36.43020545611566` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[117,0]' to a numeric value `35.63509164878464` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[117,1]' to a numeric value `-36.12266711478007` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[118,0]' to a numeric value `35.74157941415864` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[118,1]' to a numeric value `-36.69298980467917` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[119,0]' to a numeric value `35.7815794558045` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[119,1]' to a numeric value `-37.40604368247205` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[120,0]' to a numeric value `36.19392451574295` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[120,1]' to a numeric value `-37.27312756520849` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[121,0]' to a numeric value `36.37885246306571` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,875 [WARNING] Setting Var 'y[121,1]' to a numeric value `-37.65891872317149` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[122,0]' to a numeric value `36.84935458189402` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[122,1]' to a numeric value `-37.39223551026556` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[123,0]' to a numeric value `36.89018508100567` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[123,1]' to a numeric value `-38.07639206670339` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[124,0]' to a numeric value `37.55219531235977` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[124,1]' to a numeric value `-38.123591707814995` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[125,0]' to a numeric value `37.72589500203459` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[125,1]' to a numeric value `-38.675531645033324` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[126,0]' to a numeric value `37.69266731297117` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[126,1]' to a numeric value `-39.360743434093735` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[127,0]' to a numeric value `38.63585430138039` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[127,1]' to a numeric value `-39.12746043962796` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[128,0]' to a numeric value `38.68573272308985` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[128,1]' to a numeric value `-39.76984265514012` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[129,0]' to a numeric value `38.811614274761844` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[129,1]' to a numeric value `-40.24158497094181` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[130,0]' to a numeric value `39.08704243448449` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[130,1]' to a numeric value `-40.355654612252906` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[131,0]' to a numeric value `39.56168319078614` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[131,1]' to a numeric value `-40.01136826072655` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[132,0]' to a numeric value `39.58402680663345` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[132,1]' to a numeric value `-40.6920585567104` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[133,0]' to a numeric value `39.77402370984875` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[133,1]' to a numeric value `-40.98405021557858` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[134,0]' to a numeric value `40.128411381772594` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[134,1]' to a numeric value `-40.89486954744423` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[135,0]' to a numeric value `40.21439794201875` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[135,1]' to a numeric value `-41.41035662666958` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[136,0]' to a numeric value `40.313300988112914` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[136,1]' to a numeric value `-41.89443665048297` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[137,0]' to a numeric value `40.82136156373069` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[137,1]' to a numeric value `-41.42419510024123` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[138,0]' to a numeric value `40.86165872588331` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[138,1]' to a numeric value `-42.02342768213297` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[139,0]' to a numeric value `40.90123213551228` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[139,1]' to a numeric value `-42.58918174630906` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[140,0]' to a numeric value `41.77239773465389` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[140,1]' to a numeric value `-42.390644866218864` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[141,0]' to a numeric value `41.8112184043918` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[141,1]' to a numeric value `-42.97011186238932` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[142,0]' to a numeric value `41.86459018869414` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[142,1]' to a numeric value `-43.5116885565832` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[143,0]' to a numeric value `42.34275073046177` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[143,1]' to a numeric value `-43.06052781734878` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[144,0]' to a numeric value `42.38337082388839` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[144,1]' to a numeric value `-43.611973367153986` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[145,0]' to a numeric value `42.69620788146511` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[145,1]' to a numeric value `-43.494961709807846` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,876 [WARNING] Setting Var 'y[146,0]' to a numeric value `42.80861639173499` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[146,1]' to a numeric value `-43.867664761860055` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[147,0]' to a numeric value `42.96762938925528` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[147,1]' to a numeric value `-44.12042981208524` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[148,0]' to a numeric value `42.952680194581724` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[148,1]' to a numeric value `-44.76954898368757` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[149,0]' to a numeric value `43.31899747229681` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[149,1]' to a numeric value `-44.521849764851595` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[150,0]' to a numeric value `43.39703426282971` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[150,1]' to a numeric value `-44.93593613630458` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[151,0]' to a numeric value `43.80462682243102` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[151,1]' to a numeric value `-44.57665838479779` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[152,0]' to a numeric value `43.96130692936546` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[152,1]' to a numeric value `-44.785715076429256` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[153,0]' to a numeric value `43.876429184263` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[153,1]' to a numeric value `-45.55422385193511` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[154,0]' to a numeric value `44.29819367420932` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[154,1]' to a numeric value `-45.129934903194574` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[155,0]' to a numeric value `44.36293531403391` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[155,1]' to a numeric value `-45.52522031725918` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[156,0]' to a numeric value `44.39291880122462` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[156,1]' to a numeric value `-45.99305714611678` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[157,0]' to a numeric value `44.858310038107696` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[157,1]' to a numeric value `-45.4378567316709` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[158,0]' to a numeric value `44.90449321644205` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[158,1]' to a numeric value `-45.84539244452082` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[159,0]' to a numeric value `44.927449467722724` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[159,1]' to a numeric value `-46.29801569553604` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[160,0]' to a numeric value `45.09682482661749` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[160,1]' to a numeric value `-46.32563576939486` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[161,0]' to a numeric value `45.400740545481916` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[161,1]' to a numeric value `-46.04232627197398` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[162,0]' to a numeric value `45.42602169891784` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[162,1]' to a numeric value `-46.45693577522` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[163,0]' to a numeric value `45.552115231202635` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[163,1]' to a numeric value `-46.627356289173164` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[164,0]' to a numeric value `45.6360710969714` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[164,1]' to a numeric value `-46.88471891590632` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[165,0]' to a numeric value `45.59226977436866` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[165,1]' to a numeric value `-47.426997247035` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[166,0]' to a numeric value `46.003766490945466` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[166,1]' to a numeric value `-46.90009053149498` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[167,0]' to a numeric value `46.00951734598887` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[167,1]' to a numeric value `-47.30529358680041` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[168,0]' to a numeric value `46.09858320004575` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[168,1]' to a numeric value `-47.50633325056922` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[169,0]' to a numeric value `46.268669038677295` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[169,1]' to a numeric value `-47.48587601475262` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[170,0]' to a numeric value `46.46338233142956` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[170,1]' to a numeric value `-47.47325277846821` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[171,0]' to a numeric value `46.48602131989425` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,877 [WARNING] Setting Var 'y[171,1]' to a numeric value `-47.79386617958222` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[172,0]' to a numeric value `46.54367317615999` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[172,1]' to a numeric value `-48.021712616263265` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[173,0]' to a numeric value `46.65391345777` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[173,1]' to a numeric value `-48.11040928590478` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[174,0]' to a numeric value `46.563253027426384` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[174,1]' to a numeric value `-48.462890290945616` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[175,0]' to a numeric value `47.0578919656773` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[175,1]' to a numeric value `-48.26961337407492` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[176,0]' to a numeric value `47.458458547156795` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[176,1]' to a numeric value `-48.17274709491694` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[177,0]' to a numeric value `47.451686831033506` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[177,1]' to a numeric value `-48.490187380735115` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[178,0]' to a numeric value `47.49257913900205` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[178,1]' to a numeric value `-48.684633786489705` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[179,0]' to a numeric value `47.54865895946558` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[179,1]' to a numeric value `-48.83163165439545` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[180,0]' to a numeric value `47.58138052261377` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[180,1]' to a numeric value `-49.02081708766453` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[181,0]' to a numeric value `47.63496563654714` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[181,1]' to a numeric value `-49.14914986254054` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[182,0]' to a numeric value `47.69914431006652` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[182,1]' to a numeric value `-49.24045141038335` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[183,0]' to a numeric value `47.773084543464414` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[183,1]' to a numeric value `-49.2964820055091` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[184,0]' to a numeric value `47.88255010570454` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[184,1]' to a numeric value `-49.25718048963638` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[185,0]' to a numeric value `47.9909950940278` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[185,1]' to a numeric value `-49.2075052208917` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[186,0]' to a numeric value `48.033766594203954` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[186,1]' to a numeric value `-49.29782421801476` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[187,0]' to a numeric value `48.04130246069783` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[187,1]' to a numeric value `-49.45754648341404` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[188,0]' to a numeric value `48.01118722462165` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[188,1]' to a numeric value `-49.619994920892786` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[189,0]' to a numeric value `47.92551165970044` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[189,1]' to a numeric value `-49.831037637918094` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[190,0]' to a numeric value `47.923115514533514` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[190,1]' to a numeric value `-49.957452930361086` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[191,0]' to a numeric value `48.03254410828375` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[191,1]' to a numeric value `-49.96925648915769` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[192,0]' to a numeric value `48.221637640386824` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[192,1]' to a numeric value `-49.89514694306292` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[193,0]' to a numeric value `48.4384790783949` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[193,1]' to a numeric value `-49.783320334715064` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[194,0]' to a numeric value `48.636024173746875` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[194,1]' to a numeric value `-49.677849458383626` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[195,0]' to a numeric value `48.78421723675952` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[195,1]' to a numeric value `-49.607004056413466` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[196,0]' to a numeric value `48.873033403465044` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[196,1]' to a numeric value `-49.58023362048825` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,878 [WARNING] Setting Var 'y[197,0]' to a numeric value `48.90949958254506` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,879 [WARNING] Setting Var 'y[197,1]' to a numeric value `-49.59090471397148` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,879 [WARNING] Setting Var 'y[198,0]' to a numeric value `48.91430843313581` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,879 [WARNING] Setting Var 'y[198,1]' to a numeric value `-49.61946578503654` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,879 [WARNING] Setting Var 'y[199,0]' to a numeric value `48.91551459146495` outside the bounds (-10.0, 10.0).
+2026-02-21 18:03:45,879 [WARNING] Setting Var 'y[199,1]' to a numeric value `-49.639393856093925` outside the bounds (-10.0, 10.0).
+2026-02-21 18:23:40,803 [ERROR] Failed to complete training: Cannot load a SolverResults object with bad status: error
+2026-02-21 18:27:44,090 [ERROR] jax.pure_callback failed
+Traceback (most recent call last):
+  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/callback.py", line 79, in pure_callback_impl
+    return tree_util.tree_map(np.asarray, callback(*args))
+  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/jax/_src/callback.py", line 64, in __call__
+    return tree_util.tree_leaves(self.callback_func(*args, **kwargs))
+  File "/Users/mariiashapo/anaconda3/envs/node_25/lib/python3.9/site-packages/equinox/_errors.py", line 70, in raises
+    raise EqxRuntimeError(msgs[_index.item()])
+equinox._errors.EqxRuntimeError: The maximum number of solver steps was reached. Try increasing `max_steps`.
+2026-02-21 18:27:44,094 [ERROR] Failed to extract results: The maximum number of solver steps was reached. Try increasing `max_steps`.
+-------
+This error occurred during the runtime of your JAX program. Setting the environment
+variable `EQX_ON_ERROR=breakpoint` is usually the most useful way to debug such errors.
+(This can be navigated using most of the usual commands for the Python debugger:
+`u` and `d` to move through stack frames, the name of a variable to print its value,
+etc.) See also `https://docs.kidger.site/equinox/api/errors/#equinox.error_if` for more
+information.
+

@@ -14,7 +14,7 @@ DATA_PATH = REPO_ROOT / "data" / "df_train.csv"
 OUTDIR = REPO_ROOT / "results" / "pyomo_rl_runs"
 OUTDIR.mkdir(parents=True, exist_ok=True)
 
-tol = 1e-6
+tol = 1e-4
 start_date = '2015-01-15'
 
 
@@ -54,20 +54,21 @@ def main(argv=None):
     }
 
     extra_input['params_sequence'] = {'sequence_len': args.sequence_len, 'frequency': args.sequence_freq}
-    extra_input['params_model'] = {'layer_sizes': [7, 32, 1], 'penalty': 1e-5, 'w_init_method': 'xavier'}
+    extra_input['params_model'] = {'layer_sizes': [7, 32, 1], 'penalty': 1e-7, 'w_init_method': 'xavier'}
     extra_input['params_solver'] = {
         "tol": tol,
-        "dual_inf_tol": 0.1,
+        "dual_inf_tol": tol,
         "compl_inf_tol": tol,
-        "constr_viol_tol": 1e-8,
+        "constr_viol_tol": tol,
         'warm_start_init_point': 'yes',
         "halt_on_ampl_error": 'yes',
         "print_level": 5,
         "max_iter": 3000,
-        "bound_relax_factor": 1e-8,
+        "bound_relax_factor": tol,
+        "max_wall_time": 120
     }
 
-    extra_input['plot_collocation'] = True
+    extra_input['plot_collocation'] = False
     extra_input['plot_odeint'] = False
 
     runner = ExperimentRunner(start_date, args.exp, extra_input)
