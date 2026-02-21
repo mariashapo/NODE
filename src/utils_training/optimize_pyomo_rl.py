@@ -55,9 +55,9 @@ class ExperimentRunner:
             self.convergence_step = self.extra_inputs.get('convergence_steps', 5)
         
         elif optimization_aim == "converge_wall_time":
-            self.n_steps = self.extra_inputs.get('', 50)
-            self.t_start = self.extra_inputs.get('t_start', 0.1)
-            self.t_end = self.extra_inputs.get('t_end', 20.0)
+            self.n_steps = self.extra_inputs.get('', 20)
+            self.t_start = self.extra_inputs.get('t_start', 1)
+            self.t_end = self.extra_inputs.get('t_end', 80.0)
 
         self.param_combinations = self.define_param_combinations()
         self.metrics = self.initialize_metrics()
