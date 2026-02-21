@@ -47,7 +47,7 @@ class Graphs:
         labels,
         title=None,
         ylabel=None,
-        colors=('blue', 'green'),
+        colors=None,
         color_labels=('Pyomo', 'Diffrax'),
         x_label='Model Size Configuration',
         y_log=True,
@@ -60,8 +60,34 @@ class Graphs:
         legend_bbox_y=-0.02,
         legend_ncol=2,
         grid=True,
+        line_colors=None,
     ):
-        """Side-by-side boxplots with customizable sizing and legend placement."""
+        """Side-by-side boxplots with customizable sizing and legend placement.
+
+        Median lines use `line_colors` (default green) while boxes use `colors` (default rc cycle).
+        """
+
+        def _default_colors(n=2):
+            prop = plt.rcParams.get("axes.prop_cycle")
+            palette = prop.by_key().get("color", []) if prop is not None else []
+            if len(palette) >= n:
+                return palette[:n]
+            base = palette or list(plt.cm.tab10.colors)
+            return [base[i % len(base)] for i in range(n)]
+
+        def _normalize_colors(c, n=2):
+            if c is None:
+                return _default_colors(n)
+            if isinstance(c, str):
+                return [c] * n
+            c_list = list(c)
+            if len(c_list) < n:
+                base = c_list or _default_colors(n)
+                return [base[i % len(base)] for i in range(n)]
+            return c_list[:n]
+
+        colors = _normalize_colors(colors, 2)
+        line_colors = _normalize_colors(line_colors or "green", 2)
         n_groups = len(data1)
         positions_1 = [2 * i + 1.2 for i in range(n_groups)]
         positions_2 = [2 * i + 1.8 for i in range(n_groups)]
@@ -73,6 +99,7 @@ class Graphs:
             widths=widths,
             patch_artist=True,
             boxprops=dict(facecolor=colors[0]),
+            medianprops=dict(color=line_colors[0]),
         )
         box2 = ax.boxplot(
             data2,
@@ -80,6 +107,7 @@ class Graphs:
             widths=widths,
             patch_artist=True,
             boxprops=dict(facecolor=colors[1]),
+            medianprops=dict(color=line_colors[1]),
         )
 
         if title:
@@ -122,7 +150,7 @@ class Graphs:
         labels,
         title=None,
         ylabel=None,
-        colors=("blue", "green"),
+        colors=None,
         color_labels=("Pyomo", "Diffrax"),
         x_label="Model Size Configuration",
         y_log=True,
@@ -151,6 +179,16 @@ class Graphs:
         y_log_locator_base: if provided and y_log=True, use LogLocator with this base.
         y_log_mathtext: if True and y_log=True, format ticks as 10^k via LogFormatterMathtext.
         """
+
+        def _default_colors(n=2):
+            prop = plt.rcParams.get("axes.prop_cycle")
+            palette = prop.by_key().get("color", []) if prop is not None else []
+            if len(palette) >= n:
+                return palette[:n]
+            base = palette or list(plt.cm.tab10.colors)
+            return [base[i % len(base)] for i in range(n)]
+
+        colors = colors or _default_colors(2)
 
         def _summaries(data):
             center_vals, lo_vals, hi_vals = [], [], []

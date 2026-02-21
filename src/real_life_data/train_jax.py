@@ -41,6 +41,7 @@ def main(argv=None):
         help="Experiment/optimization type to run.",
     )
     parser.add_argument("--sequence_len", type=int, default=1, help="Length of date sequence window.")
+    parser.add_argument("--sequence_freq", type=int, default=3, help="Spacing/frequency between the dates if 'sequence_len' is provided > 1.")
     parser.add_argument("--n_seeds", type=int, default=1, help="Number of random seeds to run.")
     args = parser.parse_args(argv)
 
@@ -82,7 +83,7 @@ def main(argv=None):
         },
     }
 
-    extra_inputs["params_sequence"] = {"sequence_len": args.sequence_len, "frequency": 3}
+    extra_inputs["params_sequence"] = {"sequence_len": args.sequence_len, "frequency": args.sequence_freq}
     # Persist results similarly to training_convergence style
     ts = time.strftime("%Y-%m-%d_%H-%M-%S")
     subdir = OUTDIR / f"jax_rl_{ts}"

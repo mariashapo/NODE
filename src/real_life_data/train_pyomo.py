@@ -22,6 +22,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="Train Pyomo on real-life data.")
     p.add_argument("--sequence_len", type=int, default=1, help="Length of date sequence window.")
     p.add_argument("--n_seeds", type=int, default=1, help="Number of random seeds to run.")
+    p.add_argument("--sequence_freq", type=int, default=1, help="Spacing/frequency between the dates if 'sequence_len' is provided > 1.")
     p.add_argument(
         "--exp",
         default="default",
@@ -41,8 +42,8 @@ def main(argv=None):
     extra_input['params_data'] = {
         'file_path': str(DATA_PATH),
         'start_date': start_date,
-        'n_points': 300,
-        'split': 200,
+        'n_points': 600,
+        'split': 360,
         'n_days': 1,
         'm': 1,
         'prev_hour': False,
@@ -52,7 +53,7 @@ def main(argv=None):
         'encoding': {'settlement_date': 't', 'temperature': 'var1', 'hour': 'var2', 'nd': 'y'},
     }
 
-    extra_input['params_sequence'] = {'sequence_len': args.sequence_len, 'frequency': 3}
+    extra_input['params_sequence'] = {'sequence_len': args.sequence_len, 'frequency': args.sequence_freq}
     extra_input['params_model'] = {'layer_sizes': [7, 32, 1], 'penalty': 1e-5, 'w_init_method': 'xavier'}
     extra_input['params_solver'] = {
         "tol": tol,
