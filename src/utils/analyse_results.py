@@ -255,22 +255,68 @@ class Graphs:
         color='blue', label='Data Label',
         x_label='Model Size Configuration', y_log=True,
         label_fontsize=14, tick_fontsize=12, title_fontsize=16,
+        grid=True, grid_alpha=0.3, grid_linewidth=0.6, grid_style='--',
+        center_line=None,  # None | "median" | "mean" | float
+        center_line_color="gray",
+        center_line_style=":",
+        center_line_width=1.0,
+        center_line_label=None,
+        center_legend_bbox_y=-0.08,
+        center_legend_bbox_x=0.5,
+        center_legend_ncol=1,
+        center_legend_fontsize=None,
+        center_legend_loc="lower center",  # e.g., "upper right"
     ):
         n_groups = len(data)
         positions = [i + 1 for i in range(n_groups)]
         
-        plt.figure(figsize=(10, 6))
-        box = plt.boxplot(data, positions=positions, widths=0.6, patch_artist=True, boxprops=dict(facecolor=color))
+        fig, ax = plt.subplots(figsize=(10, 6))
+        box = ax.boxplot(data, positions=positions, widths=0.6, patch_artist=True, boxprops=dict(facecolor=color))
         
-        plt.title(title, fontsize=title_fontsize)
-        plt.xlabel(x_label, fontsize=label_fontsize)
-        plt.ylabel(ylabel, fontsize=label_fontsize)
+        ax.set_title(title, fontsize=title_fontsize)
+        ax.set_xlabel(x_label, fontsize=label_fontsize)
+        ax.set_ylabel(ylabel, fontsize=label_fontsize)
         if y_log:
-            plt.yscale('log')
+            ax.set_yscale('log')
         
-        plt.xticks(ticks=positions, labels=labels, fontsize=tick_fontsize)
-        plt.tick_params(axis='y', labelsize=tick_fontsize)
-        plt.grid(True)
+        ax.set_xticks(positions)
+        ax.set_xticklabels(labels, fontsize=tick_fontsize)
+        ax.tick_params(axis='y', labelsize=tick_fontsize)
+        if grid:
+            ax.grid(True, which="major", linestyle=grid_style, linewidth=grid_linewidth, alpha=grid_alpha)
+        if center_line in {"median", "mean"} or isinstance(center_line, (int, float)):
+            if isinstance(center_line, (int, float)):
+                center_val = float(center_line)
+            else:
+                flat = np.concatenate([np.ravel(np.asarray(d, dtype=float)) for d in data]) if len(data) else np.array([])
+                if flat.size == 0:
+                    center_val = None
+                else:
+                    center_val = np.nanmedian(flat) if center_line == "median" else np.nanmean(flat)
+            if center_val is not None:
+                ax.axhline(
+                    center_val,
+                    color=center_line_color,
+                    linestyle=center_line_style,
+                    linewidth=center_line_width,
+                    label=center_line_label,
+                )
+        if center_line_label:
+            legend_kwargs = dict(
+                frameon=False,
+                loc=center_legend_loc or "lower center",
+                ncol=center_legend_ncol,
+                fontsize=center_legend_fontsize,
+            )
+            if center_legend_loc == "lower center":
+                bbox_y = center_legend_bbox_y if center_legend_bbox_y is not None else -0.08
+                bbox_x = center_legend_bbox_x if center_legend_bbox_x is not None else 0.5
+                legend_kwargs.update(
+                    bbox_to_anchor=(bbox_x, bbox_y),
+                    bbox_transform=fig.transFigure,
+                )
+            ax.legend(**legend_kwargs)
+        fig.tight_layout(rect=[0, 0.05, 1, 1])
         plt.show()
 
     @staticmethod
@@ -752,6 +798,11 @@ class Results:
                 df = Results.collect_data_into_df(result, key_list)
             else:
                 df = Results.parse_sequential_training(result)
+                if key_list is not None:
+                    for j, key_name in enumerate(key_list):
+                        param = result.get(key_name)
+                        if param is not None:
+                            df[key_name] = param
             if "seed" not in df.columns:
                 df["seed"] = i
             dfs_li.append(df)
@@ -1037,6 +1088,13 @@ def plot_time_bands(
     points_marker='x',
     points_size=60,
     points_linewidth=1.8,
+    points_errorbar=False,
+    points_yerr_col=None,  # symmetric error column
+    points_lo_col=None,    # optional lower bound column
+    points_hi_col=None,    # optional upper bound column
+    points_capsize=6,
+    points_center="median",  # or "mean" when deriving on the fly
+    points_ci=(2.5, 97.5),   # percentile CI when deriving on the fly
     grid_points=200,
     tmax_quantile=0.9,
     align_grid=True,
@@ -1187,11 +1245,51 @@ def plot_time_bands(
     # Build legend with an extra entry for the dashed meaning.
     # Overlay optional single-point observations (e.g., reference runs)
     if points_df is not None and len(points_df) > 0:
-        px = np.asarray(points_df[points_x_col], dtype=float)
         y_key = points_y_col if points_y_col is not None else y_col
-        py = np.asarray(points_df[y_key], dtype=float)
-        ax.scatter(px, py, marker=points_marker, color=points_color, s=points_size,
-                   label=points_label, zorder=5, linewidths=points_linewidth)
+        if points_errorbar and not any([points_yerr_col, points_lo_col, points_hi_col]):
+            # Derive a single aligned point at mean(x) with vertical CI from y
+            x_vals = np.asarray(points_df[points_x_col], dtype=float)
+            y_vals = np.asarray(points_df[y_key], dtype=float)
+            x_mean = float(np.nanmean(x_vals))
+            if points_center == "mean":
+                py_val = float(np.nanmean(y_vals))
+            else:
+                py_val = float(np.nanmedian(y_vals))
+            lo = np.nanpercentile(y_vals, points_ci[0])
+            hi = np.nanpercentile(y_vals, points_ci[1])
+            px = np.asarray([x_mean], dtype=float)
+            py = np.asarray([py_val], dtype=float)
+            yerr = np.vstack([[py_val - lo], [hi - py_val]])
+        else:
+            px = np.asarray(points_df[points_x_col], dtype=float)
+            py = np.asarray(points_df[y_key], dtype=float)
+        if points_errorbar:
+            if points_yerr_col is not None:
+                yerr_raw = np.asarray(points_df[points_yerr_col], dtype=float)
+                yerr = np.broadcast_to(yerr_raw, (2, yerr_raw.shape[0])) if yerr_raw.ndim == 1 else yerr_raw
+            elif points_lo_col is not None and points_hi_col is not None:
+                lo = np.asarray(points_df[points_lo_col], dtype=float)
+                hi = np.asarray(points_df[points_hi_col], dtype=float)
+                yerr = np.vstack([py - lo, hi - py])
+            elif 'yerr' in locals():
+                pass  # already computed above
+            else:
+                yerr = None
+            ax.errorbar(
+                px,
+                py,
+                yerr=yerr,
+                fmt=points_marker,
+                color=points_color,
+                markersize=max(points_size ** 0.5, 1.0),
+                label=points_label,
+                linewidth=points_linewidth,
+                capsize=points_capsize,
+                zorder=5,
+            )
+        else:
+            ax.scatter(px, py, marker=points_marker, color=points_color, s=points_size,
+                       label=points_label, zorder=5, linewidths=points_linewidth)
 
     # Build legend after all artists are on the axes
     handles, labels = ax.get_legend_handles_labels()

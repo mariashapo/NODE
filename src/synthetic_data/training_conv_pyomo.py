@@ -141,9 +141,11 @@ if __name__ == "__main__":
         main()  
     else:
         main([
-            "--data_type", "ho",
-            "--exp", "regularization",
-            "--time_invariant", "True",
-            "--n_seeds", "14",
-            "--outdir", "results/pyomo_dev"
+            "--data_type", "vdp",
+            "--exp", "default",
+            "--time_invariant", "False",
+            "--n_seeds", "1",
+            # "--outdir", "results/pyomo_reg_vdp",
+            "--layer_width", "[3, 64, 2]",
+            "--penalty_lambda_reg", "0.001",
         ])

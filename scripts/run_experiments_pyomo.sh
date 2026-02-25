@@ -21,3 +21,7 @@ micromamba run -n "$ENV" python -m src.synthetic_data.training_conv_pyomo \
   --time_invariant True --no_print "False" --n_seeds 15 --outdir "$OUTDIR" --data_type "$DATA_TYPE" \
   --exp "network_size_grid_search"
 
+  micromamba run -n "$ENV" python -m src.synthetic_data.training_conv_jax \
+  --max_iter '[1000,20000]' --pretrain '[0.2,1]' --layer_width "[3,32,2]"\
+  --n_seeds 15 --outdir "$OUTDIR" --data_type "vdp" --penalty_lambda_reg 0.01 --reg_norm --time_invariant False
+
