@@ -755,34 +755,50 @@ class Results:
         """Parse results coming from the sequential training."""
         # For older logs: time_elapsed was a list (possibly multiple stages).
         # For newer JAX timing-only runs: time_elapsed is a scalar float.
-        t_info = one_seed_result.get("time_elapsed")
+        t_info = one_seed_result.get("time_elapsed", np.nan)
         pre_time = float(one_seed_result.get("pyomo_pretraining_time", 0.0) or 0.0)
-        if isinstance(t_info, (list, tuple, np.ndarray)):
-            total_elapsed = t_info[-1]
-            t_before = np.sum(t_info[:-1]) if len(t_info) > 1 else 0.0
-        else:
-            total_elapsed = float(t_info)
+        try:
+            if isinstance(t_info, (list, tuple, np.ndarray)):
+                total_elapsed = float(t_info[-1])
+                t_before = float(np.sum(t_info[:-1])) if len(t_info) > 1 else 0.0
+            else:
+                total_elapsed = float(t_info)
+                t_before = 0.0
+        except Exception:
+            total_elapsed = np.nan
             t_before = 0.0
         # Shift the timeline by any recorded Pyomo pretraining time so the
         # training curve starts after pretraining.
         t_before += pre_time
 
-        train_loss_raw = one_seed_result["train_loss"]
-        # train_loss is stored as [train_losses, test_losses]
-        training_loss = np.array(train_loss_raw[-1][0])
-        testing_loss = np.array(train_loss_raw[-1][1])
+        train_loss_raw = one_seed_result.get("train_loss")
+        training_loss = np.array([])
+        testing_loss = np.array([])
+        if train_loss_raw is not None and len(train_loss_raw) > 0:
+            last_entry = train_loss_raw[-1]
+            if isinstance(last_entry, (list, tuple)) and len(last_entry) >= 2:
+                training_loss = np.array(last_entry[0])
+                testing_loss = np.array(last_entry[1])
+            else:
+                training_loss = np.array(last_entry)
 
         n_records = len(training_loss)
-        t_per_iter = total_elapsed / max(n_records, 1)
-        
-        iters = np.arange(1, n_records + 1)
-        t_iters = iters * t_per_iter + t_before
+        if n_records > 0 and np.isfinite(total_elapsed):
+            t_per_iter = total_elapsed / max(n_records, 1)
+            iters = np.arange(1, n_records + 1)
+            t_iters = iters * t_per_iter + t_before
+        else:
+            t_iters = np.arange(1, n_records + 1, dtype=float)
 
         df = pd.DataFrame({"time_elapsed": t_iters, "mse_train": training_loss, "mse_test": testing_loss})
         df["system"] = one_seed_result.get("data_type")
         df["pretrain"] = bool(t_before > 0)
         df["max_iter"] = str(one_seed_result.get("max_iter"))
-        df["layer_width"] = one_seed_result.get("layer_widths")[1] if one_seed_result.get("layer_widths")[1] else None
+        lw = one_seed_result.get("layer_widths")
+        if isinstance(lw, (list, tuple)) and len(lw) > 1 and lw[1] is not None:
+            df["layer_width"] = lw[1]
+        else:
+            df["layer_width"] = None
         
         return df
         
