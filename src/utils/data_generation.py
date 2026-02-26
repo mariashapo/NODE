@@ -15,7 +15,7 @@ def damped_oscillation(y, t, damping_factor, omega_squared):
     return jnp.array([y[1], -damping_factor * y[1] - omega_squared * y[0]])
 
 @jit
-def van_der_pol(y, t, mu, omega, A = 0):
+def van_der_pol(y, t, mu, omega, A = 1):
     """
     Van der Pol oscillator with a periodic forcing term.
     

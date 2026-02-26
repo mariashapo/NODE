@@ -239,7 +239,7 @@ def build_parser():
     p.add_argument("--max_iter", type=parse_json, default=None, help="JAX/PT only: optional JSON list; per-model defaults are used when omitted")
     p.add_argument("--pretrain", type=parse_json, default=None, help="JAX/PT only: JSON list of fractions or []/false for none")
     p.add_argument("--penalty_lambda_reg", type=float, default=0.01, help="Regularization for Pyomo/JAX/PT")
-    p.add_argument("--reg_norm", action=argparse.BooleanOptionalAction, default=True, help="Normalize L2 regularization by parameter count (default True to match Pyomo).")
+    p.add_argument("--reg_norm", action=argparse.BooleanOptionalAction, default=False, help="Normalize L2 regularization by parameter count (default True to match Pyomo).")
     p.add_argument("--tol", type=float, default=1e-12, help="IPOPT tol (Pyomo only)")
     p.add_argument("--noise_level", type=float, default=None, help="Override noise level; if omitted, uses config value.")
     p.add_argument("--seed", type=int, default=0)
@@ -255,7 +255,7 @@ def make_pyomo_params(args) -> Dict[str, Any]:
         "layer_widths": args.layer_width if args.layer_width is not None else [2, 32, 2],
         "act_func": "tanh",
         "penalty_lambda_reg": args.penalty_lambda_reg,
-        "time_invariant": True if args.data_type != "do" else False,
+        "time_invariant": True if args.layer_width[0] == args.layer_width[-1] else False,
         "w_init_method": "xavier",
         "reg_norm": args.reg_norm,
         "skip_collocation": np.inf,
@@ -286,7 +286,7 @@ def make_jax_pt_params(args, model_type: str) -> Dict[str, Any]:
         "layer_widths": args.layer_width if args.layer_width is not None else [2, 32, 2],
         "penalty_lambda_reg": args.penalty_lambda_reg,
         "reg_norm": args.reg_norm,
-        "time_invariant": True,
+        "time_invariant": True if args.layer_width[0] == args.layer_width[-1] else False,
         "learning_rate": 1e-3,
         "max_iter": max_iter if isinstance(max_iter, Sequence) else [max_iter],
         "pretrain": args.pretrain if args.pretrain not in (False, None, []) else False,
