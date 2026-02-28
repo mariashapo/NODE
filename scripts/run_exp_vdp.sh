@@ -15,15 +15,19 @@ mkdir -p "$OUTDIR" logs
 micromamba run -n "$ENV" python -V
 
 
-# micromamba run -n "$ENV" python -m src.synthetic_data.training_conv_jax \
-#   --max_iter '[1000,25000]' --pretrain '[0.2,1]' --layer_width "[2,64,2]" \
-#   --n_seeds 15 --outdir "$OUTDIR" --data_type "$DATA_TYPE" --penalty_lambda_reg 0.001 --time_invariant True
+micromamba run -n "$ENV" python -m src.synthetic_data.training_conv_jax \
+  --max_iter '[40000]' --pretrain '[1]' --layer_width "[2,32,2]" \
+  --n_seeds 15 --outdir "$OUTDIR" --data_type "$DATA_TYPE" --penalty_lambda_reg 0.001 --time_invariant True --A 0
 
 # Single Pyomo experiments
-micromamba run -n "$ENV" python -m src.synthetic_data.training_conv_pyomo \
-  --time_invariant False --n_seeds 15 --outdir "$OUTDIR" --data_type "$DATA_TYPE" \
-  --exp "training_convergence_wall_time" --layer_width "[3,64,2]" --penalty_lambda_reg 0.001
+# micromamba run -n "$ENV" python -m src.synthetic_data.training_conv_pyomo \
+#   --time_invariant False --n_seeds 15 --outdir "$OUTDIR" --data_type "$DATA_TYPE" \
+#   --exp "training_convergence_wall_time" --layer_width "[3,64,2]" --penalty_lambda_reg 0.001
 
-# micromamba run -n "$ENV" python -m src.synthetic_data.training_conv_pytorch \
-#   --max_iter '[400,1000]' --pretrain '[0.2,1]' --layer_width "[2,64,2]" \
-#   --time_invariant True --n_seeds 15 --outdir "$OUTDIR" --data_type "$DATA_TYPE" --penalty_lambda_reg 0.001
+micromamba run -n "$ENV" python -m src.synthetic_data.training_conv_pytorch \
+  --max_iter '[400,1000]' --pretrain '[0.2,1]' --layer_width "[2,32,2]" \
+  --time_invariant True --n_seeds 15 --outdir "$OUTDIR" --data_type "$DATA_TYPE" --penalty_lambda_reg 0.001 --A 0
+
+micromamba run -n "$ENV" python -m src.synthetic_data.training_conv_pytorch \
+  --max_iter '[1200]' --pretrain '[1]' --layer_width "[2,32,2]" \
+  --time_invariant True --n_seeds 15 --outdir "$OUTDIR" --data_type "$DATA_TYPE" --penalty_lambda_reg 0.001 --A 0
