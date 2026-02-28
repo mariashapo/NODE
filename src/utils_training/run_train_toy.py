@@ -39,6 +39,7 @@ class TrainerToy:
             raise ValueError(f"Unsupported model type provided: {m}")
          
     def load_data(self):
+        forcing_A = self.data_param.get('A', None)
         if self.model_type == 'pyomo':
             self.generate_nodes()
         else:
@@ -47,7 +48,7 @@ class TrainerToy:
         # self.nodes will override t, start_time, end_time, spacing_type, n_points within generate_ode_data() function
         self.t, self.y, self.y_noisy, true_derivative = generate_ode_data(
             self.N, self.noise_level, self.ode_type, self.data_param, 
-            initial_state = self.init_state, t = self.nodes, A = self.data_param.get('A', None))
+            initial_state = self.init_state, t = self.nodes, A = forcing_A)
         
         self.true_derivative = true_derivative
         
@@ -64,7 +65,7 @@ class TrainerToy:
         self.init_state_test = self.y[-1]
         t_test, y_test, _, _ = generate_ode_data(
             self.N_test, self.noise_level, self.ode_type, self.data_param, 
-            initial_state = self.init_state_test, t = self.nodes_test)
+            initial_state = self.init_state_test, t = self.nodes_test, A = forcing_A)
         
         self.t_test = t_test
         self.y_test = y_test

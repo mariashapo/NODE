@@ -98,6 +98,7 @@ def generate_ode_data(n_points, noise_level, ode_type, params, start_time=0, end
         omega_squared = params.get("omega_squared", 1)  # Default omega_squared if not specified
         ode_func = lambda y, t: damped_oscillation(y, t, damping_factor, omega_squared)
     elif ode_type == "van_der_pol":
+        print("Van der Pol oscillator with forcing term: A =", A)
         mu = params.get("mu", 1) 
         omega = params.get("omega", 1) 
         ode_func = lambda y, t: van_der_pol(y, t, mu, omega, A)
