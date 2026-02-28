@@ -94,6 +94,7 @@ def _build_parser():
     p.add_argument("--penalty_lambda_reg", type=float, default=1e-3)
     p.add_argument("--noise_level", type=float, default=None)
     p.add_argument("--pyomo_bundle_dir", default="results/pyomo_pretrain", help="Where to look for pyomo pretrain bundles.")
+    p.add_argument("--A", type=float, default=None, help="Optional 'A' parameter for Van der Pol data generation.")
     return p
 
 def parse_args(argv=None):
@@ -149,6 +150,7 @@ def main(argv=None):
                     spacing_type="uniform",
                     model_type="jax_diffrax",
                     noise_level=args.noise_level,
+                    A=args.A,
                 )
                 params_for_seed["log"] = args.log
                 trainer.train(params_for_seed, custom_params, seed=seed)
@@ -173,6 +175,7 @@ def main(argv=None):
                 spacing_type="uniform",
                 model_type="jax_diffrax",
                 noise_level=args.noise_level,
+                A=args.A,
             )
             params_for_seed["log"] = False
             trainer.train(params_for_seed, custom_params, seed=seed)

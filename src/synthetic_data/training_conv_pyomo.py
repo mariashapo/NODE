@@ -40,6 +40,7 @@ def _build_parser():
     p.add_argument("--tol", type=float, default=None)
     p.add_argument("--time_invariant", type=str2bool, default=True)
     p.add_argument("--max_wall_time", type=float, default=None, help="Optional wall-time limit (seconds) for Pyomo solve.")
+    p.add_argument("--A", type=float, default=None, help="Optional 'A' parameter for Van der Pol data generation.")
     # training_convergence_wall_time specific arguments:
     p.add_argument("--t_range", type=json.loads, default=None)
     p.add_argument("--n_steps", type=int, default=None)
@@ -81,6 +82,7 @@ def main(argv=None):
             n_steps=args.n_steps,
             penalty_lambda_reg=args.penalty_lambda_reg,
             tol=args.tol,
+            A=args.A,
         )
         i+=1
         
@@ -112,6 +114,7 @@ def main(argv=None):
                                 "tol": args.tol,
                                 "t_range": args.t_range,
                                 "n_steps": args.n_steps,
+                                "A": args.A,
                             },
                             f,
                             indent=2,

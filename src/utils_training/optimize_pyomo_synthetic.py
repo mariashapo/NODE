@@ -45,6 +45,7 @@ class ExperimentRunner:
         """ 
         Load the trainer with the specified data type and spacing type from 'run_train_toy'.
         """
+        A = self.data_params.get('A', None)
         # default data parameters
         data_params_ho = {
             'N': 200,
@@ -62,7 +63,7 @@ class ExperimentRunner:
             'N': 200,
             'noise_level': self.data_params['noise_level'],
             'ode_type': "van_der_pol",
-            'data_param': {"mu": 1, "omega": 1},
+            'data_param': {"mu": 1, "omega": 1, **({"A": A} if A is not None else {})},
             'start_time': 0,
             'end_time': 15,
             'spacing_type': spacing_type,
@@ -110,11 +111,14 @@ class ExperimentRunner:
         n_steps=None,
         penalty_lambda_reg=None,
         tol=None,
+        A=None,
     ):
         if self.params_model['skip_collocation'] == 'inf':
             self.params_model['skip_collocation'] = np.inf
 
         self.data_params = self.config['data']
+        if A is not None:
+            self.data_params['A'] = A
         self.data_type = data_type if data_type is not None else self.data_params['data_type']
         self.params_model['layer_widths'] = layer_width if layer_width is not None else self.params_model['layer_widths']
         if penalty_lambda_reg is not None:
@@ -210,9 +214,9 @@ class ExperimentRunner:
             param_combinations = param_values
 
         elif optimization_type == 'training_convergence':
-            # TODO: [1] this really needs to be cleaned up, but some optimization types allow for multiple data inputs
-            # while the rest use the data type specified by the general config
-            data = opt_config['data']
+            data = opt_config.get('data', [self.data_type])
+            if isinstance(data, (str, bytes)):
+                data = [data]
             pre_initialize = [opt_config['pre_initialize']]
             l_range = range(opt_config['l_range'][0], opt_config['l_range'][1])
             param_combinations = list(itertools.product(data, pre_initialize, l_range))
@@ -279,6 +283,7 @@ class ExperimentRunner:
 
         elif optimization_type == 'training_convergence':
             data, pre_init, max_iter = param_comb
+            self.data_type = data
             self.params_model['params']['max_iter'] = max_iter
             if max_iter == 1:
                 self.params_model['pre_initialize'] = pre_init
@@ -288,6 +293,7 @@ class ExperimentRunner:
 
         elif optimization_type == 'training_convergence_wall_time':
             data, pre_init, max_time = param_comb
+            self.data_type = data
             self.params_model['params']['max_wall_time'] = max_time
             if param_iteration == 1:
                 self.params_model['pre_initialize'] = pre_init

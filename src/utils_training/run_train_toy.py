@@ -47,7 +47,7 @@ class TrainerToy:
         # self.nodes will override t, start_time, end_time, spacing_type, n_points within generate_ode_data() function
         self.t, self.y, self.y_noisy, true_derivative = generate_ode_data(
             self.N, self.noise_level, self.ode_type, self.data_param, 
-            initial_state = self.init_state, t = self.nodes)
+            initial_state = self.init_state, t = self.nodes, A = self.data_param.get('A', None))
         
         self.true_derivative = true_derivative
         
@@ -501,7 +501,7 @@ class TrainerToy:
             return fallback
 
     @staticmethod
-    def load_trainer(type_, spacing_type="chebyshev", model_type = "pyomo", detailed = False, noise_level: float = None):
+    def load_trainer(type_, spacing_type="chebyshev", model_type = "pyomo", detailed = False, noise_level: float = None, A: float = None):
         noise = noise_level if noise_level is not None else TrainerToy._default_noise_level()
         data_params_ho = {
             'N': 200,
@@ -519,7 +519,7 @@ class TrainerToy:
             'N': 200,
             'noise_level': noise,
             'ode_type': "van_der_pol",
-            'data_param': {"mu": 1, "omega": 1},
+            'data_param': {"mu": 1, "omega": 1, **({"A": A} if A is not None else {})},
             'start_time': 0,
             'end_time': 15,
             'spacing_type': spacing_type,

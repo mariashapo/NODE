@@ -91,6 +91,7 @@ def _build_parser():
     p.add_argument("--penalty_lambda_reg", type=float, default=1e-3)
     p.add_argument("--noise_level", type=float, default=None)
     p.add_argument("--pyomo_bundle_dir", default="results/pyomo_pretrain", help="Where to look for pyomo pretrain bundles.")
+    p.add_argument("--A", type=float, default=None, help="Optional 'A' parameter for Van der Pol data generation.")
     p.add_argument("--meta", action="store_true", default=True, help="Write run_meta.json with args/params.")
     return p
 
@@ -135,7 +136,7 @@ def main(argv=None):
                 raise ValueError(f"No PyTorch weights found in bundle {bundle_path}")
             params_for_seed["pretrain"] = False  # skip fractional pretraining; use weights instead
 
-        trainer = Trainer.load_trainer(args.data_type, spacing_type="uniform", model_type = "pytorch", noise_level=args.noise_level)
+        trainer = Trainer.load_trainer(args.data_type, spacing_type="uniform", model_type = "pytorch", noise_level=args.noise_level, A=args.A)
         params_for_seed["log"] = True
         trainer.train(params_for_seed, custom_weights, seed = seed)
         results = trainer.extract_results_pytorch()
@@ -144,7 +145,7 @@ def main(argv=None):
         results['pretrain'] = pretrain_value
         results['max_iter'] = args.max_iter
         # time should be measured off the model with no exta logging computations!!!
-        trainer = Trainer.load_trainer(args.data_type, spacing_type="uniform", model_type = "pytorch", noise_level=args.noise_level)
+        trainer = Trainer.load_trainer(args.data_type, spacing_type="uniform", model_type = "pytorch", noise_level=args.noise_level, A=args.A)
         params_for_seed["log"] = False
         trainer.train(params_for_seed, custom_weights, seed = seed)
         results_no_log = trainer.extract_results_pytorch()

@@ -15,7 +15,7 @@ def damped_oscillation(y, t, damping_factor, omega_squared):
     return jnp.array([y[1], -damping_factor * y[1] - omega_squared * y[0]])
 
 @jit
-def van_der_pol(y, t, mu, omega, A = 1):
+def van_der_pol(y, t, mu, omega, A = 0):
     """
     Van der Pol oscillator with a periodic forcing term.
     
@@ -71,7 +71,7 @@ def legendre_gauss_nodes(n, start, end):
     return jnp.array(nodes)
 
 #------------------------------------DATA GENERATION---------------------------------#
-def generate_ode_data(n_points, noise_level, ode_type, params, start_time=0, end_time=10, spacing_type="equally_spaced", initial_state=None, seed=0, t = None):
+def generate_ode_data(n_points, noise_level, ode_type, params, start_time=0, end_time=10, spacing_type="equally_spaced", initial_state=None, seed=0, t = None, A = 1):
     """If *t* is provided, it overrides start_time, end_time, spacing_type, and n_points."""
     
     if initial_state is None:
@@ -100,7 +100,7 @@ def generate_ode_data(n_points, noise_level, ode_type, params, start_time=0, end
     elif ode_type == "van_der_pol":
         mu = params.get("mu", 1) 
         omega = params.get("omega", 1) 
-        ode_func = lambda y, t: van_der_pol(y, t, mu, omega)
+        ode_func = lambda y, t: van_der_pol(y, t, mu, omega, A)
     elif ode_type == "decay":
         c = params.get("c", 1) 
         ode_func = lambda y, t: decay(y, t, c)
