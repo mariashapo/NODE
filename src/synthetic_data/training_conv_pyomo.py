@@ -146,9 +146,10 @@ if __name__ == "__main__":
         main([
             "--data_type", "vdp",
             "--exp", "default",
-            "--time_invariant", "False",
+            "--time_invariant", "True",
             "--n_seeds", "1",
             # "--outdir", "results/pyomo_reg_vdp",
-            "--layer_width", "[3, 64, 2]",
+            "--layer_width", "[2, 32, 2]",
             "--penalty_lambda_reg", "0.001",
+            "--A", "0",
         ])

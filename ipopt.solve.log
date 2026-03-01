@@ -1,9 +1,9 @@
-Solver command line: ['/Users/mariiashapo/anaconda3/envs/node_25/bin/ipopt', '/var/folders/2v/gfm3z1tn5fj8zss_r9hrgnv80000gn/T/tmp_dvgbfuf.pyomo.nl', '-AMPL', 'tol=1e-08', 'print_level=3', 'max_iter=6000', 'max_wall_time=4.42292']
+Solver command line: ['/Users/mariiashapo/anaconda3/envs/node_25/bin/ipopt', '/var/folders/2v/gfm3z1tn5fj8zss_r9hrgnv80000gn/T/tmppugdtegv.pyomo.nl', '-AMPL', 'tol=1e-08', 'print_level=3', 'max_iter=6000', 'max_wall_time=5.0']
 
 Ipopt 3.14.16: tol=1e-08
 print_level=3
 max_iter=6000
-max_wall_time=4.42292
+max_wall_time=5.0
 
 
 ******************************************************************************
@@ -12,9 +12,9 @@ This program contains Ipopt, a library for large-scale nonlinear optimization.
          For more information visit https://github.com/coin-or/Ipopt
 ******************************************************************************
 
-Total number of variables............................:      562
+Total number of variables............................:      426
                      variables with only lower bounds:        0
-                variables with lower and upper bounds:      562
+                variables with lower and upper bounds:      426
                      variables with only upper bounds:        0
 Total number of equality constraints.................:      400
 Total number of inequality constraints...............:        0
@@ -23,25 +23,25 @@ Total number of inequality constraints...............:        0
         inequality constraints with only upper bounds:        0
 
 
-Number of Iterations....: 31
+Number of Iterations....: 35
 
                                    (scaled)                 (unscaled)
-Objective...............:   5.1115937778014132e-02    5.1115937778014132e-02
-Dual infeasibility......:   5.8049501095485399e-12    5.8049501095485399e-12
-Constraint violation....:   2.6577776923719654e-09    2.6577776923719654e-09
+Objective...............:   7.2682041585464774e-01    7.2682041585464774e-01
+Dual infeasibility......:   1.0373700096747330e-02    1.0373700096747330e-02
+Constraint violation....:   5.0745170439014942e-06    5.0745170439014942e-06
 Variable bound violation:   0.0000000000000000e+00    0.0000000000000000e+00
-Complementarity.........:   2.5593925484970465e-09    2.5593925484970465e-09
-Overall NLP error.......:   2.6577776923719654e-09    2.6577776923719654e-09
+Complementarity.........:   1.5042412372345585e-04    1.5042412372345585e-04
+Overall NLP error.......:   1.0373700096747330e-02    1.0373700096747330e-02
 
 
-Number of objective function evaluations             = 51
-Number of objective gradient evaluations             = 32
-Number of equality constraint evaluations            = 51
+Number of objective function evaluations             = 38
+Number of objective gradient evaluations             = 36
+Number of equality constraint evaluations            = 38
 Number of inequality constraint evaluations          = 0
-Number of equality constraint Jacobian evaluations   = 32
+Number of equality constraint Jacobian evaluations   = 36
 Number of inequality constraint Jacobian evaluations = 0
-Number of Lagrangian Hessian evaluations             = 31
-Total seconds in IPOPT                               = 4.135
+Number of Lagrangian Hessian evaluations             = 35
+Total seconds in IPOPT                               = 5.094
 
-EXIT: Optimal Solution Found.
+EXIT: Maximum wallclock time exceeded.
 

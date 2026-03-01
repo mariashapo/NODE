@@ -242,6 +242,7 @@ def build_parser():
     p.add_argument("--reg_norm", action=argparse.BooleanOptionalAction, default=False, help="Normalize L2 regularization by parameter count (default True to match Pyomo).")
     p.add_argument("--tol", type=float, default=1e-12, help="IPOPT tol (Pyomo only)")
     p.add_argument("--noise_level", type=float, default=None, help="Override noise level; if omitted, uses config value.")
+    p.add_argument("--A", type=float, default=None, help="Optional forcing amplitude for VDP data generation.")
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--outdir", type=Path, default=Path("results/plots"))
     p.add_argument("--plot_mode", choices=["combined", "split_compare"], default="combined", help="combined: single model with train+test on one axes; split_compare: train/test split with multiple models overlaid.")
@@ -311,6 +312,7 @@ def main():
             spacing_type=spacing,
             model_type=m,
             noise_level=args.noise_level,
+            A=args.A,
         )
         if base_trainer is None:
             base_trainer = trainer  # capture data/ts from the first model

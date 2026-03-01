@@ -15222,3 +15222,295 @@ Number of nonzeros in Lagrangian Hessian.............:    20100
 2026-02-28 20:03:23,438 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
   - termination condition: maxIterations
   - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2026-03-01 00:23:03,586 [ERROR] Failed to complete training: shapes (32,2) and (3,) not aligned: 2 (dim 1) != 3 (dim 0)
+2026-03-01 00:23:05,231 [ERROR] Failed to complete training: shapes (32,2) and (3,) not aligned: 2 (dim 1) != 3 (dim 0)
+2026-03-01 00:23:06,843 [ERROR] Failed to complete training: shapes (32,2) and (3,) not aligned: 2 (dim 1) != 3 (dim 0)
+2026-03-01 00:23:08,475 [ERROR] Failed to complete training: shapes (32,2) and (3,) not aligned: 2 (dim 1) != 3 (dim 0)
+2026-03-01 00:23:10,116 [ERROR] Failed to complete training: shapes (32,2) and (3,) not aligned: 2 (dim 1) != 3 (dim 0)
+2026-03-01 00:23:11,737 [ERROR] Failed to complete training: shapes (32,2) and (3,) not aligned: 2 (dim 1) != 3 (dim 0)
+2026-03-01 00:23:13,352 [ERROR] Failed to complete training: shapes (32,2) and (3,) not aligned: 2 (dim 1) != 3 (dim 0)
+2026-03-01 00:23:14,987 [ERROR] Failed to complete training: shapes (32,2) and (3,) not aligned: 2 (dim 1) != 3 (dim 0)
+2026-03-01 00:23:16,630 [ERROR] Failed to complete training: shapes (32,2) and (3,) not aligned: 2 (dim 1) != 3 (dim 0)
+2026-03-01 00:23:18,267 [ERROR] Failed to complete training: shapes (32,2) and (3,) not aligned: 2 (dim 1) != 3 (dim 0)
+2026-03-01 00:23:19,907 [ERROR] Failed to complete training: shapes (32,2) and (3,) not aligned: 2 (dim 1) != 3 (dim 0)
+2026-03-01 00:23:21,579 [ERROR] Failed to complete training: shapes (32,2) and (3,) not aligned: 2 (dim 1) != 3 (dim 0)
+2026-03-01 00:23:23,248 [ERROR] Failed to complete training: shapes (32,2) and (3,) not aligned: 2 (dim 1) != 3 (dim 0)
+2026-03-01 00:23:24,883 [ERROR] Failed to complete training: shapes (32,2) and (3,) not aligned: 2 (dim 1) != 3 (dim 0)
+2026-03-01 00:23:26,564 [ERROR] Failed to complete training: shapes (32,2) and (3,) not aligned: 2 (dim 1) != 3 (dim 0)
+2026-03-01 00:24:31,662 [ERROR] Failed to complete training: shapes (32,2) and (3,) not aligned: 2 (dim 1) != 3 (dim 0)
+2026-03-01 00:27:18,135 [ERROR] Failed to complete training: shapes (32,2) and (3,) not aligned: 2 (dim 1) != 3 (dim 0)
+2026-03-01 01:26:22,331 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2026-03-01 01:26:47,278 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2026-03-01 01:27:17,417 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2026-03-01 01:27:32,746 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2026-03-01 01:28:04,707 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2026-03-01 01:28:20,787 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2026-03-01 01:28:50,263 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2026-03-01 01:29:15,654 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2026-03-01 01:29:17,797 [WARNING] Setting Var 'y[32,1]' to a numeric value `-10.084463876613635` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,797 [WARNING] Setting Var 'y[33,1]' to a numeric value `-10.628079369602785` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,797 [WARNING] Setting Var 'y[34,1]' to a numeric value `-11.18207579179531` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[35,1]' to a numeric value `-11.74590641561608` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[36,1]' to a numeric value `-12.319014808318036` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[37,1]' to a numeric value `-12.900835381114375` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[38,1]' to a numeric value `-13.490793947346635` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[39,1]' to a numeric value `-14.088308289137798` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[40,1]' to a numeric value `-14.692788731971202` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[41,1]' to a numeric value `-15.303638726628291` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[42,1]' to a numeric value `-15.920255437910802` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[43,1]' to a numeric value `-16.542030339566484` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[44,1]' to a numeric value `-17.16834981483115` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[45,1]' to a numeric value `-17.798595761994505` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[46,1]' to a numeric value `-18.432146204391948` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[47,1]' to a numeric value `-19.068375904220684` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[48,1]' to a numeric value `-19.706656979573893` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[49,1]' to a numeric value `-20.34635952408457` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[50,1]' to a numeric value `-20.986852228567084` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[51,1]' to a numeric value `-21.62750300404324` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[52,1]' to a numeric value `-22.267679605537758` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[53,1]' to a numeric value `-22.90675025602791` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[54,1]' to a numeric value `-23.544084269931073` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[55,1]' to a numeric value `-24.17905267551537` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[56,1]' to a numeric value `-24.811028835618792` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[57,1]' to a numeric value `-25.439389066064415` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[58,1]' to a numeric value `-26.06351325116146` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[59,1]' to a numeric value `-26.682785455684392` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[60,1]' to a numeric value `-27.29659453272683` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[61,1]' to a numeric value `-27.904334726829408` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[62,1]' to a numeric value `-28.505406271787464` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[63,1]' to a numeric value `-29.09921598254755` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[64,1]' to a numeric value `-29.68517784060949` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[65,1]' to a numeric value `-30.26271357235561` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[66,1]' to a numeric value `-30.831253219736872` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[67,1]' to a numeric value `-31.390235702752427` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[68,1]' to a numeric value `-31.93910937316744` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[69,1]' to a numeric value `-32.47733255892319` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[70,1]' to a numeric value `-33.004374098701376` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[71,1]' to a numeric value `-33.519713866115865` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[72,1]' to a numeric value `-34.02284328301399` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[73,1]' to a numeric value `-34.51326582138099` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[74,1]' to a numeric value `-34.99049749335248` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[75,1]' to a numeric value `-35.45406732885059` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[76,1]' to a numeric value `-35.90351784037323` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[77,1]' to a numeric value `-36.33840547447711` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[78,1]' to a numeric value `-36.7583010495088` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,798 [WARNING] Setting Var 'y[79,1]' to a numeric value `-37.162790179151706` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,799 [WARNING] Setting Var 'y[80,1]' to a numeric value `-37.551473681370915` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,799 [WARNING] Setting Var 'y[81,1]' to a numeric value `-37.92396797235129` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,799 [WARNING] Setting Var 'y[82,1]' to a numeric value `-38.2799054450397` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,799 [WARNING] Setting Var 'y[83,1]' to a numeric value `-38.61893483191633` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,799 [WARNING] Setting Var 'y[84,1]' to a numeric value `-38.940721551635704` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,799 [WARNING] Setting Var 'y[85,1]' to a numeric value `-39.24494803919183` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,799 [WARNING] Setting Var 'y[86,1]' to a numeric value `-39.53131405927721` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,799 [WARNING] Setting Var 'y[87,1]' to a numeric value `-39.799537002518115` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,799 [WARNING] Setting Var 'y[88,1]' to a numeric value `-40.04935216427958` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,799 [WARNING] Setting Var 'y[89,1]' to a numeric value `-40.28051300573778` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,799 [WARNING] Setting Var 'y[90,1]' to a numeric value `-40.492791396913546` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,799 [WARNING] Setting Var 'y[91,1]' to a numeric value `-40.68597784132374` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,799 [WARNING] Setting Var 'y[92,1]' to a numeric value `-40.85988168181349` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,799 [WARNING] Setting Var 'y[93,1]' to a numeric value `-41.01433128686653` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,799 [WARNING] Setting Var 'y[94,1]' to a numeric value `-41.14917421595229` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,799 [WARNING] Setting Var 'y[95,1]' to a numeric value `-41.264277360199245` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,799 [WARNING] Setting Var 'y[96,1]' to a numeric value `-41.35952704666208` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,799 [WARNING] Setting Var 'y[97,1]' to a numeric value `-41.43482905970512` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,799 [WARNING] Setting Var 'y[98,1]' to a numeric value `-41.49010832918216` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:17,799 [WARNING] Setting Var 'y[99,1]' to a numeric value `-41.525306019942285` outside the bounds (-10.0, 10.0).
+2026-03-01 01:29:31,550 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2026-03-01 01:30:11,968 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2026-03-01 01:30:28,218 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2026-03-01 01:31:00,351 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[126,0]' to a numeric value `10.042188840173905` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[127,0]' to a numeric value `10.175239557585586` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[128,0]' to a numeric value `10.30866789909597` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[129,0]' to a numeric value `10.443281334456483` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[130,0]' to a numeric value `10.57969592408255` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[131,0]' to a numeric value `10.71611442100758` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[132,0]' to a numeric value `10.851979352154714` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[133,0]' to a numeric value `10.987118326498068` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[134,0]' to a numeric value `11.12136915737062` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[135,0]' to a numeric value `11.254579702295539` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[136,0]' to a numeric value `11.386607679865376` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[137,0]' to a numeric value `11.517320465269558` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[138,0]' to a numeric value `11.646594866093562` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[139,0]' to a numeric value `11.774316880028506` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[140,0]' to a numeric value `11.900391410905007` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[141,0]' to a numeric value `12.025018562307077` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[142,0]' to a numeric value `12.148276923836276` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[143,0]' to a numeric value `12.270120647084305` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[144,0]' to a numeric value `12.390506141428256` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[145,0]' to a numeric value `12.509391960064878` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[146,0]' to a numeric value `12.626738685918243` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[147,0]' to a numeric value `12.742508817985298` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[148,0]' to a numeric value `12.856666658661151` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[149,0]' to a numeric value `12.969178202561674` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[150,0]' to a numeric value `13.080011027334598` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[151,0]' to a numeric value `13.189134186922765` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[152,0]' to a numeric value `13.296518107713844` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[153,0]' to a numeric value `13.402134487980357` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[154,0]' to a numeric value `13.50595620098227` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[155,0]' to a numeric value `13.607957202071928` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[156,0]' to a numeric value `13.70811244010757` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[157,0]' to a numeric value `13.806397773447921` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[158,0]' to a numeric value `13.90278989076582` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[159,0]' to a numeric value `13.997266236884194` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[160,0]' to a numeric value `14.089804873501544` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[161,0]' to a numeric value `14.180381517275029` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[162,0]' to a numeric value `14.268972631984953` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[163,0]' to a numeric value `14.355556338383737` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,942 [WARNING] Setting Var 'y[164,0]' to a numeric value `14.440111255360002` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[165,0]' to a numeric value `14.522616504936014` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[166,0]' to a numeric value `14.603051717156427` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[167,0]' to a numeric value `14.681397034867052` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[168,0]' to a numeric value `14.757633118382811` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[169,0]' to a numeric value `14.831741150043554` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[170,0]' to a numeric value `14.903702838656553` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[171,0]' to a numeric value `14.973500423824468` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[172,0]' to a numeric value `15.041116680157376` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[173,0]' to a numeric value `15.106534921367592` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[174,0]' to a numeric value `15.169739004245743` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[175,0]' to a numeric value `15.23071333251681` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[176,0]' to a numeric value `15.289442860574512` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[177,0]' to a numeric value `15.345913097092636` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[178,0]' to a numeric value `15.400110108511736` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[179,0]' to a numeric value `15.452020522399668` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[180,0]' to a numeric value `15.5016315306844` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[181,0]' to a numeric value `15.548930892757543` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[182,0]' to a numeric value `15.59390693844695` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[183,0]' to a numeric value `15.636548570856798` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[184,0]' to a numeric value `15.676845269073466` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[185,0]' to a numeric value `15.71478709073539` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[186,0]' to a numeric value `15.750364674464901` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[187,0]' to a numeric value `15.783569242159727` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[188,0]' to a numeric value `15.8143926011411` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[189,0]' to a numeric value `15.84282714615397` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[190,0]' to a numeric value `15.868865861212168` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[191,0]' to a numeric value `15.892502321274993` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[192,0]' to a numeric value `15.913730693728171` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[193,0]' to a numeric value `15.932545739607814` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[194,0]' to a numeric value `15.948942814414668` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[195,0]' to a numeric value `15.962917868089445` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[196,0]' to a numeric value `15.974467442747743` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[197,0]' to a numeric value `15.983588662569915` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[198,0]' to a numeric value `15.990279185592176` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:00,943 [WARNING] Setting Var 'y[199,0]' to a numeric value `15.994536843485726` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,162 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[121,0]' to a numeric value `10.070700790520029` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[122,0]' to a numeric value `10.21416518435699` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[123,0]' to a numeric value `10.35616134027444` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[124,0]' to a numeric value `10.496879767730857` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[125,0]' to a numeric value `10.636495235960771` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[126,0]' to a numeric value `10.775138339219668` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[127,0]' to a numeric value `10.912780331316172` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[128,0]' to a numeric value `11.0493930734011` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[129,0]' to a numeric value `11.184952977769731` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[130,0]' to a numeric value `11.31943582400126` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[131,0]' to a numeric value `11.452816793548362` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[132,0]' to a numeric value `11.585070506513823` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[133,0]' to a numeric value `11.71617106040778` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[134,0]' to a numeric value `11.846092070675994` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[135,0]' to a numeric value `11.974806712787617` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[136,0]' to a numeric value `12.102287765669645` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[137,0]' to a numeric value `12.228507656275077` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[138,0]' to a numeric value `12.35343850507247` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[139,0]' to a numeric value `12.477052172246069` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[140,0]' to a numeric value `12.59932030439819` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[141,0]' to a numeric value `12.720214381548859` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[142,0]' to a numeric value `12.839705764231578` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[143,0]' to a numeric value `12.957765740489387` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[144,0]' to a numeric value `13.07436557258056` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[145,0]' to a numeric value `13.189476543210086` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,750 [WARNING] Setting Var 'y[146,0]' to a numeric value `13.303070001109818` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[147,0]' to a numeric value `13.415117405798124` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[148,0]' to a numeric value `13.52559037135793` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[149,0]' to a numeric value `13.634460709081159` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[150,0]' to a numeric value `13.74170046883673` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[151,0]' to a numeric value `13.847281979029198` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[152,0]' to a numeric value `13.95117788502541` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[153,0]' to a numeric value `14.053361185936922` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[154,0]' to a numeric value `14.153805530784899` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[155,0]' to a numeric value `14.252488805876071` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[156,0]' to a numeric value `14.349387738309755` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[157,0]' to a numeric value `14.444478419973164` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[158,0]' to a numeric value `14.537737388882832` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[159,0]' to a numeric value `14.629141634975857` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[160,0]' to a numeric value `14.718668605789576` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[161,0]' to a numeric value `14.806296212028188` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[162,0]' to a numeric value `14.892002833015065` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[163,0]' to a numeric value `14.975767322029299` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[164,0]' to a numeric value `15.057569011525208` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[165,0]' to a numeric value `15.137387718233514` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[166,0]' to a numeric value `15.215203748142908` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[167,0]' to a numeric value `15.290997901360845` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[168,0]' to a numeric value `15.36475147685221` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[169,0]' to a numeric value `15.436446277054896` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[170,0]' to a numeric value `15.506064612370961` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[171,0]' to a numeric value `15.573589305532387` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[172,0]' to a numeric value `15.639003695840291` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[173,0]' to a numeric value `15.702291643276572` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[174,0]' to a numeric value `15.763437532486972` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[175,0]' to a numeric value `15.822426276634571` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[176,0]' to a numeric value `15.879243321122722` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[177,0]' to a numeric value `15.93387464718655` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,751 [WARNING] Setting Var 'y[178,0]' to a numeric value `15.98630677535209` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,752 [WARNING] Setting Var 'y[179,0]' to a numeric value `16.036526768762165` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,752 [WARNING] Setting Var 'y[180,0]' to a numeric value `16.08452223636823` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,752 [WARNING] Setting Var 'y[181,0]' to a numeric value `16.130281335987203` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,752 [WARNING] Setting Var 'y[182,0]' to a numeric value `16.173792777222587` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,752 [WARNING] Setting Var 'y[183,0]' to a numeric value `16.215045824248943` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,752 [WARNING] Setting Var 'y[184,0]' to a numeric value `16.254030298458865` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,752 [WARNING] Setting Var 'y[185,0]' to a numeric value `16.290736580971444` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,752 [WARNING] Setting Var 'y[186,0]' to a numeric value `16.325155615001037` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,752 [WARNING] Setting Var 'y[187,0]' to a numeric value `16.357278908084854` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,752 [WARNING] Setting Var 'y[188,0]' to a numeric value `16.387098534167087` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,752 [WARNING] Setting Var 'y[189,0]' to a numeric value `16.41460713553601` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,752 [WARNING] Setting Var 'y[190,0]' to a numeric value `16.439797924607756` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,752 [WARNING] Setting Var 'y[191,0]' to a numeric value `16.462664685544357` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,752 [WARNING] Setting Var 'y[192,0]' to a numeric value `16.48320177568058` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,752 [WARNING] Setting Var 'y[193,0]' to a numeric value `16.50140412670065` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,752 [WARNING] Setting Var 'y[194,0]' to a numeric value `16.51726724541779` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,752 [WARNING] Setting Var 'y[195,0]' to a numeric value `16.530787213741778` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,752 [WARNING] Setting Var 'y[196,0]' to a numeric value `16.54196068647922` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,752 [WARNING] Setting Var 'y[197,0]' to a numeric value `16.55078488154468` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,752 [WARNING] Setting Var 'y[198,0]' to a numeric value `16.55725753331456` outside the bounds (-10.0, 10.0).
+2026-03-01 01:31:24,752 [WARNING] Setting Var 'y[199,0]' to a numeric value `16.561376544130656` outside the bounds (-10.0, 10.0).
+2026-03-01 01:32:13,578 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2026-03-01 09:36:41,717 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2026-03-01 09:37:20,520 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2026-03-01 09:37:37,756 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.
+2026-03-01 09:38:13,251 [WARNING] Loading a SolverResults object with a warning status into model.name="unknown";
+  - termination condition: maxIterations
+  - message from solver: Ipopt 3.14.16\x3a Maximum Wallclock Time Exceeded.

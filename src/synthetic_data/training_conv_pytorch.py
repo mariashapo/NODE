@@ -90,6 +90,7 @@ def _build_parser():
     p.add_argument("--time_invariant", type=str2bool, default=True)
     p.add_argument("--penalty_lambda_reg", type=float, default=1e-3)
     p.add_argument("--noise_level", type=float, default=None)
+    p.add_argument("--log", type=json.loads, default=100, help="Logging frequency (epochs) or False for none.")
     p.add_argument("--pyomo_bundle_dir", default="results/pyomo_pretrain", help="Where to look for pyomo pretrain bundles.")
     p.add_argument("--A", type=float, default=None, help="Optional 'A' parameter for Van der Pol data generation.")
     p.add_argument("--meta", action="store_true", default=True, help="Write run_meta.json with args/params.")
@@ -115,6 +116,7 @@ def main(argv=None):
         'rtol': 1e-3,
         'atol': 1e-6,
         'reg_norm': args.reg_norm,
+        'log': args.log,
     }
     
     
@@ -137,7 +139,7 @@ def main(argv=None):
             params_for_seed["pretrain"] = False  # skip fractional pretraining; use weights instead
 
         trainer = Trainer.load_trainer(args.data_type, spacing_type="uniform", model_type = "pytorch", noise_level=args.noise_level, A=args.A)
-        params_for_seed["log"] = True
+        params_for_seed["log"] = args.log
         trainer.train(params_for_seed, custom_weights, seed = seed)
         results = trainer.extract_results_pytorch()
         results['train_loss'] = trainer.losses
